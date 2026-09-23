@@ -1,0 +1,31 @@
+{
+  "name": "remindme",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "npm run dev -w @remindme/api",
+    "dev:web": "npm run dev -w @remindme/web",
+    "build": "npm run build -w @remindme/api && npm run build -w @remindme/web",
+    "build:web": "npm run build -w @remindme/web",
+    "start": "npm run start -w @remindme/api",
+    "worker": "npm run worker -w @remindme/api",
+    "test": "npm run test -w @remindme/api",
+    "lint": "npm run lint -w @remindme/api && npm run lint -w @remindme/web",
+    "lint:web": "npm run lint -w @remindme/web",
+    "typecheck": "npm run typecheck -w @remindme/api && npm run typecheck -w @remindme/web",
+    "typecheck:web": "npm run typecheck -w @remindme/web",
+    "prisma:validate": "npm run prisma:validate -w @remindme/api",
+    "prisma:migrate": "npm run prisma:migrate -w @remindme/api",
+    "prisma:generate": "npm run prisma:generate -w @remindme/api",
+    "prisma:seed": "npm run prisma:seed -w @remindme/api",
+    "prisma:deploy": "npm run prisma:deploy -w @remindme/api"
+  },
+  "devDependencies": {
+    "@esbuild/win32-x64": "^0.28.2"
+  }
+}

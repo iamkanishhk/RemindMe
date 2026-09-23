@@ -1,0 +1,133 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+enum RepeatRule {
+  NONE
+  DAILY
+  WEEKLY
+}
+
+enum ReminderStatus {
+  SCHEDULED
+  CALLING
+  ANSWERED
+  COMPLETED
+  NO_ANSWER
+  BUSY
+  FAILED
+  CANCELED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  ON_HOLD
+  CANCELLED
+  EXPIRED
+  FAILED
+}
+
+model User {
+  id            String         @id @default(cuid())
+  clerkUserId   String         @unique
+  email         String         @unique
+  phoneNumbers  PhoneNumber[]
+  reminders     Reminder[]
+  subscriptions Subscription[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@map("users")
+}
+
+model Subscription {
+  id                     String             @id @default(cuid())
+  user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                 String
+  providerCustomerId     String
+  providerSubscriptionId String             @unique
+  status                 SubscriptionStatus
+  productId              String
+  amountMinorUnits       Int
+  currency               String
+  interval               String?
+  currentPeriodEnd       DateTime?
+  trialEndsAt            DateTime?
+  billingStartedAt       DateTime?
+  trialCallsUsed         Int                @default(0)
+  cancelAtPeriodEnd      Boolean            @default(false)
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  @@index([userId, status])
+  @@map("subscriptions")
+}
+
+model BillingEvent {
+  id          String   @id @default(cuid())
+  webhookId   String   @unique
+  eventType   String
+  processedAt DateTime @default(now())
+
+  @@map("billing_events")
+}
+
+model PhoneNumber {
+  id         String    @id @default(cuid())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId     String
+  e164       String    @unique
+  verified   Boolean   @default(false)
+  verifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  reminders  Reminder[]
+
+  @@index([userId])
+  @@map("phone_numbers")
+}
+
+model Reminder {
+  id            String         @id @default(cuid())
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String
+  title         String
+  message       String
+  timezone      String
+  scheduledAt   DateTime
+  nextRunAt     DateTime?
+  repeatRule    RepeatRule     @default(NONE)
+  isEnabled     Boolean        @default(true)
+  status        ReminderStatus @default(SCHEDULED)
+  lastCallAt    DateTime?
+  phoneNumber   PhoneNumber?   @relation(fields: [phoneNumberId], references: [id], onDelete: SetNull)
+  phoneNumberId String?
+  attempts      CallAttempt[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([userId, nextRunAt])
+  @@index([status, nextRunAt])
+  @@map("reminders")
+}
+
+model CallAttempt {
+  id             String         @id @default(cuid())
+  reminder       Reminder       @relation(fields: [reminderId], references: [id], onDelete: Cascade)
+  reminderId     String
+  startedAt      DateTime       @default(now())
+  endedAt        DateTime?
+  providerCallId String?        @unique
+  status         ReminderStatus
+  detail         String?
+
+  @@index([reminderId])
+  @@index([startedAt])
+  @@map("call_attempts")
+}
