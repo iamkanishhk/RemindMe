@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>New Reminder</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#4f46e5',
+                            600: '#3730a3',
+                            accent: '#3b82f6',
+                            accentHover: '#2563eb'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+        }
+        /* Custom scrollbar hiding */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Glassmorphic/Card touches */
+        .ios-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+        }
+        .drag-box {
+            touch-action: none;
+            cursor: ns-resize;
+            transition: transform 0.1s ease, border-color 0.2s, box-shadow 0.2s;
+        }
+        .drag-box:active {
+            transform: scale(0.97);
+        }
+        .date-chip-active {
+            background-color: #3b82f6;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+        }
+        /* Discrete drag overlay modal */
+        .wheel-modal {
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex items-center justify-center p-2 sm:p-4 bg-slate-100">
+
+    <!-- Main Device Wrapper -->
+    <div class="w-full max-w-sm h-full max-h-[820px] bg-white rounded-[38px] shadow-2xl border-[6px] border-slate-900/10 flex flex-col justify-between overflow-hidden relative p-4 sm:p-5">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between pt-1 pb-2">
+            <button id="backBtn" class="w-9 h-9 flex items-center justify-center rounded-full text-slate-600 hover:bg-slate-100 active:bg-slate-200 transition">
+                <i class="fa-solid fa-chevron-left text-lg"></i>
+            </button>
+            <h1 class="text-lg font-bold text-slate-800 tracking-tight">New Reminder</h1>
+            <div class="w-9"></div> <!-- Placeholder for layout balance -->
+        </div>
+
+        <!-- Main Form Scroll-Free Body -->
+        <div class="flex-1 flex flex-col justify-between py-1 gap-2.5">
+            
+            <!-- Time Picker Card -->
+            <div class="ios-card rounded-2xl p-3 border border-slate-100 flex items-center justify-between gap-2 shadow-sm bg-slate-50/50">
+                
+                <!-- Hour Picker -->
+                <div id="hourBox" class="drag-box flex-1 h-16 bg-white rounded-xl border border-slate-200/80 flex flex-col items-center justify-center shadow-xs hover:border-blue-400 relative group">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5 pointer-events-none">Hour</span>
+                    <span id="hourDisplay" class="text-2xl font-bold text-slate-800 pointer-events-none">08</span>
+                    <div class="absolute right-1.5 top-1/2 -translate-y-1/2 flex flex-col text-[8px] text-slate-300 group-hover:text-blue-500">
+                        <i class="fa-solid fa-chevron-up"></i>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                </div>
+
+                <span class="text-2xl font-bold text-slate-400">:</span>
+
+                <!-- Minute Picker -->
+                <div id="minuteBox" class="drag-box flex-1 h-16 bg-white rounded-xl border border-slate-200/80 flex flex-col items-center justify-center shadow-xs hover:border-blue-400 relative group">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5 pointer-events-none">Minute</span>
+                    <span id="minuteDisplay" class="text-2xl font-bold text-slate-800 pointer-events-none">30</span>
+                    <div class="absolute right-1.5 top-1/2 -translate-y-1/2 flex flex-col text-[8px] text-slate-300 group-hover:text-blue-500">
+                        <i class="fa-solid fa-chevron-up"></i>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                </div>
+
+                <!-- AM / PM Toggle Box -->
+                <div id="ampmBox" class="drag-box w-20 h-16 bg-white rounded-xl border border-slate-200/80 flex flex-col items-center justify-center shadow-xs hover:border-blue-400 cursor-pointer active:scale-95 transition">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5 pointer-events-none">Period</span>
+                    <span id="ampmDisplay" class="text-lg font-bold text-blue-600 pointer-events-none">PM</span>
+                </div>
+            </div>
+
+            <!-- Date Drag Picker -->
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-slate-500 flex items-center gap-1.5 px-1">
+                    <i class="fa-regular fa-calendar text-blue-500"></i>
+                    <span>Scheduled Date</span>
+                    <span class="text-[10px] text-slate-400 font-normal ml-auto">(Drag horizontally to change)</span>
+                </label>
+                
+                <div id="dateScrollContainer" class="drag-box flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-0.5 cursor-grab active:cursor-grabbing">
+                    <!-- Dynamic Date Chips rendered via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Title Input -->
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-slate-500 px-1">Reminder title</label>
+                <div class="relative">
+                    <input type="text" id="reminderTitle" value="Take evening medication" 
+                        class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition shadow-xs">
+                </div>
+            </div>
+
+            <!-- Message Input -->
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-slate-500 px-1">Message</label>
+                <textarea id="reminderMessage" rows="2" 
+                    class="w-full bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-sm text-slate-800 font-normal focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition resize-none shadow-xs">Take your medication with a glass of water.</textarea>
+            </div>
+
+            <!-- Repeat Pill Selector -->
+            <div class="space-y-1">
+                <label class="text-xs font-semibold text-slate-500 px-1">Repeat</label>
+                <div class="grid grid-cols-3 gap-1.5 p-1 bg-slate-100/80 rounded-xl border border-slate-200/60">
+                    <button type="button" data-repeat="Does not repeat" class="repeat-btn py-1.5 text-xs font-semibold rounded-lg transition bg-white text-blue-600 shadow-xs border border-slate-200/80">Does not repeat</button>
+                    <button type="button" data-repeat="Daily" class="repeat-btn py-1.5 text-xs font-medium text-slate-500 rounded-lg transition hover:text-slate-700">Daily</button>
+                    <button type="button" data-repeat="Weekly" class="repeat-btn py-1.5 text-xs font-medium text-slate-500 rounded-lg transition hover:text-slate-700">Weekly</button>
+                </div>
+            </div>
+
+            <!-- Main CTA Button -->
+            <div class="pt-1">
+                <button id="scheduleBtn" class="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-semibold py-3 rounded-xl shadow-lg shadow-blue-500/30 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-bell text-sm"></i>
+                    <span>Schedule Reminder</span>
+                </button>
+            </div>
+
+            <!-- Dynamic Bottom Status Preview -->
+            <div class="bg-blue-50/70 border border-blue-100 rounded-xl p-3 flex items-start gap-2.5">
+                <div class="w-7 h-7 rounded-full bg-blue-500/10 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
+                    <i class="fa-solid fa-phone text-xs"></i>
+                </div>
+                <p id="livePreviewText" class="text-xs text-blue-900/80 leading-relaxed font-medium">
+                    At <span id="previewTime" class="font-bold">8:30 PM</span> on <span id="previewDate" class="font-bold">Today</span>, we'll trigger: <span id="previewMsg" class="italic text-slate-600">"Take your medication with a glass of water."</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Toast / Modal -->
+    <div id="confirmModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-200">
+        <div class="bg-white rounded-2xl p-5 w-full max-w-xs shadow-2xl transform scale-90 transition-transform duration-200 text-center space-y-3">
+            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-800">Reminder Scheduled!</h3>
+            <p id="modalDetail" class="text-xs text-slate-500 leading-relaxed"></p>
+            <button id="closeModalBtn" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 text-xs rounded-xl transition">
+                Done
+            </button>
+        </div>
+    </div>
+
+    <!-- Drag Help Tooltip Toast -->
+    <div id="dragTooltip" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800/90 text-white text-[11px] px-3 py-1.5 rounded-full shadow-lg pointer-events-none transition opacity-0">
+        Drag up/down to change value
+    </div>
+
+    <script>
+        // State Management
+        const state = {
+            hour: 8,
+            minute: 30,
+            ampm: 'PM',
+            selectedDateIndex: 0,
+            dates: [],
+            title: 'Take evening medication',
+            message: 'Take your medication with a glass of water.',
+            repeat: 'Does not repeat'
+        };
+
+        // DOM Elements
+        const hourDisplay = document.getElementById('hourDisplay');
+        const minuteDisplay = document.getElementById('minuteDisplay');
+        const ampmDisplay = document.getElementById('ampmDisplay');
+        const hourBox = document.getElementById('hourBox');
+        const minuteBox = document.getElementById('minuteBox');
+        const ampmBox = document.getElementById('ampmBox');
+        const dateScrollContainer = document.getElementById('dateScrollContainer');
+        const reminderTitle = document.getElementById('reminderTitle');
+        const reminderMessage = document.getElementById('reminderMessage');
+        const livePreviewText = document.getElementById('livePreviewText');
+        const previewTime = document.getElementById('previewTime');
+        const previewDate = document.getElementById('previewDate');
+        const previewMsg = document.getElementById('previewMsg');
+        const scheduleBtn = document.getElementById('scheduleBtn');
+        const confirmModal = document.getElementById('confirmModal');
+        const modalDetail = document.getElementById('modalDetail');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const dragTooltip = document.getElementById('dragTooltip');
+
+        function generateDates() {
+            const list = [];
+            const today = new Date();
+            
+            for (let i = 0; i < 14; i++) {
+                const d = new Date(today);
+                d.setDate(today.getDate() + i);
+
+                let label = '';
+                if (i === 0) label = 'Today';
+                else if (i === 1) label = 'Tomorrow';
+                else {
+                    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                    label = days[d.getDay()];
+                }
+
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const formattedStr = `${label}, ${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+                
+                list.push({
+                    shortLabel: label,
+                    dayNum: d.getDate(),
+                    month: months[d.getMonth()],
+                    fullString: formattedStr,
+                    rawDate: d
+                });
+            }
+            state.dates = list;
+        }
+
+        // Render Date Chips
+        function renderDateChips() {
+            dateScrollContainer.innerHTML = '';
+            state.dates.forEach((dateObj, idx) => {
+                const isSelected = idx === state.selectedDateIndex;
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = `shrink-0 px-3.5 py-2 rounded-xl text-xs font-medium transition-all flex flex-col items-center justify-center border ${
+                    isSelected 
+                        ? 'date-chip-active border-blue-500 font-semibold scale-105' 
+                        : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
+                }`;
+                chip.innerHTML = `
+                    <span class="text-[10px] uppercase opacity-80">${dateObj.shortLabel}</span>
+                    <span class="text-xs font-bold">${dateObj.month} ${dateObj.dayNum}</span>
+                `;
+                chip.addEventListener('click', () => {
+                    state.selectedDateIndex = idx;
+                    renderDateChips();
+                    updatePreview();
+                });
+                dateScrollContainer.appendChild(chip);
+            });
+        }
+
+        function setupDragControl(element, type) {
+            let startY = 0;
+            let currentVal = 0;
+            let isDragging = false;
+
+            const onStart = (e) => {
+                isDragging = true;
+                startY = e.touches ? e.touches[0].clientY : e.clientY;
+                currentVal = type === 'hour' ? state.hour : state.minute;
+                showTooltip();
+                element.classList.add('border-blue-500', 'bg-blue-50/20');
+            };
+
+            const onMove = (e) => {
+                if (!isDragging) return;
+                const currentY = e.touches ? e.touches[0].clientY : e.clientY;
+                const deltaY = startY - currentY; // Up is positive
+                
+                // Sensitivity threshold
+                const step = Math.round(deltaY / 12);
+
+                if (type === 'hour') {
+                    let newHour = ((currentVal - 1 + step) % 12);
+                    if (newHour < 0) newHour += 12;
+                    state.hour = newHour + 1;
+                    hourDisplay.textContent = state.hour.toString().padStart(2, '0');
+                } else if (type === 'minute') {
+                    let newMin = (currentVal + step) % 60;
+                    if (newMin < 0) newMin += 60;
+                    state.minute = newMin;
+                    minuteDisplay.textContent = state.minute.toString().padStart(2, '0');
+                }
+                updatePreview();
+            };
+
+            const onEnd = () => {
+                if (isDragging) {
+                    isDragging = false;
+                    hideTooltip();
+                    element.classList.remove('border-blue-500', 'bg-blue-50/20');
+                }
+            };
+
+            // Mouse Events
+            element.addEventListener('mousedown', onStart);
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('mouseup', onEnd);
+
+            // Touch Events
+            element.addEventListener('touchstart', onStart, { passive: true });
+            window.addEventListener('touchmove', onMove, { passive: true });
+            window.addEventListener('touchend', onEnd);
+
+            // Wheel Scroll Events
+            element.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = e.deltaY < 0 ? 1 : -1;
+                if (type === 'hour') {
+                    let newHour = state.hour + delta;
+                    if (newHour > 12) newHour = 1;
+                    if (newHour < 1) newHour = 12;
+                    state.hour = newHour;
+                    hourDisplay.textContent = state.hour.toString().padStart(2, '0');
+                } else if (type === 'minute') {
+                    let newMin = state.minute + delta;
+                    if (newMin > 59) newMin = 0;
+                    if (newMin < 0) newMin = 59;
+                    state.minute = newMin;
+                    minuteDisplay.textContent = state.minute.toString().padStart(2, '0');
+                }
+                updatePreview();
+            }, { passive: false });
+        }
+
+        // Horizontal Drag Scroll for Date Chips Container
+        function setupHorizontalDateDrag() {
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            dateScrollContainer.addEventListener('mousedown', (e) => {
+                isDown = true;
+                startX = e.pageX - dateScrollContainer.offsetLeft;
+                scrollLeft = dateScrollContainer.scrollLeft;
+            });
+
+            dateScrollContainer.addEventListener('mouseleave', () => { isDown = false; });
+            dateScrollContainer.addEventListener('mouseup', () => { isDown = false; });
+
+            dateScrollContainer.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - dateScrollContainer.offsetLeft;
+                const walk = (x - startX) * 1.5;
+                dateScrollContainer.scrollLeft = scrollLeft - walk;
+            });
+        }
+
+        function updatePreview() {
+            const minFormatted = state.minute.toString().padStart(2, '0');
+            const timeStr = `${state.hour}:${minFormatted} ${state.ampm}`;
+            const dateObj = state.dates[state.selectedDateIndex] || state.dates[0];
+
+            previewTime.textContent = timeStr;
+            previewDate.textContent = dateObj.shortLabel === 'Today' || dateObj.shortLabel === 'Tomorrow' 
+                ? dateObj.shortLabel 
+                : dateObj.fullString;
+            
+            const msgVal = reminderMessage.value.trim();
+            previewMsg.textContent = msgVal ? `"${msgVal}"` : `"${state.title}"`;
+        }
+
+        function showTooltip() {
+            dragTooltip.style.opacity = '1';
+        }
+
+        function hideTooltip() {
+            dragTooltip.style.opacity = '0';
+        }
+
+        // Initialize Application
+        window.onload = function() {
+            generateDates();
+            renderDateChips();
+
+            // Set up Drag Controls
+            setupDragControl(hourBox, 'hour');
+            setupDragControl(minuteBox, 'minute');
+            setupHorizontalDateDrag();
+
+            // AM/PM Click Toggle
+            ampmBox.addEventListener('click', () => {
+                state.ampm = state.ampm === 'AM' ? 'PM' : 'AM';
+                ampmDisplay.textContent = state.ampm;
+                updatePreview();
+            });
+
+            // Form Inputs Listener
+            reminderTitle.addEventListener('input', (e) => {
+                state.title = e.target.value;
+                updatePreview();
+            });
+
+            reminderMessage.addEventListener('input', (e) => {
+                state.message = e.target.value;
+                updatePreview();
+            });
+
+            // Repeat Toggle Buttons
+            document.querySelectorAll('.repeat-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.repeat-btn').forEach(b => {
+                        b.classList.remove('bg-white', 'text-blue-600', 'shadow-xs', 'border', 'border-slate-200/80');
+                        b.classList.add('text-slate-500');
+                    });
+                    btn.classList.add('bg-white', 'text-blue-600', 'shadow-xs', 'border', 'border-slate-200/80');
+                    btn.classList.remove('text-slate-500');
+                    state.repeat = btn.dataset.repeat;
+                });
+            });
+
+            // Schedule Button Event
+            scheduleBtn.addEventListener('click', () => {
+                const minFormatted = state.minute.toString().padStart(2, '0');
+                const selectedDate = state.dates[state.selectedDateIndex];
+                
+                modalDetail.innerHTML = `
+                    Set for <strong>${state.hour}:${minFormatted} ${state.ampm}</strong><br>
+                    Date: <strong>${selectedDate.fullString}</strong><br>
+                    Repeat: <strong>${state.repeat}</strong>
+                `;
+                
+                confirmModal.classList.remove('opacity-0', 'pointer-events-none');
+                confirmModal.children[0].classList.remove('scale-90');
+                confirmModal.children[0].classList.add('scale-100');
+            });
+
+            closeModalBtn.addEventListener('click', () => {
+                confirmModal.classList.add('opacity-0', 'pointer-events-none');
+                confirmModal.children[0].classList.remove('scale-100');
+                confirmModal.children[0].classList.add('scale-90');
+            });
+
+            // Back button quick message
+            document.getElementById('backBtn').addEventListener('click', () => {
+                const toast = document.createElement('div');
+                toast.className = 'fixed top-4 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-1.5 rounded-full shadow-md z-50 transition opacity-0';
+                toast.textContent = 'Navigating back...';
+                document.body.appendChild(toast);
+                setTimeout(() => toast.style.opacity = '1', 10);
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 200);
+                }, 1500);
+            });
+
+            updatePreview();
+        };
+    </script>
+</body>
+</html>

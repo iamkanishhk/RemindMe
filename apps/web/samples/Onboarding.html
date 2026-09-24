@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Welcome - Important Reminders</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'sans-serif'],
+                    },
+                    colors: {
+                        ios: {
+                            blue: '#2563eb',
+                            brightBlue: '#3b82f6',
+                            lightBlue: '#eff6ff',
+                            border: '#dbeafe',
+                            darkText: '#0f172a',
+                            mutedText: '#64748b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+            background: #e2e8f0;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Ambient Glow behind Illustration */
+        .illustration-bg-glow {
+            background: radial-gradient(circle, rgba(191, 219, 254, 0.75) 0%, rgba(239, 246, 255, 0.2) 70%);
+            filter: blur(28px);
+        }
+
+        /* iOS Liquid Push Button Styling */
+        .btn-ios-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 8px 20px -4px rgba(37, 99, 235, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.25);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-ios-primary:active {
+            transform: scale(0.97);
+            box-shadow: 0 3px 10px -2px rgba(37, 99, 235, 0.4), inset 0 1px 0 0 rgba(0, 0, 0, 0.1);
+            filter: brightness(0.95);
+        }
+
+        .btn-ios-secondary {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1.5px solid rgba(191, 219, 254, 0.9);
+            box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+            backdrop-filter: blur(12px);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-ios-secondary:active {
+            transform: scale(0.97);
+            background: rgba(239, 246, 255, 0.95);
+            border-color: rgba(147, 197, 253, 1);
+        }
+
+        /* Smooth appearance animation */
+        @keyframes iosFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-ios-fade {
+            animation: iosFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="w-full max-w-[390px] h-full max-h-[844px] bg-white rounded-[48px] shadow-2xl border-[8px] border-slate-900/10 flex flex-col justify-between overflow-hidden relative p-5 select-none">
+        
+        <!-- Top Dynamic Island & System Status Bar -->
+        <div class="w-full flex items-center justify-between pt-1 pb-1 z-20 shrink-0">
+            <span class="text-xs font-bold text-slate-900 ml-3 tracking-tight">9:41</span>
+            
+            <!-- Dynamic Island -->
+            <div class="w-[115px] h-[28px] bg-black rounded-full flex items-center justify-end pr-2.5">
+                <div class="w-2.5 h-2.5 rounded-full bg-slate-900 border border-slate-800"></div>
+            </div>
+            
+            <!-- System Status Icons -->
+            <div class="flex items-center gap-1.5 mr-3 text-slate-900 text-xs">
+                <i class="fa-solid fa-signal text-[10px]"></i>
+                <i class="fa-solid fa-wifi text-[10px]"></i>
+                <i class="fa-solid fa-battery-full text-[12px]"></i>
+            </div>
+        </div>
+
+        <div class="flex-1 flex flex-col items-center justify-between py-2 z-10 overflow-hidden animate-ios-fade">
+            
+            <!-- Illustration Image Wrapper -->
+            <div class="relative w-full flex items-center justify-center my-auto min-h-[230px] px-2">
+                <!-- Soft Backing Glow -->
+                <div class="absolute w-64 h-64 rounded-full illustration-bg-glow -z-10"></div>
+                
+                <!-- Main Image Asset directly loaded from assets/1.png -->
+                <img src="../assets/1.png" 
+                     alt="Important Reminders Illustration" 
+                     class="max-w-[240px] max-h-[220px] w-auto h-auto object-contain drop-shadow-md transition-transform duration-300 hover:scale-[1.02]">
+            </div>
+
+            <!-- Typography Header and Subtitle -->
+            <div class="text-center px-3 space-y-2.5 my-auto">
+                <h1 class="text-[25px] sm:text-[27px] font-extrabold text-slate-900 tracking-tight leading-[1.25]">
+                    Important reminders<br>should reach you.
+                </h1>
+                <p class="text-xs sm:text-[13px] text-slate-500 font-medium leading-relaxed px-3 max-w-[310px] mx-auto">
+                    We call your phone when it's time, speak your reminder, and end the call automatically.
+                </p>
+            </div>
+
+            <div class="w-full space-y-3 px-1 mt-auto pt-2">
+                <!-- Primary Action -->
+                <button id="btnGetStarted" class="btn-ios-primary w-full py-3.5 rounded-2xl text-white font-bold text-[14px] tracking-wide flex items-center justify-center cursor-pointer">
+                    <span>Get Started</span>
+                </button>
+                
+                <!-- Secondary Action -->
+                <button id="btnAccount" class="btn-ios-secondary w-full py-3.5 rounded-2xl text-blue-600 font-bold text-[14px] tracking-wide flex items-center justify-center cursor-pointer">
+                    <span>I already have an account</span>
+                </button>
+            </div>
+
+        </div>
+
+        <div class="pt-3 pb-0.5 text-center flex flex-col items-center justify-center gap-2 z-20 shrink-0">
+            <!-- Footer Trust Badge -->
+            <div class="inline-flex items-center gap-2 text-slate-400">
+                <div class="w-5 h-5 rounded-full bg-slate-100/90 flex items-center justify-center text-[10px] border border-slate-200/50">
+                    <i class="fa-solid fa-shield-halved text-slate-500"></i>
+                </div>
+                <span class="text-[11px] font-medium text-slate-400 leading-tight">
+                    Your reminders and phone number are protected.
+                </span>
+            </div>
+            
+            <!-- iOS Home Indicator Bar -->
+            <div class="w-32 h-1 bg-slate-900/25 rounded-full mt-1.5"></div>
+        </div>
+
+    </div>
+
+    <div id="actionModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-all duration-200">
+        <div class="bg-white/95 backdrop-blur-xl rounded-3xl p-5 w-full max-w-[270px] shadow-2xl transform scale-90 transition-transform duration-200 text-center space-y-3 border border-slate-100">
+            <div id="modalIcon" class="w-12 h-12 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto text-xl">
+                <i class="fa-solid fa-arrow-right"></i>
+            </div>
+            <h3 id="modalTitle" class="text-base font-bold text-slate-900">Welcome!</h3>
+            <p id="modalDesc" class="text-xs text-slate-500 leading-relaxed"></p>
+            <button id="closeModalBtn" class="w-full bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-semibold py-2.5 text-xs rounded-xl transition">
+                Continue
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnGetStarted = document.getElementById('btnGetStarted');
+            const btnAccount = document.getElementById('btnAccount');
+            const actionModal = document.getElementById('actionModal');
+            const modalIcon = document.getElementById('modalIcon');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalDesc = document.getElementById('modalDesc');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+
+            // Handle "Get Started" Click
+            btnGetStarted.addEventListener('click', () => {
+                showModal(
+                    'fa-rocket',
+                    'bg-blue-100 text-blue-600',
+                    'Getting Started',
+                    'Setting up your automated reminder calling preferences...'
+                );
+            });
+
+            // Handle "I already have an account" Click
+            btnAccount.addEventListener('click', () => {
+                showModal(
+                    'fa-user-check',
+                    'bg-indigo-100 text-indigo-600',
+                    'Welcome Back',
+                    'Redirecting to your existing account dashboard...'
+                );
+            });
+
+            // Modal Display Helper Function
+            function showModal(iconClass, bgClass, title, desc) {
+                modalIcon.className = `w-12 h-12 rounded-full flex items-center justify-center mx-auto text-xl ${bgClass}`;
+                modalIcon.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+                modalTitle.textContent = title;
+                modalDesc.textContent = desc;
+
+                actionModal.classList.remove('opacity-0', 'pointer-events-none');
+                actionModal.children[0].classList.remove('scale-90');
+                actionModal.children[0].classList.add('scale-100');
+            }
+
+            // Close Modal Action
+            closeModalBtn.addEventListener('click', () => {
+                actionModal.classList.add('opacity-0', 'pointer-events-none');
+                actionModal.children[0].classList.remove('scale-100');
+                actionModal.children[0].classList.add('scale-90');
+            });
+        });
+    </script>
+</body>
+</html>
