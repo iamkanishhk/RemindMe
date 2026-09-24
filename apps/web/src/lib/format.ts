@@ -101,12 +101,15 @@ export function toLocalInputValue(iso: string, timeZone: string): string {
 const WEEKDAYS = 7 * 24 * 3600 * 1000;
 const MONTHS = 30 * 24 * 3600 * 1000;
 
+/** Return true if the ISO instant falls on today's date in the given timezone. */
+export function isToday(timeZone: string, iso: string): boolean {
+  const fmt = new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' });
+  return fmt.format(new Date(iso)) === fmt.format(new Date());
+}
+
 /** Stable day key for grouping reminders in their own timezone. */
 export function dayGroupKey(timeZone: string, iso: string): string {
-  const d = new Date(iso);
-  const key = new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
-  const today = new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
-  if (key === today) return `Today · ${formatDay(timeZone, iso)}`;
+  if (isToday(timeZone, iso)) return `Today · ${formatDay(timeZone, iso)}`;
   return formatDay(timeZone, iso);
 }
 

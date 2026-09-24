@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { usePhoneNumbers } from '../hooks/queries';
 import { timezoneList } from '../lib/format';
 import type { RepeatRule } from '../lib/types';
@@ -122,8 +121,7 @@ export default function ReminderForm({ initial, submitLabel, busy, error, onSubm
           <Spinner label="Loading phone numbers…" />
         ) : verifiedPhones.length === 0 ? (
           <span className="field-note">
-            No verified phone numbers yet.{' '}
-            <Link to="/phone-numbers">Add and verify one</Link> to schedule reminders.
+            No verified phone numbers yet. Add and verify one to schedule reminders.
           </span>
         ) : (
           <select value={phoneNumberId} onChange={(e) => setPhoneNumberId(e.target.value)}>
