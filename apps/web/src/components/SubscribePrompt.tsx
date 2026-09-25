@@ -1,17 +1,24 @@
 import { useState } from 'react';
 import { useCreateCheckoutSession, useBillingStatus } from '../hooks/queries';
-import { ErrorBanner } from './ErrorBanner';
-import { Spinner } from './Spinner';
+import { Skeleton } from './Skeleton';
+import { useErrorToast } from './Toast';
 
 export function SubscribePrompt() {
   const billing = useBillingStatus();
   const checkout = useCreateCheckoutSession();
   const [error, setError] = useState('');
 
+  useErrorToast(error);
+
   if (billing.isLoading) {
     return (
-      <div className="banner">
-        <Spinner label="Checking subscription…" />
+      <div className="banner skeleton-area-light" aria-busy="true">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="mt-2.5 h-4 w-1/2" />
+        <div className="row">
+          <div />
+          <Skeleton className="h-10 w-56 rounded-full" />
+        </div>
       </div>
     );
   }
@@ -44,7 +51,6 @@ export function SubscribePrompt() {
           {checkout.isPending ? 'Starting…' : 'Subscribe to keep reminders on'}
         </button>
       </div>
-      <ErrorBanner message={error} />
     </div>
   );
 }

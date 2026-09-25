@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDeleteReminder, useReminder, useUpdateReminder } from '../hooks/queries';
 import { formatDateTimeLocal, formatRelative, formatTime, repeatLabel } from '../lib/format';
-import { StatusChip } from '../components/StatusChip';
-import { Spinner } from '../components/Spinner';
-import { ErrorBanner } from '../components/ErrorBanner';
+import { Skeleton } from '../components/Skeleton';
+import ErrorPage from '../components/ErrorPage';
+import { useErrorToast } from '../components/Toast';
+import ConfirmSheet from '../components/ConfirmSheet';
 import LiquidGlass from 'liquid-glass-react';
 
 export default function ReminderDetailPage() {
@@ -18,11 +19,86 @@ export default function ReminderDetailPage() {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [error, setError] = useState('');
 
+  useErrorToast(error);
+
   if (reminder.isLoading) {
     return (
-      <section className="ios-page">
-        <div className="ios-loading">
-          <Spinner label="Loading reminder…" />
+      <section
+        className="min-h-screen w-full bg-black text-[#f5f5f7]"
+        aria-busy="true"
+      >
+        <div className="mx-auto w-full max-w-[920px] px-4 pb-24 pt-9">
+          {/* Header */}
+          <div className="flex items-start gap-3.5 skeleton-area">
+            <Skeleton className="mt-[13px] h-3 w-3 rounded-full" />
+            <Skeleton className="h-[44px] w-3/5 rounded-xl" />
+          </div>
+
+          {/* REMINDER */}
+          <div className="mt-7">
+            <div className="px-4 pb-2.5">
+              <Skeleton className="h-3 w-24" />
+            </div>
+            <div className="overflow-hidden rounded-[16px] bg-[#1c1c1e] skeleton-area">
+              <div className="grid grid-cols-[minmax(130px,0.75fr)_minmax(0,1.5fr)] items-center gap-5 px-[17px] py-3">
+                <div className="flex items-center gap-[11px]">
+                  <Skeleton className="h-7 w-7 rounded-lg" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <div className="justify-self-end">
+                  <Skeleton className="h-4 w-40" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* SCHEDULE */}
+          <div className="mt-7">
+            <div className="px-4 pb-2.5">
+              <Skeleton className="h-3 w-28" />
+            </div>
+            <div className="overflow-hidden rounded-[16px] bg-[#1c1c1e] skeleton-area">
+              {[
+                ['w-32', 'w-48'],
+                ['w-44', 'w-36'],
+                ['w-36', 'w-44'],
+              ].map(([label, value], i) => (
+                <div
+                  key={i}
+                  className={`grid grid-cols-[minmax(130px,0.75fr)_minmax(0,1.5fr)] items-center gap-5 px-[17px] py-3 ${
+                    i < 2 ? 'border-b border-[rgba(84,84,88,0.55)]' : ''
+                  }`}
+                >
+                  <Skeleton className={`h-4 ${label}`} />
+                  <div className="justify-self-end">
+                    <Skeleton className={`h-4 ${value}`} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* CALL INFORMATION */}
+          <div className="mt-7">
+            <div className="px-4 pb-2.5">
+              <Skeleton className="h-3 w-[120px]" />
+            </div>
+            <div className="overflow-hidden rounded-[16px] bg-[#1c1c1e] skeleton-area">
+              {[0, 1].map((i) => (
+                <div
+                  key={i}
+                  className={`grid grid-cols-[minmax(130px,0.75fr)_minmax(0,1.5fr)] items-center gap-5 px-[17px] py-3 ${
+                    i === 0 ? 'border-b border-[rgba(84,84,88,0.55)]' : ''
+                  }`}
+                >
+                  <Skeleton className="h-4 w-24" />
+                  <div className="justify-self-end">
+                    <Skeleton className="h-4 w-40" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
     );
@@ -30,12 +106,12 @@ export default function ReminderDetailPage() {
 
   if (reminder.error || !reminder.data) {
     return (
-      <section className="ios-page">
-
-        <div className="ios-error-card">
-          <ErrorBanner message={reminder.error?.message ?? 'Reminder not found'} />
-        </div>
-      </section>
+      <ErrorPage
+        message={reminder.error?.message ?? 'Reminder not found'}
+        title="Couldn't load reminder"
+        onRetry={() => void reminder.refetch()}
+        secondary={{ label: 'Go to dashboard', onClick: () => navigate('/') }}
+      />
     );
   }
 
@@ -70,7 +146,7 @@ export default function ReminderDetailPage() {
 
   return (
     <section className="ios-page">
-      <div className="ios-container">
+      <div className="ios-container rise-in">
         {/* Header */}
         <header className="ios-header mt-10">
           <div className="ios-title-row">
@@ -174,13 +250,6 @@ export default function ReminderDetailPage() {
 
          
         </header>
-
-        {/* Error */}
-        {error && (
-          <div className="ios-error-wrapper">
-            <ErrorBanner message={error} />
-          </div>
-        )}
 
         {/* Overview */}
         <section className="ios-section">
@@ -287,106 +356,16 @@ export default function ReminderDetailPage() {
       </div>
 
         {/* iOS Popup */}
-        {confirmingDelete && (
-          <div className="ios-popup-backdrop fixed inset-0 z-[60] flex items-center justify-center bg-black/60 px-4 backdrop-blur-[3px]">
-            <div
-              className="
-                ios-popup-card
-                relative
-                w-[430px]
-                max-w-full
-                rounded-[28px]
-                border border-white/[0.07]
-                bg-gradient-to-b from-[#2a2d32] to-[#1b1d21]
-                px-5 pt-[25px] pb-5
-                text-center
-                shadow-[0_30px_70px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.04)]
-              "
-            >
-              {/* Title */}
-              <h2
-                className="
-                  mb-[30px]
-                  text-[24px]
-                  font-medium
-                  leading-[1.15]
-                  tracking-[-0.5px]
-                  text-[#f5f5f7]
-                "
-              >
-                Delete Reminder
-              </h2>
-
-              {/* Message */}
-              <p
-                className="
-                  mb-[43px]
-                  text-[20px]
-                  font-normal
-                  leading-[1.35]
-                  tracking-[-0.2px]
-                  text-[#f5f5f7]
-                "
-              >
-                Are you sure you want to delete this reminder? This action cannot be undone.
-              </p>
-
-              {/* Buttons */}
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => void doDelete()}
-                  className="
-                    flex
-                    h-[70px]
-                    items-center
-                    justify-center
-                    gap-2
-                    rounded-full
-                    border-0
-                    bg-gradient-to-b from-[#168cff] to-[#087cf0]
-                    text-[21px]
-                    font-medium
-                    tracking-[-0.25px]
-                    text-white
-                    shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]
-                    transition
-                    active:scale-[0.97]
-                    disabled:opacity-50
-                  "
-                >
-                  {busy ? 'Deleting…' : 'Delete'}
-                </button>
-
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => setConfirmingDelete(false)}
-                  className="
-                    flex
-                    h-[70px]
-                    items-center
-                    justify-center
-                    rounded-full
-                    border-0
-                    bg-gradient-to-b from-[#41464e] to-[#373c43]
-                    text-[21px]
-                    font-medium
-                    tracking-[-0.25px]
-                    text-white/90
-                    shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]
-                    transition
-                    active:scale-[0.97]
-                    disabled:opacity-50
-                  "
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        <ConfirmSheet
+          open={confirmingDelete}
+          title="Delete Reminder"
+          message="Are you sure you want to delete this reminder? This action cannot be undone."
+          confirmLabel="Delete"
+          tone="destructive"
+          busy={busy}
+          onConfirm={() => void doDelete()}
+          onCancel={() => setConfirmingDelete(false)}
+        />
 
       <style>{`
         :root {
@@ -874,49 +853,11 @@ export default function ReminderDetailPage() {
         .ios-loading {
           min-height: 60vh;
           display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        /* Popup */
-
-        @keyframes ios-pop {
-          0% {
-            opacity: 0;
-            transform: scale(0.6) translateY(16px);
+align-items: center;
+            justify-content: center;
           }
 
-          60% {
-            opacity: 1;
-            transform: scale(1.05) translateY(-3px);
-          }
-
-          100% {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-          }
-        }
-
-        .ios-popup-card {
-          transform-origin: center;
-          animation: ios-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-        }
-
-        @keyframes ios-backdrop {
-          from {
-            opacity: 0;
-          }
-
-          to {
-            opacity: 1;
-          }
-        }
-
-        .ios-popup-backdrop {
-          animation: ios-backdrop 0.22s ease-out both;
-        }
-
-        /* Responsive */
+          /* Responsive */
 
         @media (max-width: 680px) {
           .ios-container {
@@ -1005,11 +946,6 @@ export default function ReminderDetailPage() {
           .ios-action-button,
           .ios-back {
             transition: none;
-          }
-
-          .ios-popup-card,
-          .ios-popup-backdrop {
-            animation: none;
           }
         }
       `}</style>

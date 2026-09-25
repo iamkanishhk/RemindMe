@@ -3,7 +3,7 @@ import { useUser, useReverification } from '@clerk/react';
 import { useCreatePhoneNumber, useVerifyPhoneNumber } from '../hooks/queries';
 import { ApiError } from '../lib/api';
 import { Spinner } from './Spinner';
-import { ErrorBanner } from './ErrorBanner';
+import { useErrorToast } from './Toast';
 
 const countries = [
   { code: '+1', name: 'United States', flag: '🇺🇸' },
@@ -43,6 +43,8 @@ export default function PhoneVerifyOnboarding() {
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
   const [codeBusy, setCodeBusy] = useState(false);
   const [remaining, setRemaining] = useState(0);
+
+  useErrorToast(error);
 
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
   const otpRef = useRef<{ e164: string; clerkPhoneId: string } | null>(null);
@@ -180,7 +182,6 @@ export default function PhoneVerifyOnboarding() {
           }`}
         >
           <div className="w-full shrink-0 flex flex-col items-center">
-            <ErrorBanner message={error} />
             <div className="space-y-7 px-1 mt-6">
               <div className="space-y-2">
                 <h1 className="text-[28px] font-bold text-[#0f172a] tracking-tight leading-tight">

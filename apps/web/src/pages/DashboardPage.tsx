@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { useMe, useReminders, useUpdateReminder } from '../hooks/queries';
 import { formatRelative, formatTime, isToday, repeatLabel } from '../lib/format';
 import type { Reminder } from '../lib/types';
-import { Spinner } from '../components/Spinner';
-import { ErrorBanner } from '../components/ErrorBanner';
+import { Skeleton } from '../components/Skeleton';
+import { useErrorToast } from '../components/Toast';
 import { motion } from 'framer-motion';
 import LiquidGlass from 'liquid-glass-react';
 import {
@@ -695,6 +695,9 @@ function ScheduleItem({ reminder }: { reminder: Reminder }) {
         border-b
         border-t
         border-[#38383a61]
+        transition-colors
+        duration-150
+        active:bg-[#141416]
       `}
     >
       <Link
@@ -766,6 +769,7 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
   return (
     <div
       className="
+      rise-in
       border-b
       border-t
       border-[#2C2C2E]
@@ -886,6 +890,8 @@ export default function DashboardPage() {
     reminders.error?.message ||
     '';
 
+  useErrorToast(error);
+
   const email = me.data?.email ?? '';
   const next = today[0];
 
@@ -916,8 +922,6 @@ export default function DashboardPage() {
         antialiased
       "
     >
-      <ErrorBanner message={error} />
-
       {/* ------------------------------------------------------------------ */}
       {/* Header                                                             */}
       {/* ------------------------------------------------------------------ */}
@@ -936,9 +940,12 @@ export default function DashboardPage() {
             </div>
              <Link
               to="/reminders/new"
+              aria-label="New reminder"
               className="
-              text-[#0A84FF]
-              text-[35px]
+                pressable-round
+                inline-flex
+                text-[#0A84FF]
+                text-[35px]
               "
             >
               +
@@ -950,8 +957,42 @@ export default function DashboardPage() {
 
       <div className="mx-auto max-w-xl">
         {reminders.isLoading ? (
-          <div className="flex justify-center py-20">
-            <Spinner label="Loading schedules…" />
+          <div className="mt-5 flex flex-col gap-6 skeleton-area" aria-busy="true">
+            {/* Hero */}
+            <div className="border-b border-t border-[#2C2C2E] p-5">
+              <Skeleton className="mt-4 h-[22px] w-2/5" />
+              <div className="mt-4 flex items-center justify-between gap-4">
+                <div className="flex min-w-0 items-baseline gap-2">
+                  <Skeleton className="h-[48px] w-24" />
+                  <Skeleton className="h-5 w-10" />
+                </div>
+                <Skeleton className="h-6 w-14 rounded-full" />
+              </div>
+              <Skeleton className="mt-4 h-4 w-24" />
+            </div>
+
+            {/* Today's schedule */}
+            <div>
+              <div className="mb-2.5 px-1">
+                <Skeleton className="h-5 w-16" />
+              </div>
+
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between gap-4 border-b border-t border-[#38383a61] px-4 py-3.5"
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-baseline gap-1.5">
+                      <Skeleton className="h-[48px] w-16" />
+                      <Skeleton className="h-5 w-8" />
+                    </div>
+                    <Skeleton className="mt-1 h-4 w-2/5" />
+                  </div>
+                  <Skeleton className="h-[30px] w-[65px] rounded-full" />
+                </div>
+              ))}
+            </div>
           </div>
         ) : today.length === 0 ? (
           /* -------------------------------------------------------------- */
@@ -1045,6 +1086,7 @@ export default function DashboardPage() {
 
               {/* iOS grouped list */}
                 <div
+                  className="stagger"
                >
                 {today.map((r) => (
                   <ScheduleItem

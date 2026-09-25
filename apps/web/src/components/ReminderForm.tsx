@@ -3,8 +3,9 @@ import { usePhoneNumbers } from '../hooks/queries';
 import { timezoneList } from '../lib/format';
 import type { RepeatRule } from '../lib/types';
 import type { ReminderInputBody } from '../hooks/queries';
-import { ErrorBanner } from './ErrorBanner';
+import { useErrorToast } from './Toast';
 import { Spinner } from './Spinner';
+import { Skeleton } from './Skeleton';
 
 export interface ReminderFormInitial {
   title: string;
@@ -36,6 +37,8 @@ export default function ReminderForm({ initial, submitLabel, busy, error, onSubm
   const [repeatRule, setRepeatRule] = useState<RepeatRule>(initial.repeatRule);
   const [phoneNumberId, setPhoneNumberId] = useState(initial.phoneNumberId);
   const [localError, setLocalError] = useState('');
+
+  useErrorToast(error || localError);
 
   useEffect(() => {
     if (!phoneNumberId && verifiedPhones.length > 0 && !verifiedPhones.some((p) => p.id === phoneNumberId)) {
@@ -76,8 +79,6 @@ export default function ReminderForm({ initial, submitLabel, busy, error, onSubm
 
   return (
     <form className="form" onSubmit={handleSubmit}>
-      <ErrorBanner message={error || localError} />
-
       <label className="field">
         <span className="label">Title</span>
         <input type="text" value={title} maxLength={80} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Take the cake out of the oven" />
@@ -118,7 +119,9 @@ export default function ReminderForm({ initial, submitLabel, busy, error, onSubm
       <label className="field">
         <span className="label">Call this verified number</span>
         {phoneQuery.isLoading ? (
-          <Spinner label="Loading phone numbers…" />
+          <div className="skeleton-area-light">
+            <Skeleton className="h-10 w-full rounded" />
+          </div>
         ) : verifiedPhones.length === 0 ? (
           <span className="field-note">
             No verified phone numbers yet. Add and verify one to schedule reminders.

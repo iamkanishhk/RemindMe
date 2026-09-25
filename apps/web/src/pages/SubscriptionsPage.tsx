@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useBillingStatus, useCancelSubscription } from '../hooks/queries';
 import { formatDateTimeLocal, formatMoney } from '../lib/format';
 import { Spinner } from '../components/Spinner';
-import { ErrorBanner } from '../components/ErrorBanner';
+import { SkeletonRow } from '../components/Skeleton';
+import { useErrorToast } from '../components/Toast';
+import ConfirmSheet from '../components/ConfirmSheet';
 import { iosTheme } from './iosTheme';
 import type { SubscriptionStatus } from '../lib/types';
 
@@ -41,6 +43,9 @@ export default function SubscriptionsPage() {
   const cancelSub = useCancelSubscription();
 
   const [cancelError, setCancelError] = useState('');
+  const [confirmingCancel, setConfirmingCancel] = useState(false);
+
+  useErrorToast(cancelError);
 
   async function doCancel() {
     setCancelError('');
@@ -76,11 +81,18 @@ export default function SubscriptionsPage() {
         <section className="ios-settings-section">
           <div className="ios-section-label">SUBSCRIPTION</div>
 
-          <div className="ios-settings-card">
+          <div
+            className={`ios-settings-card${billing.isLoading ? ' skeleton-area' : ''}`}
+            aria-busy={billing.isLoading}
+          >
             {billing.isLoading ? (
-              <div className="ios-loading-row">
-                <Spinner label="Loading subscription…" />
-              </div>
+              <>
+                <SkeletonRow />
+                <div className="ios-divider" />
+                <SkeletonRow />
+                <div className="ios-divider" />
+                <SkeletonRow />
+              </>
             ) : !b || (!b.status && b.mode === 'none') ? (
               <div className="ios-no-subscription">
                 <div className="ios-subscription-icon">
@@ -219,7 +231,7 @@ export default function SubscriptionsPage() {
                       type="button"
                       className="btn btn-danger-outline"
                       disabled={cancelSub.isPending}
-                      onClick={() => void doCancel()}
+                      onClick={() => setConfirmingCancel(true)}
                     >
                       {cancelSub.isPending ? (
                         <Spinner />
@@ -238,12 +250,6 @@ export default function SubscriptionsPage() {
                     </span>
                   </div>
                 ) : null}
-
-                {cancelError && (
-                  <div className="ios-cancel-error">
-                    <ErrorBanner message={cancelError} />
-                  </div>
-                )}
               </>
             )}
           </div>
@@ -255,6 +261,17 @@ export default function SubscriptionsPage() {
           <span>Plan &amp; Billing</span>
         </div>
       </div>
+
+      <ConfirmSheet
+        open={confirmingCancel}
+        title="Cancel subscription"
+        message="You'll keep access until the end of the current billing period, then your reminders will stop calling."
+        confirmLabel="Cancel subscription"
+        tone="destructive"
+        busy={cancelSub.isPending}
+        onConfirm={() => void doCancel()}
+        onCancel={() => setConfirmingCancel(false)}
+      />
 
       <style>{iosTheme}</style>
     </section>

@@ -1,20 +1,58 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCalls } from '../hooks/queries';
 import { formatDateTimeLocal } from '../lib/format';
 import { StatusChip } from '../components/StatusChip';
 import { Spinner } from '../components/Spinner';
-import { ErrorBanner } from '../components/ErrorBanner';
+import { Skeleton } from '../components/Skeleton';
+import ErrorPage from '../components/ErrorPage';
 import { EmptyState } from '../components/EmptyState';
 import LiquidGlass from 'liquid-glass-react';
 
 export default function HistoryPage() {
   const calls = useCalls();
+  const navigate = useNavigate();
 
   if (calls.isLoading) {
     return (
-      <section className="ios-history-page">
-        <div className="ios-loading">
-          <Spinner label="Loading call history…" />
+      <section
+        className="min-h-screen w-full bg-black text-[#f5f5f7]"
+        aria-busy="true"
+      >
+        <div className="mx-auto w-full max-w-[920px] px-4 pb-24 pt-9">
+          {/* Header */}
+          <div className="skeleton-area pb-6">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="mt-3 h-[52px] w-2/3 rounded-xl" />
+            <Skeleton className="mt-2.5 h-4 w-full" />
+          </div>
+
+          <div>
+            <div className="px-4 pb-2.5">
+              <Skeleton className="h-3 w-28" />
+            </div>
+
+            <div className="flex flex-col gap-3">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="overflow-hidden rounded-[17px] bg-[#18181A] skeleton-area"
+                >
+                  <div className="flex min-h-[58px] items-center justify-between gap-4 px-[17px] py-3.5">
+                    <div className="flex items-center gap-2.5">
+                      <Skeleton className="h-6 w-12 rounded-full" />
+                    </div>
+                    <Skeleton className="h-3 w-12" />
+                  </div>
+                  <div className="flex items-center gap-3 px-[17px] pb-4">
+                    <Skeleton className="h-[38px] w-[38px] rounded-[10px]" />
+                    <div className="min-w-0 flex-1">
+                      <Skeleton className="h-4 w-2/3" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
     );
@@ -22,23 +60,12 @@ export default function HistoryPage() {
 
   if (calls.isError) {
     return (
-      <section className="ios-history-page">
-        <div className="ios-history-container">
-          <header className="ios-page-header">
-            <div className="ios-eyebrow">ACTIVITY</div>
-            <h1>Call history</h1>
-            <p>Every call attempt and its result.</p>
-          </header>
-
-          <div className="ios-error-card">
-            <ErrorBanner
-              message={
-                calls.error?.message ?? 'Could not load call history'
-              }
-            />
-          </div>
-        </div>
-      </section>
+      <ErrorPage
+        message={calls.error?.message ?? 'Could not load call history'}
+        title="Couldn't load call history"
+        onRetry={() => void calls.refetch()}
+        secondary={{ label: 'Go to dashboard', onClick: () => navigate('/') }}
+      />
     );
   }
 
@@ -109,7 +136,7 @@ export default function HistoryPage() {
                 RECENT CALLS
               </div>
 
-              <div className="ios-call-list">
+              <div className="ios-call-list stagger">
                 {attempts.map((a, index) => (
                   <article className="ios-call-card" key={a.id}>
                     {/* Top row */}
@@ -215,7 +242,7 @@ export default function HistoryPage() {
               <div className="ios-pager">
                 <button
                   type="button"
-                  className="ios-load-more"
+                  className="pressable ios-load-more"
                   disabled={calls.isFetchingNextPage}
                   onClick={() => void calls.fetchNextPage()}
                 >

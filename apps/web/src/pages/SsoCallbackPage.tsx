@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useClerk } from '@clerk/react';
-import { Spinner } from '../components/Spinner';
-import { ErrorBanner } from '../components/ErrorBanner';
+import { Skeleton } from '../components/Skeleton';
+import ErrorPage from '../components/ErrorPage';
 
 export default function SsoCallbackPage() {
   const { handleRedirectCallback } = useClerk();
@@ -24,11 +24,29 @@ export default function SsoCallbackPage() {
     };
   }, [handleRedirectCallback, navigate]);
 
+  if (error) {
+    return (
+      <ErrorPage
+        light
+        message={error}
+        title="Couldn't complete sign-in"
+        secondary={{
+          label: 'Back to sign in',
+          onClick: () => navigate('/sign-in'),
+        }}
+      />
+    );
+  }
+
   return (
     <div className="auth-wrap">
       <div className="auth-card">
         <h1>Finishing sign-in</h1>
-        {error ? <ErrorBanner message={error} /> : <Spinner label="Completing Google sign-in…" />}
+        <div className="flex flex-col gap-3 skeleton-area-light" aria-busy="true">
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="mt-2 h-11 w-full rounded-full" />
+        </div>
       </div>
     </div>
   );

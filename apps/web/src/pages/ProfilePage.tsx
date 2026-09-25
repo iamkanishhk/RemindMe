@@ -4,7 +4,9 @@ import { useClerk, useUser } from '@clerk/react';
 import { useDeleteMe, useMe } from '../hooks/queries';
 import { formatDateTimeLocal } from '../lib/format';
 import { Spinner } from '../components/Spinner';
-import { ErrorBanner } from '../components/ErrorBanner';
+import { SkeletonRow } from '../components/Skeleton';
+import { useErrorToast } from '../components/Toast';
+import ConfirmSheet from '../components/ConfirmSheet';
 import { iosTheme } from './iosTheme';
 
 function displayNameFromEmail(email: string): string {
@@ -22,7 +24,10 @@ export default function ProfilePage() {
   const [confirmText, setConfirmText] = useState('');
   const [busy, setBusy] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const [confirmingSignOut, setConfirmingSignOut] = useState(false);
   const [error, setError] = useState('');
+
+  useErrorToast(error);
 
   const email =
     me.data?.email ?? user?.primaryEmailAddress?.emailAddress ?? '';
@@ -67,25 +72,14 @@ export default function ProfilePage() {
       <div className="ios-settings-container">
         {/* Header */}
         <header className="ios-settings-header">
-          <div className="ios-settings-eyebrow">PROFILE</div>
-
           <h1>Profile</h1>
         </header>
-
-        {/* Global error */}
-        {error && (
-          <div className="ios-global-error">
-            <ErrorBanner message={error} />
-          </div>
-        )}
 
         {/* =========================================
             IDENTITY
         ========================================== */}
         <section className="ios-settings-section">
-          <div className="ios-section-label">YOU</div>
-
-          <div className="ios-settings-card">
+      
             <div className="ios-profile-card">
               <div className="ios-avatar">
                 {avatarUrl ? (
@@ -102,7 +96,7 @@ export default function ProfilePage() {
                 {email && <div className="ios-profile-email">{email}</div>}
               </div>
             </div>
-          </div>
+        
         </section>
 
         {/* =========================================
@@ -111,19 +105,21 @@ export default function ProfilePage() {
         <section className="ios-settings-section">
           <div className="ios-section-label">ACCOUNT</div>
 
-          <div className="ios-settings-card">
+          <div
+            className={`ios-settings-card${me.isLoading ? ' skeleton-area' : ''}`}
+            aria-busy={me.isLoading}
+          >
             {me.isLoading ? (
-              <div className="ios-loading-row">
-                <Spinner label="Loading account…" />
-              </div>
+              <>
+                <SkeletonRow />
+                <div className="ios-divider" />
+                <SkeletonRow />
+              </>
             ) : (
               <>
                 <div className="ios-setting-row">
                   <div className="ios-row-leading">
-                    <div className="ios-setting-icon blue">
-                      <span>@</span>
-                    </div>
-
+                  
                     <div className="ios-row-title">Email</div>
                   </div>
 
@@ -134,10 +130,6 @@ export default function ProfilePage() {
 
                 <div className="ios-setting-row">
                   <div className="ios-row-leading">
-                    <div className="ios-setting-icon orange">
-                      <span>◷</span>
-                    </div>
-
                     <div className="ios-row-title">Member since</div>
                   </div>
 
@@ -156,30 +148,16 @@ export default function ProfilePage() {
             SESSION
         ========================================== */}
         <section className="ios-settings-section">
-          <div className="ios-section-label">SESSION</div>
-
-          <div className="ios-settings-card">
-            <div className="ios-setting-row">
-              <div className="ios-row-leading">
-                <div className="ios-setting-icon blue">
-                  <span>⎋</span>
-                </div>
-
-                <div className="ios-row-title">Sign out</div>
-              </div>
-
-              <div className="ios-row-value">
+          
                 <button
                   type="button"
-                  className="ios-signout-button"
+                  className="ios-settings-card w-full h-[5vh] text-[#DC3E35]"
                   disabled={signingOut}
-                  onClick={() => void doSignOut()}
+                  onClick={() => setConfirmingSignOut(true)}
                 >
                   {signingOut ? <Spinner /> : 'Sign out'}
                 </button>
-              </div>
-            </div>
-          </div>
+            
         </section>
 
         {/* =========================================
@@ -190,61 +168,16 @@ export default function ProfilePage() {
             DANGER ZONE
           </div>
 
-          <div className="ios-danger-card">
-            <div className="ios-danger-header">
-              <div className="ios-danger-icon">
-                <span>!</span>
-              </div>
+             <button
+                  type="button"
+                  className="ios-delete-button"
+                  
+                  onClick={() => {}}
+                >
+                  {signingOut ? <Spinner /> : 'Delete Account'}
+                </button>
 
-              <div>
-                <h2>Delete account</h2>
-
-                <p>
-                  Deleting your account permanently removes
-                  your phone numbers and reminder history.
-                </p>
-              </div>
-            </div>
-
-            <div className="ios-delete-confirm">
-              <label
-                htmlFor="delete-confirm"
-                className="ios-input-label"
-              >
-                Confirmation
-              </label>
-
-              <input
-                id="delete-confirm"
-                type="text"
-                value={confirmText}
-                onChange={(e) => setConfirmText(e.target.value)}
-                placeholder="type 'delete'"
-                autoComplete="off"
-                spellCheck={false}
-              />
-
-              <div className="ios-input-hint">
-                Type <code>delete</code> to confirm.
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className="ios-delete-button"
-              disabled={!confirmed || busy}
-              onClick={() => void doDelete()}
-            >
-              {busy ? (
-                <Spinner />
-              ) : (
-                <>
-                  <span className="ios-delete-icon">⌫</span>
-                  Delete my account
-                </>
-              )}
-            </button>
-          </div>
+         
         </section>
 
         <div className="ios-footer-note">
@@ -253,6 +186,16 @@ export default function ProfilePage() {
           <span>Account &amp; Session</span>
         </div>
       </div>
+
+      <ConfirmSheet
+        open={confirmingSignOut}
+        title="Sign out"
+        message="You'll be signed out of RemindMe on this device."
+        confirmLabel="Sign out"
+        busy={signingOut}
+        onConfirm={() => void doSignOut()}
+        onCancel={() => setConfirmingSignOut(false)}
+      />
 
       <style>{iosTheme}</style>
     </section>

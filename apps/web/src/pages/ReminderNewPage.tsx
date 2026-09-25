@@ -13,7 +13,7 @@ import {
 import { timezoneList } from '../lib/format';
 import type { RepeatRule } from '../lib/types';
 import { SubscribePrompt } from '../components/SubscribePrompt';
-import { ErrorBanner } from '../components/ErrorBanner';
+import { useErrorToast } from '../components/Toast';
 import { Spinner } from '../components/Spinner';
 import { ApiError } from '../lib/api';
 import LiquidGlass from 'liquid-glass-react';
@@ -545,6 +545,8 @@ export default function ReminderNewPage() {
   const [localError, setLocalError] = useState('');
   const [subscriptionRequired, setSubscriptionRequired] = useState(false);
 
+  useErrorToast(error || localError);
+
   const verifiedPhones = (phoneQuery.data ?? []).filter((p) => p.verified);
   const verifiedPhone = verifiedPhones[0];
   const selected = dates[dateIndex] ?? dates[0]!;
@@ -645,6 +647,7 @@ export default function ReminderNewPage() {
                       aria-label="Create reminder"
                       disabled={busy}
                       onClick={() => void createReminder()}
+                      className="active:scale-[0.9]"
                       style={{
                                       width: 50,
                                       height: 50,
@@ -702,8 +705,6 @@ export default function ReminderNewPage() {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            <ErrorBanner message={error || localError} />
-
             {/* ---------------------------------------------------------- */}
             {/* Time Picker                                                */}
             {/* ---------------------------------------------------------- */}

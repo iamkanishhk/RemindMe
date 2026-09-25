@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth, useSignIn } from '@clerk/react';
-import { ErrorBanner } from '../components/ErrorBanner';
 import { Spinner } from '../components/Spinner';
+import { Skeleton } from '../components/Skeleton';
+import { useErrorToast } from '../components/Toast';
 import illustration from '../../assets/2.png';
 
 export default function SignInPage() {
@@ -10,6 +11,8 @@ export default function SignInPage() {
   const { signIn } = useSignIn();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+
+  useErrorToast(error);
 
   if (isLoaded && isSignedIn) {
     return <Navigate to="/" replace />;
@@ -59,7 +62,6 @@ export default function SignInPage() {
       </div>
 
       <div className="w-full max-w-[310px] space-y-3.5 pb-4">
-        <ErrorBanner message={error} />
         <button
           type="button"
           className="w-full py-3.5 rounded-full font-semibold text-[14px] flex items-center justify-center gap-3 bg-[#e9ecef] text-[#2b303a] transition active:scale-[0.97] active:bg-[#dee2e6] disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
@@ -76,7 +78,11 @@ export default function SignInPage() {
           )}
           <span>Continue with Google</span>
         </button>
-        {!isLoaded ? <p className="text-center text-xs text-slate-400 font-medium">Loading…</p> : null}
+        {!isLoaded ? (
+          <div className="skeleton-area-light">
+            <Skeleton className="h-[50px] w-full rounded-full" />
+          </div>
+        ) : null}
       </div>
     </div>
   );
