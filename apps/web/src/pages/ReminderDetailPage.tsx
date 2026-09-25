@@ -5,6 +5,7 @@ import { formatDateTimeLocal, formatRelative, formatTime, repeatLabel } from '..
 import { StatusChip } from '../components/StatusChip';
 import { Spinner } from '../components/Spinner';
 import { ErrorBanner } from '../components/ErrorBanner';
+import LiquidGlass from 'liquid-glass-react';
 
 export default function ReminderDetailPage() {
   const { id = '' } = useParams();
@@ -30,12 +31,6 @@ export default function ReminderDetailPage() {
   if (reminder.error || !reminder.data) {
     return (
       <section className="ios-page">
-        <div className="ios-nav">
-          <Link to="/" className="ios-back">
-            <span className="ios-back-icon">‹</span>
-            <span>Reminders</span>
-          </Link>
-        </div>
 
         <div className="ios-error-card">
           <ErrorBanner message={reminder.error?.message ?? 'Reminder not found'} />
@@ -69,71 +64,115 @@ export default function ReminderDetailPage() {
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not delete reminder');
       setBusy(false);
+      setConfirmingDelete(false);
     }
   }
 
   return (
     <section className="ios-page">
       <div className="ios-container">
-        {/* Navigation */}
-        <div className="ios-nav">
-          <Link to="/" className="ios-back">
-            <span className="ios-back-icon">‹</span>
-            <span>Reminders</span>
-          </Link>
-        </div>
-
         {/* Header */}
-        <header className="ios-header">
+        <header className="ios-header mt-10">
           <div className="ios-title-row">
             <div className="ios-title-wrap">
               <span className={`ios-status-dot ${r.isEnabled ? 'active' : 'paused'}`} />
 
               <div>
                 <h1>{r.title}</h1>
+               <LiquidGlass
+                           displacementScale={64}
+                           saturation={130}
+                           aberrationIntensity={2}
+                           elasticity={0.35}
+                           cornerRadius={100}
+                          blurAmount={0.1}
+                          padding="15px"
+                          style={{ 
+                            width: 50,
+                            height: 20,
+                            top: 15,
+                            right: 60,
+                            position: 'fixed',
+                           }}
+                            >
+                           <div className="flex items-center gap-5 justify-center">
+                             <button
+                              disabled={busy}
+                              onClick={() => void toggle()}
+                              className="w-10">
+                              {r.isEnabled ? '| |' : '▶'}
+                            </button>
 
-                <div className="ios-title-meta">
-                  <StatusChip status={r.status} />
-                </div>
+
+                                <button
+                                  type="button"
+                                  className="w-10"
+                                  onClick={() => setConfirmingDelete(true)}
+                                >
+                                   <svg width="35" height="35" viewBox="0 0 24 24" fill="none " 
+                                xmlns="http://www.w3.org/2000/svg">
+
+                              <path d="M5 7H19"
+                                    stroke="#FF3B30"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"/>
+
+                              <path d="M9 4H15"
+                                    stroke="#FF3B30"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"/>
+
+
+                              <path d="M7 7.5L7.7 19C7.77 20.1 8.68 21 9.78 21H14.22C15.32 21 16.23 20.1 16.3 19L17 7.5"
+                                    stroke="#FF3B30"
+                                    stroke-width="1.8"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"/>
+
+
+                              <path d="M10 11V17"
+                                    stroke="#FF3B30"
+                                    stroke-width="1.6"
+                                    stroke-linecap="round"/>
+
+                              <path d="M14 11V17"
+                                    stroke="#FF3B30"
+                                    stroke-width="1.6"
+                                    stroke-linecap="round"/>
+                            </svg>
+                                </button>
+
+
+                             
+                            
+                            
+                              </div>
+                                  </LiquidGlass>
+                                   <LiquidGlass 
+             displacementScale={64}
+             saturation={130}
+             aberrationIntensity={2}
+             elasticity={0.35}
+             cornerRadius={100}
+            blurAmount={0.1}
+            padding="15px"
+            style={{ 
+              width: 15,
+              height: 15,
+              top: 20,
+              left: 30,
+              position: 'fixed',
+             }}
+              >
+              <Link to="/" className="ios-back">
+            <span className="ios-back-icon text-white p-2">‹</span>
+          </Link>
+                    </LiquidGlass>
               </div>
             </div>
           </div>
 
-          <div className="ios-actions">
-            <button
-              type="button"
-              className={`ios-action-button ${r.isEnabled ? 'secondary' : 'green'}`}
-              disabled={busy}
-              onClick={() => void toggle()}
-            >
-              <span className="ios-action-icon">
-                {r.isEnabled ? 'Ⅱ' : '▶'}
-              </span>
-              {r.isEnabled ? 'Pause' : 'Resume'}
-            </button>
-
-
-            {confirmingDelete ? (
-              <button
-                type="button"
-                className="ios-action-button destructive"
-                disabled={busy}
-                onClick={() => void doDelete()}
-              >
-                <span className="ios-action-icon">!</span>
-                Confirm delete
-              </button>
-            ) : (
-              <button
-                type="button"
-                className="ios-action-button destructive-outline"
-                onClick={() => setConfirmingDelete(true)}
-              >
-                <span className="ios-action-icon">⌫</span>
-                Delete
-              </button>
-            )}
-          </div>
+         
         </header>
 
         {/* Error */}
@@ -246,6 +285,108 @@ export default function ReminderDetailPage() {
         </section>
 
       </div>
+
+        {/* iOS Popup */}
+        {confirmingDelete && (
+          <div className="ios-popup-backdrop fixed inset-0 z-[60] flex items-center justify-center bg-black/60 px-4 backdrop-blur-[3px]">
+            <div
+              className="
+                ios-popup-card
+                relative
+                w-[430px]
+                max-w-full
+                rounded-[28px]
+                border border-white/[0.07]
+                bg-gradient-to-b from-[#2a2d32] to-[#1b1d21]
+                px-5 pt-[25px] pb-5
+                text-center
+                shadow-[0_30px_70px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.04)]
+              "
+            >
+              {/* Title */}
+              <h2
+                className="
+                  mb-[30px]
+                  text-[24px]
+                  font-medium
+                  leading-[1.15]
+                  tracking-[-0.5px]
+                  text-[#f5f5f7]
+                "
+              >
+                Delete Reminder
+              </h2>
+
+              {/* Message */}
+              <p
+                className="
+                  mb-[43px]
+                  text-[20px]
+                  font-normal
+                  leading-[1.35]
+                  tracking-[-0.2px]
+                  text-[#f5f5f7]
+                "
+              >
+                Are you sure you want to delete this reminder? This action cannot be undone.
+              </p>
+
+              {/* Buttons */}
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => void doDelete()}
+                  className="
+                    flex
+                    h-[70px]
+                    items-center
+                    justify-center
+                    gap-2
+                    rounded-full
+                    border-0
+                    bg-gradient-to-b from-[#168cff] to-[#087cf0]
+                    text-[21px]
+                    font-medium
+                    tracking-[-0.25px]
+                    text-white
+                    shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]
+                    transition
+                    active:scale-[0.97]
+                    disabled:opacity-50
+                  "
+                >
+                  {busy ? 'Deleting…' : 'Delete'}
+                </button>
+
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => setConfirmingDelete(false)}
+                  className="
+                    flex
+                    h-[70px]
+                    items-center
+                    justify-center
+                    rounded-full
+                    border-0
+                    bg-gradient-to-b from-[#41464e] to-[#373c43]
+                    text-[21px]
+                    font-medium
+                    tracking-[-0.25px]
+                    text-white/90
+                    shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]
+                    transition
+                    active:scale-[0.97]
+                    disabled:opacity-50
+                  "
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
       <style>{`
         :root {
@@ -737,6 +878,44 @@ export default function ReminderDetailPage() {
           justify-content: center;
         }
 
+        /* Popup */
+
+        @keyframes ios-pop {
+          0% {
+            opacity: 0;
+            transform: scale(0.6) translateY(16px);
+          }
+
+          60% {
+            opacity: 1;
+            transform: scale(1.05) translateY(-3px);
+          }
+
+          100% {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+
+        .ios-popup-card {
+          transform-origin: center;
+          animation: ios-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        @keyframes ios-backdrop {
+          from {
+            opacity: 0;
+          }
+
+          to {
+            opacity: 1;
+          }
+        }
+
+        .ios-popup-backdrop {
+          animation: ios-backdrop 0.22s ease-out both;
+        }
+
         /* Responsive */
 
         @media (max-width: 680px) {
@@ -826,6 +1005,11 @@ export default function ReminderDetailPage() {
           .ios-action-button,
           .ios-back {
             transition: none;
+          }
+
+          .ios-popup-card,
+          .ios-popup-backdrop {
+            animation: none;
           }
         }
       `}</style>

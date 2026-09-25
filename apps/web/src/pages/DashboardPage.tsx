@@ -1,10 +1,17 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useMe, useReminders, useUpdateReminder } from '../hooks/queries';
 import { formatRelative, formatTime, isToday, repeatLabel } from '../lib/format';
 import type { Reminder } from '../lib/types';
 import { Spinner } from '../components/Spinner';
 import { ErrorBanner } from '../components/ErrorBanner';
+import { motion } from 'framer-motion';
+import LiquidGlass from 'liquid-glass-react';
+import {
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from 'framer-motion';
 
 function sortKey(r: Reminder): number {
   return r.nextRunAt ? new Date(r.nextRunAt).getTime() : Number.MAX_SAFE_INTEGER;
@@ -75,10 +82,10 @@ function CheckCircleIcon() {
   );
 }
 
-function PlusIcon() {
+function SearchIcon() {
   return (
     <svg
-      viewBox="0 0 448 512"
+      viewBox="0 0 512 512"
       fill="currentColor"
       className="h-[18px] w-[18px]"
       aria-hidden="true"
@@ -117,8 +124,221 @@ function PauseIcon() {
 /* -------------------------------------------------------------------------- */
 /* iOS-style Switch                                                           */
 /* -------------------------------------------------------------------------- */
+ const IOS_SWITCH_CONFIG = {
+  // ─────────────────────────────────────────────
+  // GEOMETRY
+  // ─────────────────────────────────────────────
+  geometry: {
+    trackWidth: 65,
+    trackHeight: 30,
+    trackPadding: 3,
 
-function IOSSwitch({
+    knobWidth: 36,
+    knobHeight: 25,
+
+    // 9999 = pill / circle
+    knobRadius: 9999,
+  },
+
+  // ─────────────────────────────────────────────
+  // SPRING PHYSICS
+  // ─────────────────────────────────────────────
+  physics: {
+    stiffness: 420,
+    damping: 28,
+    mass: 0.8,
+
+    // How long we consider the switch to be
+    // in its "liquid motion" state.
+    animationDuration: 450,
+
+    // Minimum velocity before liquid mode activates.
+    velocityThreshold: 2,
+
+    // Velocity used as the reference for
+    // calculating stretch.
+    velocityReference: 450,
+  },
+
+  // ─────────────────────────────────────────────
+  // LIQUID / GLASS
+  // ─────────────────────────────────────────────
+  glass: {
+    // Size multiplier while moving
+    scale: 1.27,
+
+    // Extra width/height of glass layer
+    thickness: 2,
+
+    // Overall transparency
+    transmission: 0.92,
+
+    // Backdrop blur
+    blur: 4,
+
+    // Glass saturation
+    saturation: 150,
+
+    // Contrast
+    contrast: 505,
+
+    // Border opacity
+    borderOpacity: 0.75,
+
+    // Shadow strength
+    shadowOpacity: 2.30,
+
+    // How much the glass reacts to velocity
+    velocityDisplacement: 8,
+
+    // Base displacement
+    displacement: 12,
+  },
+
+  // ─────────────────────────────────────────────
+  // LIQUID STRETCH
+  // ─────────────────────────────────────────────
+  stretch: {
+    // Base horizontal stretch multiplier
+    factorX: 1.45,
+
+    // Base vertical compression
+    factorY: 0.16,
+
+    // Minimum vertical scale
+    minY: 0.72,
+
+    // Maximum normalized velocity
+    maxVelocity: 2.5,
+
+    // Optional anisotropic multiplier
+    anisotropy: 1.0,
+  },
+
+  // ─────────────────────────────────────────────
+  // CHROMATIC ABERRATION
+  // ─────────────────────────────────────────────
+  chromatic: {
+    // Minimum RGB separation
+    base: 1,
+
+    // Additional separation based on velocity
+    velocityAmount: 4,
+
+    // CSS overlay opacity
+    overlayOpacity: 0.75,
+
+    // Red channel
+    red: 'rgba(255, 0, 90, 0.28)',
+
+    // Cyan / blue channel
+    blue: 'rgba(0, 240, 255, 0.28)',
+  },
+
+  // ─────────────────────────────────────────────
+  // SOLID KNOB
+  // ─────────────────────────────────────────────
+  knob: {
+    restingScale: 1,
+
+    movingScale: 0.88,
+
+    fadeDuration: 0.14,
+
+    background: '#FFFFFF',
+
+  },
+
+  // ─────────────────────────────────────────────
+  // SPECULAR / LIGHTING
+  // ─────────────────────────────────────────────
+  lighting: {
+    specularOpacity: 0.0,
+
+    specularGradient: `
+      linear-gradient(
+        135deg,
+        rgba(255,255,255,0.9) 0%,
+        rgba(255,255,255,0.22) 38%,
+        transparent 68%
+      )
+    `,
+
+    causticOpacity: 0.45,
+
+    causticGradient: `
+      radial-gradient(
+        circle at 50% 85%,
+        rgba(255,255,255,0.45) 0%,
+        transparent 68%
+      )
+    `,
+  },
+
+  // ─────────────────────────────────────────────
+  // COLORS
+  // ─────────────────────────────────────────────
+  colors: {
+    on: '#34C759',
+    off: '#C6C6C6',
+
+    onGlow: 'rgba(52,199,89,0.45)',
+    offGlow: 'rgba(255,255,255,0.18)',
+
+    onAmbientOpacity: 0.35,
+
+    onAmbientGradient: `
+      radial-gradient(
+        circle at 82% 50%,
+        rgba(255,255,255,0.9),
+        transparent 65%
+      )
+    `,
+  },
+
+  // ─────────────────────────────────────────────
+  // ANIMATION
+  // ─────────────────────────────────────────────
+  animation: {
+    liquidFadeDuration: 0.1,
+
+    liquidEase: [0.16, 1, 0.3, 1],
+
+    ambientDuration: 0.25,
+
+    // whileTap scale
+    tapScale: 0.92,
+  },
+
+  // ─────────────────────────────────────────────
+  // LIQUID GLASS COMPONENT
+  // ─────────────────────────────────────────────
+  liquidGlass: {
+    displacementScale: 12,
+    saturation: 150,
+    aberrationIntensity: 3,
+    blurAmount: 0.08,
+  },
+
+  // ─────────────────────────────────────────────
+  // TRACK SHADOWS
+  // ─────────────────────────────────────────────
+  shadows: {
+    on: `
+      inset 0 2px 4px rgba(0,0,0,0.20),
+      inset 0 -1px 1px rgba(255,255,255,0.20),
+      0 2px 6px rgba(0,0,0,0.25)
+    `,
+
+    off: `
+      inset 0 2px 5px rgba(0,0,0,0.45),
+      inset 0 -1px 1px rgba(255,255,255,0.08),
+      0 2px 6px rgba(0,0,0,0.25)
+    `,
+  },
+} as const;
+
+export function IOSSwitch({
   enabled,
   busy,
   onClick,
@@ -129,6 +349,87 @@ function IOSSwitch({
   onClick: () => void;
   label: string;
 }) {
+  const config = IOS_SWITCH_CONFIG;
+
+  const {
+    geometry,
+    physics,
+    glass,
+    stretch,
+    chromatic,
+    knob,
+    lighting,
+    colors,
+    animation,
+    liquidGlass,
+    shadows,
+  } = config;
+
+  const travel =
+    geometry.trackWidth -
+    geometry.knobWidth -
+    geometry.trackPadding * 2;
+
+  const targetX = enabled ? travel : 0;
+
+  const x = useMotionValue(targetX);
+
+  const springX = useSpring(x, {
+    stiffness: physics.stiffness,
+    damping: physics.damping,
+    mass: physics.mass,
+  });
+
+  const [velocity, setVelocity] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    x.set(targetX);
+    setIsAnimating(true);
+
+    const timer = window.setTimeout(() => {
+      setIsAnimating(false);
+    }, physics.animationDuration);
+
+    return () => window.clearTimeout(timer);
+  }, [enabled, targetX, x, physics.animationDuration]);
+
+  useEffect(() => {
+    return springX.on('change', () => {
+      setVelocity(springX.getVelocity());
+    });
+  }, [springX]);
+
+  const isLiquidActive =
+    isAnimating ||
+    Math.abs(velocity) > physics.velocityThreshold;
+
+  const normalizedVelocity = Math.min(
+    Math.abs(velocity) / physics.velocityReference,
+    stretch.maxVelocity
+  );
+
+  const stretchX = isLiquidActive
+    ? 1 +
+      normalizedVelocity *
+        stretch.factorX *
+        stretch.anisotropy
+    : 1;
+
+  const stretchY = isLiquidActive
+    ? Math.max(
+        stretch.minY,
+        1 -
+          normalizedVelocity *
+            stretch.factorY *
+            stretch.anisotropy
+      )
+    : 1;
+
+  const aberrationIntensity =
+    chromatic.base +
+    normalizedVelocity * chromatic.velocityAmount;
+
   return (
     <button
       type="button"
@@ -137,42 +438,225 @@ function IOSSwitch({
       aria-label={label}
       disabled={busy}
       onClick={onClick}
-      className={`
+      className="
         relative
-        h-[31px]
-        w-[51px]
         shrink-0
         rounded-full
-        transition-all
-        duration-200
+        transition-colors
+        duration-300
         ease-out
         focus:outline-none
         focus-visible:ring-2
-        focus-visible:ring-blue-500/70
+        focus-visible:ring-emerald-400/70
         disabled:opacity-50
-        ${enabled ? 'bg-[#34C759]' : 'bg-[#39393D]'}
-      `}
+        touch-manipulation
+        select-none
+        overflow-visible
+      "
+      style={{
+        width: geometry.trackWidth,
+        height: geometry.trackHeight,
+        padding: geometry.trackPadding,
+        borderRadius:
+          Math.min(
+            geometry.trackHeight / 2,
+            geometry.knobRadius
+          ),
+
+        backgroundColor: enabled
+          ? colors.on
+          : colors.off,
+
+        boxShadow: enabled
+          ? shadows.on
+          : shadows.off,
+
+        WebkitTapHighlightColor: 'transparent',
+      }}
     >
-      <span
-        aria-hidden="true"
-        className={`
-          absolute
-          top-[2px]
-          left-[2px]
-          h-[27px]
-          w-[27px]
-          rounded-full
-          bg-white
-          shadow-[0_2px_5px_rgba(0,0,0,0.35)]
-          transition-transform
-          duration-200
-          ease-out
-          ${enabled ? 'translate-x-5' : 'translate-x-0'}
-        `}
+      {/* Ambient track glow */}
+      <motion.div
+        className="pointer-events-none absolute inset-0 rounded-full"
+        animate={{
+          opacity: enabled
+            ? colors.onAmbientOpacity
+            : 0,
+        }}
+        transition={{
+          duration: animation.ambientDuration,
+        }}
+        style={{
+          background:
+            colors.onAmbientGradient,
+        }}
       />
+
+      {/* Sliding knob */}
+      <motion.div
+        className="absolute pointer-events-none"
+        style={{
+          left: geometry.trackPadding,
+          top: '50%',
+          x: springX,
+          y: '-50%',
+          width: geometry.knobWidth,
+          height: geometry.knobHeight,
+        }}
+      >
+        {/* ==========================================
+            SOLID RESTING KNOB
+            ========================================== */}
+        <motion.div
+          className="absolute inset-0 flex items-center justify-center bg-white"
+          animate={{
+            opacity: isLiquidActive ? 0 : 1,
+            scale: isLiquidActive
+              ? knob.movingScale
+              : knob.restingScale,
+          }}
+          transition={{
+            duration: knob.fadeDuration,
+            ease: 'easeOut',
+          }}
+          style={{
+            borderRadius: geometry.knobRadius,
+
+          }}
+        >
+        </motion.div>
+
+        {/* ==========================================
+            LIQUID GLASS
+            ========================================== */}
+        <motion.div
+          className="absolute pointer-events-none z-20"
+          animate={{
+            opacity: isLiquidActive
+              ? glass.transmission
+              : 0,
+
+            scale: isLiquidActive
+              ? glass.scale
+              : 0.82,
+
+            scaleX: stretchX,
+            scaleY: stretchY,
+          }}
+          transition={{
+            duration:
+              animation.liquidFadeDuration,
+
+            ease: animation.liquidEase,
+          }}
+          style={{
+            width:
+              geometry.knobWidth +
+              glass.thickness * 2,
+
+            height:
+              geometry.knobHeight +
+              glass.thickness * 2,
+
+            left: -glass.thickness,
+            top: -glass.thickness,
+
+            borderRadius:
+              geometry.knobRadius,
+
+            backdropFilter: `
+              blur(${glass.blur}px)
+              saturate(${glass.saturation}%)
+              contrast(${glass.contrast}%)
+            `,
+
+            WebkitBackdropFilter: `
+              blur(${glass.blur}px)
+              saturate(${glass.saturation}%)
+              contrast(${glass.contrast}%)
+            `,
+
+            background:
+              'rgba(255,255,255,0.16)',
+
+            border: `
+              1px solid
+              rgba(255,255,255,${glass.borderOpacity})
+            `,
+
+            boxShadow: `
+              inset 0 2px 4px
+                rgba(255,255,255,0.95),
+
+              inset 0 -2px 4px
+                rgba(0,0,0,${glass.shadowOpacity}),
+
+              0 5px 14px
+                rgba(0,0,0,0.30),
+
+              0 0 12px
+                ${
+                  enabled
+                    ? colors.onGlow
+                    : colors.offGlow
+                }
+            `,
+          }}
+        >
+
+          {/* RGB dispersion */}
+          <motion.div
+            className="absolute inset-0 overflow-hidden rounded-full pointer-events-none"
+            animate={{
+              opacity: isLiquidActive
+                ? chromatic.overlayOpacity
+                : 0,
+            }}
+          >
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `
+                  linear-gradient(
+                    90deg,
+                    ${chromatic.red} 0%,
+                    transparent 38%,
+                    transparent 62%,
+                    ${chromatic.blue} 100%
+                  )
+                `,
+              }}
+            />
+          </motion.div>
+
+          {/* Specular highlight */}
+          <div
+            className="absolute inset-0 rounded-full pointer-events-none"
+            style={{
+              opacity:
+                lighting.specularOpacity,
+
+              background:
+                lighting.specularGradient,
+            }}
+          />
+
+          {/* Caustic */}
+          <div
+            className="absolute inset-0 rounded-full pointer-events-none"
+            style={{
+              opacity:
+                lighting.causticOpacity,
+
+              background:
+                lighting.causticGradient,
+            }}
+          />
+        </motion.div>
+      </motion.div>
     </button>
   );
 }
+
 
 /* -------------------------------------------------------------------------- */
 /* Schedule Item                                                              */
@@ -207,13 +691,10 @@ function ScheduleItem({ reminder }: { reminder: Reminder }) {
         gap-4
         px-4
         py-3.5
-        min-h-[76px]
-        bg-[#1C1C1E]
+        min-h-[10vh]
         border-b
-        border-[#38383A]
-        last:border-b-0
-        transition-colors
-        ${!enabled ? 'opacity-50' : ''}
+        border-t
+        border-[#38383a61]
       `}
     >
       <Link
@@ -221,28 +702,27 @@ function ScheduleItem({ reminder }: { reminder: Reminder }) {
         className="min-w-0 flex-1"
       >
         <div className="flex items-baseline gap-1.5">
-          <span
-            className={`
-              text-[18px]
-              leading-none
-              font-semibold
-              tracking-[-0.02em]
-              tabular-nums
-              ${enabled ? 'text-white' : 'text-[#8E8E93]'}
-            `}
-          >
-            {hour}
-          </span>
+         <span
+              className="
+                text-[48px]
+                leading-none
+                tracking-[-0.045em]
+                text-[#8E8E93]
+                tabular-nums
+              "
+            >
+              {hour}
+            </span>
 
-          <span
-            className={`
-              text-[12px]
-              font-medium
-              ${enabled ? 'text-[#8E8E93]' : 'text-[#636366]'}
-            `}
-          >
-            {meridiem}
-          </span>
+            <span
+              className="
+                text-[19px]
+                tracking-[-0.01em]
+                text-[#8E8E93]
+              "
+            >
+              {meridiem}
+            </span>
         </div>
 
         <p
@@ -252,26 +732,13 @@ function ScheduleItem({ reminder }: { reminder: Reminder }) {
             text-[14px]
             leading-[18px]
             font-medium
-            ${enabled ? 'text-[#F2F2F7]' : 'text-[#8E8E93]'}
+          text-[#8E8E93]
           `}
         >
           {reminder.title}
         </p>
 
-        <p
-          className="
-            mt-0.5
-            truncate
-            text-[11px]
-            leading-[15px]
-            font-medium
-            text-[#636366]
-          "
-        >
-          {repeatLabel(reminder.repeatRule)}
-          {' · '}
-          {reminder.phoneNumber?.e164 ?? 'No phone'}
-        </p>
+       
       </Link>
 
       <IOSSwitch
@@ -299,107 +766,15 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
   return (
     <div
       className="
-        relative
-        overflow-hidden
-        rounded-[28px]
-        bg-[#1C1C1E]
-        border
-        border-[#2C2C2E]
-        shadow-[0_18px_50px_rgba(0,0,0,0.25)]
+      border-b
+      border-t
+      border-[#2C2C2E]
+
       "
     >
-      {/* Subtle iOS-style blue glow */}
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
-          -right-16
-          -top-24
-          h-48
-          w-48
-          rounded-full
-          bg-[#0A84FF]/10
-          blur-3xl
-        "
-      />
 
       <div className="relative p-5">
-        <div className="flex items-center justify-between">
-          <span
-            className="
-              text-[12px]
-              font-semibold
-              tracking-[0.01em]
-              text-[#0A84FF]
-            "
-          >
-            Next reminder
-          </span>
-
-          <span
-            className="
-              rounded-full
-              bg-[#2C2C2E]
-              px-2.5
-              py-1
-              text-[10px]
-              font-semibold
-              text-[#8E8E93]
-            "
-          >
-            Today
-          </span>
-        </div>
-
-        <div className="mt-4 flex items-center justify-between gap-4">
-          <div className="flex min-w-0 items-baseline gap-2">
-            <span
-              className="
-                text-[48px]
-                leading-none
-                font-semibold
-                tracking-[-0.045em]
-                text-white
-                tabular-nums
-              "
-            >
-              {hour}
-            </span>
-
-            <span
-              className="
-                text-[19px]
-                font-medium
-                tracking-[-0.01em]
-                text-[#8E8E93]
-              "
-            >
-              {meridiem}
-            </span>
-          </div>
-
-          <Link
-            to={`/reminders/${reminder.id}`}
-            aria-label="View reminder"
-            className="
-              flex
-              h-12
-              w-12
-              shrink-0
-              items-center
-              justify-center
-              rounded-full
-              text-white
-
-              active:scale-90
-            "
-          >
-            <PhoneIcon />
-          </Link>
-        </div>
-
-        <h2
+           <h2
           className="
             mt-4
             truncate
@@ -413,24 +788,47 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
           {reminder.title}
         </h2>
 
-        <div className="mt-1.5 flex items-center gap-2">
-          <span className="text-[13px] font-medium text-[#8E8E93]">
-            Today
-          </span>
+        <div className="mt-4 flex items-center justify-between gap-4">
+          <div className="flex min-w-0 items-baseline gap-2">
+            <span
+              className="
+                text-[48px]
+                leading-none
+                tracking-[-0.045em]
+                text-white
+                tabular-nums
+              "
+            >
+              {hour}
+            </span>
 
-          <span
-            aria-hidden="true"
-            className="text-[#48484A]"
+            <span
+              className="
+                text-[19px]
+                tracking-[-0.01em]
+                text-white
+              "
+            >
+              {meridiem}
+            </span>
+          </div>
+
+          <Link
+            to={`/reminders/${reminder.id}`}
+            className="
+              flex
+              h-12
+              w-12
+              shrink-0
+              items-center
+              justify-center
+              rounded-full
+              text-white
+
+              active:scale-90
+            "
           >
-            •
-          </span>
-
-          <span className="text-[13px] font-medium text-[#0A84FF]">
-            {relative}
-          </span>
-        </div>
-
-        <div className="mt-4">
+            <div className="mt-4">
           <span
             className={`
               inline-flex
@@ -441,46 +839,21 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
               py-1.5
               text-[11px]
               font-semibold
-              ${
-                enabled
-                  ? 'bg-[#123D24] text-[#30D158]'
-                  : 'bg-[#2C2C2E] text-[#8E8E93]'
-              }
+             bg-[#3f576f50]
+              text-[#0A84FF]
             `}
           >
-            {enabled ? (
-              <CheckCircleIcon />
-            ) : (
-              <PauseIcon />
-            )}
-
-            {enabled ? 'Call scheduled' : 'Call paused'}
+            VIEW
           </span>
         </div>
+          </Link>
+        </div>
 
-        <Link
-          to={`/reminders/${reminder.id}`}
-          className="
-            mt-5
-            flex
-            w-full
-            items-center
-            justify-center
-            gap-2
-            rounded-[14px]
-            bg-[#2C2C2E]
-            py-3
-            text-[14px]
-            font-semibold
-            text-[#0A84FF]
-            transition
-            hover:bg-[#3A3A3C]
-            active:scale-[0.98]
-          "
-        >
-          <span>View reminder</span>
-          <ChevronIcon />
-        </Link>
+      
+          <span className="text-[13px] font-medium text-[#0A84FF]">
+            {relative}
+          </span>
+
       </div>
     </div>
   );
@@ -549,93 +922,28 @@ export default function DashboardPage() {
       {/* Header                                                             */}
       {/* ------------------------------------------------------------------ */}
 
-      <div className="mx-auto flex max-w-xl items-center justify-between py-3">
-        <div className="flex min-w-0 items-center gap-3">
-          {/* Avatar */}
-          <div className="relative shrink-0">
-            <div
+   <div className="mb-4 pt-5 flex items-center justify-between">
+     <div
               className="
                 flex
-                h-11
-                w-11
-                items-center
-                justify-center
-                rounded-full
-                bg-[#2C2C2E]
-                text-[17px]
+                text-[25px]
                 font-semibold
                 text-white
-                ring-1
-                ring-white/[0.08]
+            
               "
             >
-              {email
-                ? displayName.charAt(0).toUpperCase()
-                : 'R'}
+              Call Reminder
             </div>
-
-            <span
+             <Link
+              to="/reminders/new"
               className="
-                absolute
-                bottom-0
-                right-0
-                h-3
-                w-3
-                rounded-full
-                border-2
-                border-black
-                bg-[#30D158]
-              "
-            />
-          </div>
-
-          <div className="min-w-0">
-            <span
-              className="
-                block
-                text-[12px]
-                leading-4
-                font-medium
-                text-[#8E8E93]
+              text-[#0A84FF]
+              text-[35px]
               "
             >
-              {greetingLabel()}
-            </span>
-
-            <h1
-              className="
-                truncate
-                text-[17px]
-                leading-[21px]
-                font-semibold
-                tracking-[-0.01em]
-                text-[#F2F2F7]
-              "
-            >
-              {displayName}
-            </h1>
-          </div>
-        </div>
-
-        <span
-          className="
-            ml-3
-            shrink-0
-            rounded-full
-            bg-[#1C1C1E]
-            px-3
-            py-1.5
-            text-[12px]
-            font-medium
-            text-[#8E8E93]
-            ring-1
-            ring-white/[0.05]
-          "
-        >
-          {todayLabel}
-        </span>
-      </div>
-
+              +
+            </Link>
+            </div>
       {/* ------------------------------------------------------------------ */}
       {/* Main Content                                                       */}
       {/* ------------------------------------------------------------------ */}
@@ -703,30 +1011,6 @@ export default function DashboardPage() {
               Nothing planned yet. Schedule a call reminder to get started.
             </p>
 
-            <Link
-              to="/reminders/new"
-              className="
-                mt-6
-                inline-flex
-                items-center
-                justify-center
-                gap-2
-                rounded-[14px]
-                bg-[#0A84FF]
-                px-5
-                py-3
-                text-[14px]
-                font-semibold
-                text-white
-                shadow-[0_8px_24px_rgba(10,132,255,0.22)]
-                transition-all
-                hover:bg-[#2190FF]
-                active:scale-[0.97]
-              "
-            >
-              <PlusIcon />
-              <span>Create reminder</span>
-            </Link>
           </div>
         ) : (
           <div className="mt-5 flex flex-col gap-6">
@@ -754,44 +1038,14 @@ export default function DashboardPage() {
                       text-[#F2F2F7]
                     "
                   >
-                    Today&apos;s schedule
+                   Other
                   </h3>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span
-                    className="
-                      text-[12px]
-                      font-medium
-                      text-[#0A84FF]
-                    "
-                  >
-                    Today
-                  </span>
-
-                  <span
-                    className="
-                      text-[11px]
-                      font-medium
-                      text-[#636366]
-                    "
-                  >
-                    {today.length}{' '}
-                    {today.length === 1 ? 'call' : 'calls'}
-                  </span>
                 </div>
               </div>
 
               {/* iOS grouped list */}
-              <div
-                className="
-                  overflow-hidden
-                  rounded-[18px]
-                  border
-                  border-[#2C2C2E]
-                  bg-[#1C1C1E]
-                "
-              >
+                <div
+               >
                 {today.map((r) => (
                   <ScheduleItem
                     key={r.id}
@@ -803,38 +1057,6 @@ export default function DashboardPage() {
           </div>
         )}
       </div>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* Floating Action Button                                             */}
-      {/* ------------------------------------------------------------------ */}
-
-      <Link
-        to="/reminders/new"
-        className="
-          fixed
-          bottom-6
-          right-5
-          z-20
-          flex
-          h-14
-          w-14
-          items-center
-          justify-center
-          rounded-full
-          bg-[#0A84FF]
-          text-white
-          shadow-[0_10px_35px_rgba(10,132,255,0.38)]
-          ring-1
-          ring-white/10
-          transition-all
-          duration-150
-          hover:bg-[#2190FF]
-          active:scale-90
-        "
-        aria-label="Create new reminder"
-      >
-        <PlusIcon />
-      </Link>
     </section>
   );
 }

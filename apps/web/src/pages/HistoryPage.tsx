@@ -5,6 +5,7 @@ import { StatusChip } from '../components/StatusChip';
 import { Spinner } from '../components/Spinner';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { EmptyState } from '../components/EmptyState';
+import LiquidGlass from 'liquid-glass-react';
 
 export default function HistoryPage() {
   const calls = useCalls();
@@ -48,19 +49,47 @@ export default function HistoryPage() {
       <div className="ios-history-container">
         {/* Page Header */}
         <header className="ios-page-header">
-          <div className="ios-eyebrow">ACTIVITY</div>
 
-          <div className="ios-title-row">
-            <div>
-              <h1>Call history</h1>
-              <p>Every call attempt and its result.</p>
-            </div>
-
-            {attempts.length > 0 && (
-              <div className="ios-count-badge">
-                {attempts.length}
-              </div>
-            )}
+        <div className="flex">
+              <span className="w-full text-4xl">Call history</span>
+           <div className="flex items-center justify-center w-fit">
+              <LiquidGlass 
+             displacementScale={64}
+             saturation={130}
+             aberrationIntensity={2}
+             elasticity={0.35}
+             cornerRadius={100}
+            blurAmount={0.1}
+            padding="15px"
+            style={{ 
+              width: 20,
+              height: 20,
+              top: 15,
+              right: 50,
+              position: 'fixed',
+             }}
+              >
+              <svg width="40" height="40" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
+                  <circle
+                    cx="42"
+                    cy="42"
+                    r="19"
+                    fill="none"
+                    stroke="white"
+                    stroke-width="8"
+                  />
+                  <line
+                    x1="56"
+                    y1="56"
+                    x2="73"
+                    y2="73"
+                    stroke="white"
+                    stroke-width="8"
+                    stroke-linecap="round"
+                  />
+                </svg>
+                    </LiquidGlass>
+           </div>
           </div>
         </header>
 
@@ -210,7 +239,7 @@ export default function HistoryPage() {
           color-scheme: dark;
 
           --ios-black: #000000;
-          --ios-card: #1c1c1e;
+          --ios-card: #18181A;
           --ios-card-elevated: #2c2c2e;
 
           --ios-text: #f5f5f7;
@@ -318,26 +347,7 @@ export default function HistoryPage() {
           letter-spacing: -0.01em;
         }
 
-        .ios-count-badge {
-          min-width: 34px;
-          height: 34px;
-
-          padding: 0 10px;
-
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-
-          border-radius: 999px;
-
-          background: #2c2c2e;
-          color: var(--ios-secondary);
-
-          font-size: 14px;
-          font-weight: 600;
-
-          font-variant-numeric: tabular-nums;
-        }
+       
 
         /* --------------------------------
            Section
@@ -387,9 +397,6 @@ export default function HistoryPage() {
             transform 0.15s ease;
         }
 
-        .ios-call-card:hover {
-          background: #202023;
-        }
 
         /* --------------------------------
            Card top
@@ -884,9 +891,6 @@ export default function HistoryPage() {
             align-items: flex-start;
           }
 
-          .ios-count-badge {
-            margin-top: 5px;
-          }
 
           .ios-section-label {
             padding-left: 13px;

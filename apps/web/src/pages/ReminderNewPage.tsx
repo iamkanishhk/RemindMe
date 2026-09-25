@@ -16,6 +16,7 @@ import { SubscribePrompt } from '../components/SubscribePrompt';
 import { ErrorBanner } from '../components/ErrorBanner';
 import { Spinner } from '../components/Spinner';
 import { ApiError } from '../lib/api';
+import LiquidGlass from 'liquid-glass-react';
 
 const DEFAULT_TZ =
   Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
@@ -28,7 +29,7 @@ const REPEAT_OPTIONS: Array<{
 }> = [
   {
     value: 'NONE',
-    label: 'Does not repeat'
+    label: 'Once'
   },
   {
     value: 'DAILY',
@@ -39,25 +40,6 @@ const REPEAT_OPTIONS: Array<{
     label: 'Weekly'
   }
 ];
-
-const inputCls = `
-  w-full
-  rounded-[13px]
-  border
-  border-[#38383A]
-  bg-[#1C1C1E]
-  px-3.5
-  py-3
-  text-[15px]
-  font-medium
-  text-[#F2F2F7]
-  outline-none
-  placeholder:text-[#636366]
-  transition
-  focus:border-[#0A84FF]
-  focus:ring-2
-  focus:ring-[#0A84FF]/20
-`;
 
 const pad = (v: number) => String(v).padStart(2, '0');
 
@@ -157,12 +139,16 @@ function buildDates() {
 function ChevronLeftIcon() {
   return (
     <svg
-      viewBox="0 0 512 512"
-      fill="currentColor"
-      className="h-[17px] w-[17px]"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5"
       aria-hidden="true"
     >
-      <path d="M310.6 105.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3L179.3 256l176.6 105.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0l-192-160c-12.5-12.5-12.5-32.8 0-45.3l192-160z" />
+      <path d="m15 18-6-6 6-6" />
     </svg>
   );
 }
@@ -170,12 +156,16 @@ function ChevronLeftIcon() {
 function ChevronUpIcon() {
   return (
     <svg
-      viewBox="0 0 448 512"
-      fill="currentColor"
-      className="h-2.5 w-2.5"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-3.5 w-3.5"
       aria-hidden="true"
     >
-      <path d="M233.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L256 173.3 61.7 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z" />
+      <path d="m18 15-6-6-6 6" />
     </svg>
   );
 }
@@ -183,12 +173,16 @@ function ChevronUpIcon() {
 function ChevronDownIcon() {
   return (
     <svg
-      viewBox="0 0 448 512"
-      fill="currentColor"
-      className="h-2.5 w-2.5"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-3.5 w-3.5"
       aria-hidden="true"
     >
-      <path d="M214.6 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 61.7 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z" />
+      <path d="m6 9 6 6 6-6" />
     </svg>
   );
 }
@@ -196,12 +190,17 @@ function ChevronDownIcon() {
 function BellIcon() {
   return (
     <svg
-      viewBox="0 0 448 512"
-      fill="currentColor"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       className="h-4 w-4"
       aria-hidden="true"
     >
-      <path d="M224 0c-17.7 0-32 14.3-32 32V51.2C119 66 64 130.6 64 208v25.4c0 45.4-15.5 89.5-43.8 124.9L5.3 377c-5.8 7.2-6.9 17.1-2.9 25.4S14.8 416 24 416H424c9.2 0 17.6-5.3 21.6-13.6s2.9-18.2-2.9-25.4l-14.9-18.6C399.5 322.9 384 278.8 384 233.4V208c0-77.4-55-142-128-156.8V32c0-17.7-14.3-32-32-32zm0 96c61.9 0 112 50.1 112 112v25.4c0 47.9 13.9 94.6 39.7 134.6H72.3C98.1 328 112 281.3 112 233.4V208c0-61.9 50.1-112 112-112zM288 448a64 64 0 1 1-128 0H288z" />
+      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
     </svg>
   );
 }
@@ -209,12 +208,16 @@ function BellIcon() {
 function PhoneIcon() {
   return (
     <svg
-      viewBox="0 0 512 512"
-      fill="currentColor"
-      className="h-3.5 w-3.5"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
       aria-hidden="true"
     >
-      <path d="M164.9 24.6c-7.7-18.6-28-28.5-47.4-23.2l-88 24C12.1 30.2 0 46 0 64C0 311.4 200.6 512 448 512c18 0 33.8-12.1 38.6-29.5l24-88c5.3-19.4-4.6-39.7-23.2-47.4l-96-40c-16.3-6.8-35.2-2.1-46.3 11.6L304.7 368C234.3 334.7 177.3 277.7 144 207.3L193.3 167c13.7-11.2 18.4-30 11.6-46.3l-40-96z" />
+      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
     </svg>
   );
 }
@@ -227,17 +230,12 @@ function CalendarIcon() {
       stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
-      className="h-3.5 w-3.5"
+      strokeLinejoin="round"
+      className="h-4 w-4"
       aria-hidden="true"
     >
-      <rect
-        x="3"
-        y="4"
-        width="18"
-        height="17"
-        rx="2"
-      />
-      <path d="M3 9h18M8 2v4M16 2v4" />
+      <rect width="18" height="18" x="3" y="4" rx="4" />
+      <path d="M16 2v4M8 2v4M3 10h18" />
     </svg>
   );
 }
@@ -250,11 +248,12 @@ function ClockIcon() {
       stroke="currentColor"
       strokeWidth="2"
       strokeLinecap="round"
+      strokeLinejoin="round"
       className="h-4 w-4"
       aria-hidden="true"
     >
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 7v5l3 2" />
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="12 6 12 12 16 14" />
     </svg>
   );
 }
@@ -271,8 +270,55 @@ function MessageIcon() {
       className="h-4 w-4"
       aria-hidden="true"
     >
-      <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H7l-4 2 1.5-4A7.5 7.5 0 1 1 20 11.5Z" />
+      <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
     </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Section Header Component                                                   */
+/* -------------------------------------------------------------------------- */
+
+function SectionHeader({
+  icon,
+  title,
+  trailing
+}: {
+  icon?: React.ReactNode;
+  title: string;
+  trailing?: string;
+}) {
+  return (
+    <div className="mb-2 flex items-center justify-between px-2">
+      <div className="flex items-center gap-2 text-[#0A84FF]">
+        {icon}
+        <span className="text-[13px] font-semibold uppercase tracking-[0.05em] text-[#8E8E93]">
+          {title}
+        </span>
+      </div>
+      {trailing && (
+        <span className="text-[12px] font-medium text-[#636366]">
+          {trailing}
+        </span>
+      )}
+    </div>
   );
 }
 
@@ -293,20 +339,16 @@ function ScrubBox({
   normalize: (v: number) => number;
   format: (v: number) => string;
 }) {
-  const [dragging, setDragging] =
-    useState(false);
+  const [dragging, setDragging] = useState(false);
 
   const drag = useRef<{
     startY: number;
     base: number;
   } | null>(null);
 
-  const apply = (v: number) =>
-    onChange(normalize(v));
+  const apply = (v: number) => onChange(normalize(v));
 
-  function onPointerDown(
-    e: ReactPointerEvent<HTMLDivElement>
-  ) {
+  function onPointerDown(e: ReactPointerEvent<HTMLDivElement>) {
     if (!e.isPrimary) return;
 
     e.preventDefault();
@@ -319,27 +361,17 @@ function ScrubBox({
     setDragging(true);
 
     try {
-      e.currentTarget.setPointerCapture(
-        e.pointerId
-      );
+      e.currentTarget.setPointerCapture(e.pointerId);
     } catch {
       // Ignore pointer capture failures.
     }
   }
 
-  function onPointerMove(
-    e: ReactPointerEvent<HTMLDivElement>
-  ) {
+  function onPointerMove(e: ReactPointerEvent<HTMLDivElement>) {
     if (!drag.current) return;
 
-    const step = Math.round(
-      (drag.current.startY - e.clientY) /
-        12
-    );
-
-    apply(
-      drag.current.base + step
-    );
+    const step = Math.round((drag.current.startY - e.clientY) / 12);
+    apply(drag.current.base + step);
   }
 
   function endDrag() {
@@ -347,20 +379,12 @@ function ScrubBox({
     setDragging(false);
   }
 
-  function onWheel(
-    e: ReactWheelEvent<HTMLDivElement>
-  ) {
+  function onWheel(e: ReactWheelEvent<HTMLDivElement>) {
     e.preventDefault();
-
-    apply(
-      current +
-        (e.deltaY < 0 ? 1 : -1)
-    );
+    apply(current + (e.deltaY < 0 ? 1 : -1));
   }
 
-  function stopPropagation(
-    e: ReactPointerEvent<HTMLButtonElement>
-  ) {
+  function stopPropagation(e: ReactPointerEvent<HTMLButtonElement>) {
     e.stopPropagation();
   }
 
@@ -388,7 +412,7 @@ function ScrubBox({
       className={`
         relative
         flex
-        h-[76px]
+        h-[84px]
         flex-1
         select-none
         touch-none
@@ -396,57 +420,22 @@ function ScrubBox({
         items-center
         justify-center
         overflow-hidden
-        rounded-[16px]
+        rounded-[20px]
         border
         transition-all
-        duration-150
-        ${
-          dragging
-            ? 'border-[#0A84FF] bg-[#252527] shadow-[0_0_0_2px_rgba(10,132,255,0.12)]'
-            : 'border-[#38383A] bg-[#1C1C1E]'
-        }
+        duration-200
+      
       `}
     >
-      <span
-        className="
-          pointer-events-none
-          mb-0.5
-          text-[10px]
-          font-semibold
-          uppercase
-          tracking-[0.08em]
-          text-[#636366]
-        "
-      >
+      <span className="pointer-events-none mb-1 text-[10px] font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
         {label}
       </span>
 
-      <span
-        className="
-          pointer-events-none
-          text-[26px]
-          leading-7
-          font-semibold
-          tracking-[-0.03em]
-          text-[#F2F2F7]
-          tabular-nums
-        "
-      >
+      <span className="pointer-events-none text-[32px] font-bold tracking-tight text-white tabular-nums">
         {format(current)}
       </span>
 
-      <span
-        className="
-          absolute
-          right-2
-          top-1/2
-          flex
-          -translate-y-1/2
-          flex-col
-          text-[#636366]
-        "
-        aria-hidden="true"
-      >
+      <div className="absolute right-2 top-1/2 flex -translate-y-1/2 flex-col gap-0.5 text-[#8E8E93]">
         <button
           type="button"
           tabIndex={-1}
@@ -456,13 +445,7 @@ function ScrubBox({
             e.stopPropagation();
             apply(current + 1);
           }}
-          className="
-            rounded-md
-            p-1
-            transition
-            hover:bg-[#2C2C2E]
-            hover:text-[#0A84FF]
-          "
+          className="rounded-lg p-1.5 transition active:scale-90 hover:bg-[#3A3A3C] hover:text-[#0A84FF]"
         >
           <ChevronUpIcon />
         </button>
@@ -476,23 +459,17 @@ function ScrubBox({
             e.stopPropagation();
             apply(current - 1);
           }}
-          className="
-            rounded-md
-            p-1
-            transition
-            hover:bg-[#2C2C2E]
-            hover:text-[#0A84FF]
-          "
+          className="rounded-lg p-1.5 transition active:scale-90 hover:bg-[#3A3A3C] hover:text-[#0A84FF]"
         >
           <ChevronDownIcon />
         </button>
-      </span>
+      </div>
     </div>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/* Drag Scroll                                                                */
+/* Drag Scroll Hook                                                           */
 /* -------------------------------------------------------------------------- */
 
 function useDragScroll<T extends HTMLElement>() {
@@ -500,11 +477,9 @@ function useDragScroll<T extends HTMLElement>() {
 
   useEffect(() => {
     const el = ref.current;
-
     if (!el) return;
 
     const target = el;
-
     let state: {
       down: boolean;
       startX: number;
@@ -514,8 +489,7 @@ function useDragScroll<T extends HTMLElement>() {
     function onDown(e: MouseEvent) {
       state = {
         down: true,
-        startX:
-          e.pageX - target.offsetLeft,
+        startX: e.pageX - target.offsetLeft,
         scrollLeft: target.scrollLeft
       };
     }
@@ -526,47 +500,19 @@ function useDragScroll<T extends HTMLElement>() {
 
     function onMove(e: MouseEvent) {
       if (!state || !state.down) return;
-
       e.preventDefault();
-
-      const x =
-        e.pageX - target.offsetLeft;
-
-      target.scrollLeft =
-        state.scrollLeft -
-        (x - state.startX);
+      const x = e.pageX - target.offsetLeft;
+      target.scrollLeft = state.scrollLeft - (x - state.startX);
     }
 
-    target.addEventListener(
-      'mousedown',
-      onDown
-    );
-
-    window.addEventListener(
-      'mouseup',
-      onUp
-    );
-
-    window.addEventListener(
-      'mousemove',
-      onMove
-    );
+    target.addEventListener('mousedown', onDown);
+    window.addEventListener('mouseup', onUp);
+    window.addEventListener('mousemove', onMove);
 
     return () => {
-      target.removeEventListener(
-        'mousedown',
-        onDown
-      );
-
-      window.removeEventListener(
-        'mouseup',
-        onUp
-      );
-
-      window.removeEventListener(
-        'mousemove',
-        onMove
-      );
+      target.removeEventListener('mousedown', onDown);
+      window.removeEventListener('mouseup', onUp);
+      window.removeEventListener('mousemove', onMove);
     };
   }, []);
 
@@ -574,99 +520,43 @@ function useDragScroll<T extends HTMLElement>() {
 }
 
 /* -------------------------------------------------------------------------- */
-/* Page                                                                       */
+/* Page Component                                                             */
 /* -------------------------------------------------------------------------- */
 
 export default function ReminderNewPage() {
   const navigate = useNavigate();
+  const phoneQuery = usePhoneNumbers();
+  const create = useCreateReminder();
 
-  const phoneQuery =
-    usePhoneNumbers();
+  const dates = useMemo(buildDates, []);
+  const initial = useMemo(initialTime, []);
+  const scrollRef = useDragScroll<HTMLDivElement>();
 
-  const create =
-    useCreateReminder();
+  const [dateIndex, setDateIndex] = useState(0);
+  const [hour, setHour] = useState(initial.hour);
+  const [minute, setMinute] = useState(initial.minute);
+  const [ampm, setAmpm] = useState<'AM' | 'PM'>(initial.ampm);
+  const [title, setTitle] = useState('');
+  const [message, setMessage] = useState('');
+  const [repeatRule, setRepeatRule] = useState<RepeatRule>('NONE');
+  const [timezone, setTimezone] = useState(DEFAULT_TZ);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [localError, setLocalError] = useState('');
+  const [subscriptionRequired, setSubscriptionRequired] = useState(false);
 
-  const dates = useMemo(
-    buildDates,
-    []
-  );
-
-  const initial = useMemo(
-    initialTime,
-    []
-  );
-
-  const scrollRef =
-    useDragScroll<HTMLDivElement>();
-
-  const [dateIndex, setDateIndex] =
-    useState(0);
-
-  const [hour, setHour] =
-    useState(initial.hour);
-
-  const [minute, setMinute] =
-    useState(initial.minute);
-
-  const [ampm, setAmpm] =
-    useState<'AM' | 'PM'>(
-      initial.ampm
-    );
-
-  const [title, setTitle] =
-    useState('');
-
-  const [message, setMessage] =
-    useState('');
-
-  const [repeatRule, setRepeatRule] =
-    useState<RepeatRule>('NONE');
-
-  const [timezone, setTimezone] =
-    useState(DEFAULT_TZ);
-
-  const [busy, setBusy] =
-    useState(false);
-
-  const [error, setError] =
-    useState('');
-
-  const [localError, setLocalError] =
-    useState('');
-
-  const [
-    subscriptionRequired,
-    setSubscriptionRequired
-  ] = useState(false);
-
-  const verifiedPhones =
-    (phoneQuery.data ?? []).filter(
-      (p) => p.verified
-    );
-
-  const verifiedPhone =
-    verifiedPhones[0];
-
-  const selected =
-    dates[dateIndex] ??
-    dates[0]!;
+  const verifiedPhones = (phoneQuery.data ?? []).filter((p) => p.verified);
+  const verifiedPhone = verifiedPhones[0];
+  const selected = dates[dateIndex] ?? dates[0]!;
 
   function buildBody(): ReminderInputBody {
-    const selectedDate =
-      selected.date;
-
-    const hh = pad(
-      toHour24(hour, ampm)
-    );
-
+    const selectedDate = selected.date;
+    const hh = pad(toHour24(hour, ampm));
     const mi = pad(minute);
 
-    const localDateTime =
-      `${selectedDate.getFullYear()}-${pad(
-        selectedDate.getMonth() + 1
-      )}-${pad(
-        selectedDate.getDate()
-      )}T${hh}:${mi}`;
+    const localDateTime = `${selectedDate.getFullYear()}-${pad(
+      selectedDate.getMonth() + 1
+    )}-${pad(selectedDate.getDate())}T${hh}:${mi}`;
 
     return {
       title: title.trim(),
@@ -674,8 +564,7 @@ export default function ReminderNewPage() {
       timezone,
       localDateTime,
       repeatRule,
-      phoneNumberId:
-        verifiedPhone?.id ?? ''
+      phoneNumberId: verifiedPhone?.id ?? ''
     };
   }
 
@@ -703,13 +592,8 @@ export default function ReminderNewPage() {
     return '';
   }
 
-  async function handleSubmit(
-    e: FormEvent
-  ) {
-    e.preventDefault();
-
+  async function createReminder() {
     const problem = validate();
-
     if (problem) {
       setLocalError(problem);
       return;
@@ -721,31 +605,14 @@ export default function ReminderNewPage() {
     setSubscriptionRequired(false);
 
     try {
-      const reminder =
-        await create.mutateAsync(
-          buildBody()
-        );
-
-      navigate(
-        `/reminders/${reminder.id}`,
-        {
-          replace: true
-        }
-      );
+      const reminder = await create.mutateAsync(buildBody());
+      navigate(`/reminders/${reminder.id}`, { replace: true });
     } catch (err) {
-      if (
-        err instanceof ApiError &&
-        err.code ===
-          'SUBSCRIPTION_REQUIRED'
-      ) {
-        setSubscriptionRequired(
-          true
-        );
+      if (err instanceof ApiError && err.code === 'SUBSCRIPTION_REQUIRED') {
+        setSubscriptionRequired(true);
       } else {
         setError(
-          err instanceof Error
-            ? err.message
-            : 'Could not create reminder'
+          err instanceof Error ? err.message : 'Could not create reminder'
         );
       }
     } finally {
@@ -753,677 +620,324 @@ export default function ReminderNewPage() {
     }
   }
 
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    void createReminder();
+  }
+
   return (
-    <section
-      className="
-        min-h-screen
-        overflow-x-hidden
-        bg-[#000000]
-        px-4
-        pb-10
-        pt-2
-        text-[#F2F2F7]
-        antialiased
-      "
-    >
-      <div className="mx-auto max-w-xl">
+    <section className="min-h-screen bg-[#000000] pb-28 pt-2 text-[#F2F2F7] antialiased selection:bg-[#0A84FF]/30">
+     
+
+      <div className="relative z-10 mx-auto max-w-lg px-4">
         {/* ---------------------------------------------------------------- */}
-        {/* Navigation                                                       */}
+        {/* Navigation Bar                                                   */}
         {/* ---------------------------------------------------------------- */}
 
-        <div
-          className="
-            flex
-            h-12
-            items-center
-            justify-between
-          "
-        >
-          <Link
-            to="/"
-            aria-label="Back to dashboard"
-            className="
-              flex
-              h-9
-              w-9
-              items-center
-              justify-center
-              rounded-full
-              text-[#0A84FF]
-              transition
-              hover:bg-[#1C1C1E]
-              active:scale-90
-            "
-          >
-            <ChevronLeftIcon />
-          </Link>
+        <header className="mt-20">
 
-          <h1
-            className="
-              text-[17px]
-              font-semibold
-              tracking-[-0.01em]
-              text-[#F2F2F7]
-            "
-          >
+          <h1 className="text-[17px] font-bold tracking-tight text-white">
             New Reminder
           </h1>
-
-          <div
-            className="h-9 w-9"
-            aria-hidden="true"
-          />
-        </div>
+          <div>
+                      <button
+                      type="button"
+                      aria-label="Create reminder"
+                      disabled={busy}
+                      onClick={() => void createReminder()}
+                      style={{
+                                      width: 50,
+                                      height: 50,
+                                      borderRadius: 25,
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      border: '1px solid #0A92FF',
+                                      top: 15,
+                                      right: 15,
+                                      position: 'fixed',
+                                      backgroundColor: '#0A84FF',
+                                      fontSize: 24,
+                                      color: 'white',
+                                      lineHeight: 1,
+                                      padding: 0,
+                                      cursor: busy ? 'default' : 'pointer',
+                                      opacity: busy ? 0.6 : 1,
+                                      transition: 'transform 0.12s ease',
+                                    }}>
+                                    {busy ? <Spinner /> : '✓'}
+                        </button>
+                                    
+                                      
+                                    
+                                             
+                                               <LiquidGlass 
+                         displacementScale={64}
+                         saturation={130}
+                         aberrationIntensity={2}
+                         elasticity={0.35}
+                         cornerRadius={100}
+                        blurAmount={0.1}
+                        padding="15px"
+                        style={{ 
+                          width: 15,
+                          height: 15,
+                          top: 20,
+                          left: 30,
+                          position: 'fixed',
+                         }}
+                          >
+                          <Link to="/" className="ios-back">
+                        <span className="ios-back-icon text-white p-2">‹</span>
+                      </Link>
+                                </LiquidGlass>
+          </div>
+          
+          <div className="h-10 w-10" aria-hidden="true" />
+        </header>
 
         {subscriptionRequired ? (
           <div className="mt-4">
             <SubscribePrompt />
           </div>
         ) : (
-          <form
-            onSubmit={handleSubmit}
-          >
-            <div className="flex flex-col gap-5 pb-8">
-              <ErrorBanner
-                message={
-                  error || localError
-                }
-              />
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+            <ErrorBanner message={error || localError} />
 
-              {/* ---------------------------------------------------------- */}
-              {/* Time                                                         */}
-              {/* ---------------------------------------------------------- */}
+            {/* ---------------------------------------------------------- */}
+            {/* Time Picker                                                */}
+            {/* ---------------------------------------------------------- */}
 
-              <section>
-                <SectionHeader
-                  icon={<ClockIcon />}
-                  title="Time"
-                />
+            <section>
 
-                <div
-                  className="
-                    rounded-[22px]
-                    border
-                    border-[#2C2C2E]
-                    bg-[#1C1C1E]
-                    p-3
-                  "
-                >
-                  <div className="flex items-center gap-2">
-                    <ScrubBox
-                      label="Hour"
-                      current={hour}
-                      onChange={setHour}
-                      normalize={normHour}
-                      format={pad}
-                    />
-
-                    <span
-                      className="
-                        select-none
-                        text-[25px]
-                        font-semibold
-                        text-[#636366]
-                      "
-                      aria-hidden="true"
-                    >
-                      :
-                    </span>
-
-                    <ScrubBox
-                      label="Minute"
-                      current={minute}
-                      onChange={setMinute}
-                      normalize={normMinute}
-                      format={pad}
-                    />
-
-                    <button
-                      type="button"
-                      aria-pressed={
-                        ampm === 'PM'
-                      }
-                      aria-label="Toggle AM/PM"
-                      onClick={() =>
-                        setAmpm((a) =>
-                          a === 'AM'
-                            ? 'PM'
-                            : 'AM'
-                        )
-                      }
-                      className="
-                        h-[76px]
-                        w-[72px]
-                        shrink-0
-                        rounded-[16px]
-                        border
-                        border-[#38383A]
-                        bg-[#1C1C1E]
-                        transition
-                        hover:border-[#0A84FF]
-                        active:scale-[0.96]
-                      "
-                    >
-                      <span
-                        className="
-                          block
-                          text-[10px]
-                          font-semibold
-                          uppercase
-                          tracking-[0.08em]
-                          text-[#636366]
-                        "
-                      >
-                        Period
-                      </span>
-
-                      <span
-                        className="
-                          mt-0.5
-                          block
-                          text-[18px]
-                          font-semibold
-                          text-[#0A84FF]
-                        "
-                      >
-                        {ampm}
-                      </span>
-                    </button>
-                  </div>
-                </div>
-              </section>
-
-              {/* ---------------------------------------------------------- */}
-              {/* Date                                                         */}
-              {/* ---------------------------------------------------------- */}
-
-              <section>
-                <SectionHeader
-                  icon={<CalendarIcon />}
-                  title="Scheduled Date"
-                  trailing="Next 2 weeks"
-                />
-
-                <div
-                  ref={scrollRef}
-                  className="
-                    no-scrollbar
-                    flex
-                    cursor-grab
-                    gap-2
-                    overflow-x-auto
-                    py-1
-                    active:cursor-grabbing
-                  "
-                >
-                  {dates.map(
-                    (d, i) => {
-                      const selected =
-                        i === dateIndex;
-
-                      return (
-                        <button
-                          key={d.date.toISOString()}
-                          type="button"
-                          onClick={() =>
-                            setDateIndex(i)
-                          }
-                          aria-pressed={
-                            selected
-                          }
-                          className={`
-                            flex
-                            min-w-[68px]
-                            shrink-0
-                            flex-col
-                            items-center
-                            justify-center
-                            rounded-[15px]
-                            border
-                            px-3
-                            py-2.5
-                            transition-all
-                            ${
-                              selected
-                                ? `
-                                  border-[#0A84FF]
-                                  bg-[#0A84FF]
-                                  text-white
-                                  shadow-[0_7px_20px_rgba(10,132,255,0.22)]
-                                `
-                                : `
-                                  border-[#38383A]
-                                  bg-[#1C1C1E]
-                                  text-[#8E8E93]
-                                  hover:border-[#48484A]
-                                `
-                            }
-                          `}
-                        >
-                          <span
-                            className={`
-                              text-[10px]
-                              font-semibold
-                              uppercase
-                              tracking-[0.02em]
-                              ${
-                                selected
-                                  ? 'text-white/75'
-                                  : 'text-[#636366]'
-                              }
-                            `}
-                          >
-                            {d.label}
-                          </span>
-
-                          <span
-                            className={`
-                              mt-0.5
-                              text-[12px]
-                              font-semibold
-                              ${
-                                selected
-                                  ? 'text-white'
-                                  : 'text-[#F2F2F7]'
-                              }
-                            `}
-                          >
-                            {d.sub}
-                          </span>
-                        </button>
-                      );
-                    }
-                  )}
-                </div>
-              </section>
-
-              {/* ---------------------------------------------------------- */}
-              {/* Details                                                      */}
-              {/* ---------------------------------------------------------- */}
-
-              <section>
-                <SectionHeader
-                  icon={<MessageIcon />}
-                  title="Details"
-                />
-
-                <div
-                  className="
-                    overflow-hidden
-                    rounded-[20px]
-                    border
-                    border-[#2C2C2E]
-                    bg-[#1C1C1E]
-                  "
-                >
-                  <div className="px-4 pt-3.5 pb-3">
-                    <label
-                      htmlFor="reminder-title"
-                      className="
-                        mb-2
-                        block
-                        text-[11px]
-                        font-semibold
-                        uppercase
-                        tracking-[0.06em]
-                        text-[#636366]
-                      "
-                    >
-                      Reminder title
-                    </label>
-
-                    <input
-                      id="reminder-title"
-                      type="text"
-                      value={title}
-                      maxLength={80}
-                      onChange={(e) =>
-                        setTitle(
-                          e.target.value
-                        )
-                      }
-                      placeholder="e.g. Take the cake out of the oven"
-                      className={inputCls}
-                    />
-                  </div>
-
-                  <div
-                    className="
-                      mx-4
-                      border-t
-                      border-[#38383A]
-                    "
+              <div className="">
+                <div className="flex items-center gap-2">
+                  <ScrubBox
+                    label="Hour"
+                    current={hour}
+                    onChange={setHour}
+                    normalize={normHour}
+                    format={pad}
                   />
 
-                  <div className="px-4 pt-3 pb-3.5">
-                    <div className="mb-2 flex items-center justify-between">
-                      <label
-                        htmlFor="reminder-message"
-                        className="
-                          text-[11px]
-                          font-semibold
-                          uppercase
-                          tracking-[0.06em]
-                          text-[#636366]
-                        "
+                  <span
+                    className="select-none text-[28px] font-light text-[#8E8E93]"
+                    aria-hidden="true"
+                  >
+                    :
+                  </span>
+
+                  <ScrubBox
+                    label="Minute"
+                    current={minute}
+                    onChange={setMinute}
+                    normalize={normMinute}
+                    format={pad}
+                  />
+
+                  <button
+                    type="button"
+                    aria-pressed={ampm === 'PM'}
+                    aria-label="Toggle AM/PM"
+                    onClick={() => setAmpm((a) => (a === 'AM' ? 'PM' : 'AM'))}
+                    className="flex h-[84px] w-[76px] shrink-0 flex-col items-center justify-center rounded-[20px] border transition-all duration-200 active:scale-95 hover:border-[#0A84FF]/50 hover:bg-[#2C2C2E]/80"
+                  >
+                  
+                    <span className="mt-0.5 text-[20px] font-bold text-[#0A84FF]">
+                      {ampm}
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            {/* ---------------------------------------------------------- */}
+            {/* Date Scroller                                              */}
+            {/* ---------------------------------------------------------- */}
+
+            <section>
+            
+              <div
+                ref={scrollRef}
+                className="no-scrollbar flex cursor-grab gap-2.5 overflow-x-auto py-1 active:cursor-grabbing"
+              >
+                {dates.map((d, i) => {
+                  const isSelected = i === dateIndex;
+
+                  return (
+                    <button
+                      key={d.date.toISOString()}
+                      type="button"
+                      onClick={() => setDateIndex(i)}
+                      aria-pressed={isSelected}
+                      className={`
+                        flex
+                        min-w-[76px]
+                        shrink-0
+                        flex-col
+                        items-center
+                        justify-center
+                        rounded-[20px]
+                        border
+                        px-3.5
+                        py-3
+                        transition-all
+                        duration-200
+                        active:scale-95
+                        ${
+                          isSelected
+                            ? 'border-[#abd5ff] bg-[#0A84FF] text-white '
+                            : ''
+                        }
+                      `}
+                    >
+                      <span
+                        className={`text-[11px] font-bold uppercase tracking-wider ${
+                          isSelected ? 'text-white/80' : 'text-[#8E8E93]'
+                        }`}
                       >
-                        Message
-                      </label>
+                        {d.label}
+                      </span>
 
                       <span
-                        className="
-                          text-[10px]
-                          font-medium
-                          text-[#636366]
-                        "
+                        className={`mt-1 text-[13px] font-bold ${
+                          isSelected ? 'text-white' : 'text-[#F2F2F7]'
+                        }`}
                       >
-                        {message.length}/500
+                        {d.sub}
                       </span>
-                    </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
 
-                    <textarea
-                      id="reminder-message"
-                      rows={3}
-                      maxLength={500}
-                      value={message}
-                      onChange={(e) =>
-                        setMessage(
-                          e.target.value
-                        )
-                      }
-                      placeholder="What we'll read over the call"
-                      className={
-                        inputCls +
-                        ' resize-none'
-                      }
-                    />
-                  </div>
+            {/* ---------------------------------------------------------- */}
+            {/* Details Section                                            */}
+            {/* ---------------------------------------------------------- */}
+
+            <section>
+
+              <div className="overflow-hidden rounded-[26px] border border-white/10 bg-[#1C1C1E]/60 backdrop-blur-2xl">
+                <div className="p-4">
+                  <label
+                    htmlFor="reminder-title"
+                    className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-[#8E8E93]"
+                  >
+                    Title
+                  </label>
+                  <input
+                    id="reminder-title"
+                    type="text"
+                    value={title}
+                    maxLength={80}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="e.g. Take the cake out of the oven"
+                    className="w-full rounded-[16px] border border-white/10 bg-[#000000]/40 px-4 py-3 text-[16px] font-medium text-white placeholder:text-[#636366] outline-none transition focus:border-[#0A84FF] focus:ring-2 focus:ring-[#0A84FF]/30"
+                  />
                 </div>
-              </section>
 
-              {/* ---------------------------------------------------------- */}
-              {/* Repeat                                                        */}
-              {/* ---------------------------------------------------------- */}
+                <div className="mx-4 border-t border-white/5" />
 
-              <section>
-                <SectionHeader
-                  title="Repeat"
-                />
+                <div className="p-4">
+                  <div className="mb-1.5 flex items-center justify-between">
+                    <label
+                      htmlFor="reminder-message"
+                      className="text-[11px] font-bold uppercase tracking-wider text-[#8E8E93]"
+                    >
+                      Message
+                    </label>
 
-                <div
-                  className="
-                    rounded-[15px]
-                    border
-                    border-[#2C2C2E]
-                    bg-[#1C1C1E]
-                    p-1
-                  "
-                >
-                  <div className="grid grid-cols-3 gap-1">
-                    {REPEAT_OPTIONS.map(
-                      (opt) => {
-                        const selected =
-                          repeatRule ===
-                          opt.value;
-
-                        return (
-                          <button
-                            key={
-                              opt.value
-                            }
-                            type="button"
-                            aria-pressed={
-                              selected
-                            }
-                            onClick={() =>
-                              setRepeatRule(
-                                opt.value
-                              )
-                            }
-                            className={`
-                              min-h-[38px]
-                              rounded-[11px]
-                              px-2
-                              py-2
-                              text-[12px]
-                              font-semibold
-                              transition-all
-                              ${
-                                selected
-                                  ? `
-                                    bg-[#3A3A3C]
-                                    text-[#F2F2F7]
-                                    shadow-sm
-                                  `
-                                  : `
-                                    text-[#8E8E93]
-                                    hover:text-[#F2F2F7]
-                                  `
-                              }
-                            `}
-                          >
-                            {opt.label}
-                          </button>
-                        );
-                      }
-                    )}
+                    <span className="text-[11px] font-semibold text-[#636366]">
+                      {message.length}/500
+                    </span>
                   </div>
+
+                  <textarea
+                    id="reminder-message"
+                    rows={3}
+                    maxLength={500}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="What we'll read over the call"
+                    className="w-full resize-none rounded-[16px] border border-white/10 bg-[#000000]/40 px-4 py-3 text-[16px] font-medium text-white placeholder:text-[#636366] outline-none transition focus:border-[#0A84FF] focus:ring-2 focus:ring-[#0A84FF]/30"
+                  />
                 </div>
-              </section>
+              </div>
+            </section>
 
-              {/* ---------------------------------------------------------- */}
-              {/* Timezone                                                      */}
-              {/* ---------------------------------------------------------- */}
+            {/* ---------------------------------------------------------- */}
+            {/* Repeat                                                     */}
+            {/* ---------------------------------------------------------- */}
 
-              <section>
-                <SectionHeader
-                  title="Timezone"
-                />
+            <section>
 
+
+              <div className="rounded-[20px] border border-white/10 bg-[#1C1C1E]/60 p-1.5 backdrop-blur-xl">
+                <div className="grid grid-cols-3 gap-1">
+                  {REPEAT_OPTIONS.map((opt) => {
+                    const isSelected = repeatRule === opt.value;
+
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        aria-pressed={isSelected}
+                        onClick={() => setRepeatRule(opt.value)}
+                        className={`
+                          min-h-[42px]
+                          rounded-[14px]
+                          px-3
+                          py-2
+                          text-[13px]
+                          font-semibold
+                          transition-all
+                          duration-200
+                          active:scale-95
+                          ${
+                            isSelected
+                              ? 'bg-[#3A3A3C] text-white shadow-md'
+                              : 'text-[#8E8E93] hover:text-white'
+                          }
+                        `}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
+
+            {/* ---------------------------------------------------------- */}
+            {/* Timezone                                                   */}
+            {/* ---------------------------------------------------------- */}
+
+            <section>
+              <SectionHeader title="Timezone" />
+
+              <div className="relative">
                 <select
                   id="reminder-timezone"
                   value={timezone}
-                  onChange={(e) =>
-                    setTimezone(
-                      e.target.value
-                    )
-                  }
-                  className={`
-                    ${inputCls}
-                    appearance-none
-                  `}
+                  onChange={(e) => setTimezone(e.target.value)}
+                  className="w-full appearance-none rounded-[20px] border border-white/10 bg-[#1C1C1E]/60 px-4 py-3.5 text-[15px] font-semibold text-white outline-none transition focus:border-[#0A84FF] focus:ring-2 focus:ring-[#0A84FF]/30"
                 >
-                  {timezoneList().map(
-                    (tz) => (
-                      <option
-                        key={tz}
-                        value={tz}
-                        className="bg-[#1C1C1E]"
-                      >
-                        {tz}
-                      </option>
-                    )
-                  )}
+                  {timezoneList().map((tz) => (
+                    <option key={tz} value={tz} className="bg-[#1C1C1E] text-white">
+                      {tz}
+                    </option>
+                  ))}
                 </select>
-              </section>
 
-              {/* ---------------------------------------------------------- */}
-              {/* Preview                                                       */}
-              {/* ---------------------------------------------------------- */}
-
-              {phoneQuery.isLoading ? (
-                <div
-                  className="
-                    rounded-[18px]
-                    border
-                    border-[#2C2C2E]
-                    bg-[#1C1C1E]
-                    p-4
-                  "
-                >
-                  <Spinner label="Checking phone numbers…" />
+                <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#8E8E93]">
+                  <ChevronDownIcon />
                 </div>
-              ) : !verifiedPhone ? (
-                <div
-                  className="
-                    rounded-[18px]
-                    border
-                    border-[#5A4215]
-                    bg-[#211B0C]
-                    p-4
-                  "
-                >
-                  <div className="flex gap-3">
-                    <div
-                      className="
-                        flex
-                        h-8
-                        w-8
-                        shrink-0
-                        items-center
-                        justify-center
-                        rounded-full
-                        bg-[#FF9F0A]/15
-                        text-[#FF9F0A]
-                      "
-                    >
-                      <PhoneIcon />
-                    </div>
-
-                    <p
-                      className="
-                        text-[13px]
-                        leading-5
-                        font-medium
-                        text-[#FFD60A]
-                      "
-                    >
-                      No verified phone
-                      numbers yet. Add
-                      and verify one to
-                      schedule reminders.
-                      Your verified
-                      number is used
-                      automatically.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div
-                  className="
-                    rounded-[18px]
-                    border
-                    border-[#1D4B70]
-                    bg-[#102333]
-                    p-4
-                  "
-                >
-              
-                </div>
-              )}
-
-              {/* ---------------------------------------------------------- */}
-              {/* Submit                                                        */}
-              {/* ---------------------------------------------------------- */}
-
-              <div className="pt-1">
-                <button
-                  type="submit"
-                  disabled={
-                    busy ||
-                    !verifiedPhone
-                  }
-                  className="
-                    flex
-                    min-h-[52px]
-                    w-full
-                    items-center
-                    justify-center
-                    gap-2
-                    rounded-[16px]
-                    bg-[#0A84FF]
-                    px-5
-                    py-3
-                    text-[15px]
-                    font-semibold
-                    text-white
-                    shadow-[0_10px_30px_rgba(10,132,255,0.25)]
-                    transition-all
-                    hover:bg-[#2190FF]
-                    active:scale-[0.985]
-                    disabled:cursor-not-allowed
-                    disabled:opacity-45
-                    disabled:shadow-none
-                  "
-                >
-                  <BellIcon />
-
-                  <span>
-                    {busy
-                      ? 'Scheduling…'
-                      : 'Schedule Reminder'}
-                  </span>
-                </button>
               </div>
-            </div>
+            </section>
           </form>
         )}
       </div>
     </section>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/* Section Header                                                             */
-/* -------------------------------------------------------------------------- */
-
-function SectionHeader({
-  icon,
-  title,
-  trailing
-}: {
-  icon?: React.ReactNode;
-  title: string;
-  trailing?: string;
-}) {
-  return (
-    <div
-      className="
-        mb-2
-        flex
-        items-center
-        gap-1.5
-        px-1
-      "
-    >
-      {icon ? (
-        <span className="text-[#636366]">
-          {icon}
-        </span>
-      ) : null}
-
-      <span
-        className="
-          text-[12px]
-          font-semibold
-          text-[#8E8E93]
-        "
-      >
-        {title}
-      </span>
-
-      {trailing ? (
-        <span
-          className="
-            ml-auto
-            text-[10px]
-            font-medium
-            text-[#636366]
-          "
-        >
-          {trailing}
-        </span>
-      ) : null}
-    </div>
   );
 }

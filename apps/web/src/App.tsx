@@ -9,10 +9,11 @@ import SignInPage from './pages/SignInPage';
 import SsoCallbackPage from './pages/SsoCallbackPage';
 import DashboardPage from './pages/DashboardPage';
 import ReminderNewPage from './pages/ReminderNewPage';
-import ReminderEditPage from './pages/ReminderEditPage';
 import ReminderDetailPage from './pages/ReminderDetailPage';
 import HistoryPage from './pages/HistoryPage';
 import SettingsPage from './pages/SettingsPage';
+import ProfilePage from './pages/ProfilePage';
+import SubscriptionsPage from './pages/SubscriptionsPage';
 
 export default function App() {
   if (!config.clerkPublishableKey) {
@@ -30,9 +31,10 @@ export default function App() {
               <Route path="/" element={<DashboardPage />} />
               <Route path="/reminders/new" element={<ReminderNewPage />} />
               <Route path="/reminders/:id" element={<ReminderDetailPage />} />
-              <Route path="/reminders/:id/edit" element={<ReminderEditPage />} />
               <Route path="/history" element={<HistoryPage />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/subscriptions" element={<SubscriptionsPage />} />
             </Route>
           </Route>
         </Route>
