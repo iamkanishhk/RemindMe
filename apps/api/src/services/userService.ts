@@ -58,6 +58,15 @@ export async function getOwnUser(userId: string) {
 }
 
 export async function deleteMe(userId: string): Promise<void> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { clerkUserId: true }
+  });
+
+  if (user?.clerkUserId) {
+    await clerkClient.users.deleteUser(user.clerkUserId);
+  }
+
   await prisma.$transaction([
     prisma.reminder.deleteMany({ where: { userId } }),
     prisma.phoneNumber.deleteMany({ where: { userId } }),

@@ -14,7 +14,6 @@ function displayNameFromEmail(email: string): string {
   return local.charAt(0).toUpperCase() + local.slice(1);
 }
 
-
 export default function ProfilePage() {
   const me = useMe();
   const { user } = useUser();
@@ -38,8 +37,6 @@ export default function ProfilePage() {
     (email ? displayNameFromEmail(email) : 'RemindMe');
 
   const avatarUrl = user?.imageUrl;
-
-  
 
   async function doSignOut() {
     setSigningOut(true);
@@ -65,7 +62,6 @@ export default function ProfilePage() {
         e instanceof Error ? e.message : 'Could not delete your account'
       );
       setBusy(false);
-      setConfirmingDelete(false);
     }
   }
 
@@ -173,9 +169,10 @@ export default function ProfilePage() {
              <button
                   type="button"
                   className="ios-delete-button"
+                  disabled={busy}
                   onClick={() => setConfirmingDelete(true)}
                 >
-                  Delete Account
+                  {busy ? <Spinner /> : 'Delete Account'}
                 </button>
 
          
@@ -189,6 +186,17 @@ export default function ProfilePage() {
       </div>
 
       <ConfirmSheet
+        open={confirmingDelete}
+        title="Delete account"
+        message="Your account, reminders, and phone numbers will be permanently deleted. This can't be undone."
+        confirmLabel="Delete"
+        tone="destructive"
+        busy={busy}
+        onConfirm={() => void doDelete().finally(() => setConfirmingDelete(false))}
+        onCancel={() => setConfirmingDelete(false)}
+      />
+
+      <ConfirmSheet
         open={confirmingSignOut}
         title="Sign out"
         message="You'll be signed out of RemindMe on this device."
@@ -196,17 +204,6 @@ export default function ProfilePage() {
         busy={signingOut}
         onConfirm={() => void doSignOut()}
         onCancel={() => setConfirmingSignOut(false)}
-      />
-
-      <ConfirmSheet
-        open={confirmingDelete}
-        title="Delete account"
-        message="This permanently deletes your account and all reminders. This can't be undone."
-        confirmLabel="Delete account"
-        tone="destructive"
-        busy={busy}
-        onConfirm={() => void doDelete()}
-        onCancel={() => setConfirmingDelete(false)}
       />
 
       <style>{iosTheme}</style>
