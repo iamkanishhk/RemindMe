@@ -174,55 +174,63 @@ export default function PhoneVerifyOnboarding() {
   const canResend = step === 'otp' && remaining <= 0 && !codeBusy && (otpRef.current ?? verifying) !== null;
 
   return (
-    <div className="min-h-screen bg-slate-200 flex flex-col items-center justify-center p-6 select-none">
-      <div className="w-full max-w-[400px] overflow-hidden">
+    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-6 select-none font-[-apple-system,BlinkMacSystemFont,'SF_Pro_Display','SF_Pro_Text',sans-serif] antialiased">
+      <div className="w-full max-w-[390px] overflow-hidden relative rounded-[38px]  shadow-[0_0_50px_rgba(0,0,0,0.8)] p-6">
+        {/* Animated Container Slider */}
         <div
-          className={`flex transition-transform duration-[400ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
-            step === 'otp' ? '-translate-x-1/2' : ''
+          className={`w-[200%] flex transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+            step === 'otp' ? '-translate-x-1/2' : 'translate-x-0'
           }`}
         >
-          <div className="w-full shrink-0 flex flex-col items-center">
-            <div className="space-y-7 px-1 mt-6">
+          {/* STEP 1: PHONE NUMBER INPUT */}
+          <div
+            className={`w-1/2 shrink-0 flex flex-col justify-between transition-opacity duration-300 ease-out pr-3 ${
+              step === 'phone' ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+            }`}
+          >
+            <div className="space-y-6 pt-2">
               <div className="space-y-2">
-                <h1 className="text-[28px] font-bold text-[#0f172a] tracking-tight leading-tight">
+                <h1 className="text-[28px] font-bold text-white tracking-tight leading-snug">
                   Where should we
                   <br />
                   call you?
                 </h1>
-                <p className="text-[14px] text-[#64748b] font-normal leading-relaxed">
+                <p className="text-[14px] text-neutral-400 font-normal leading-relaxed">
                   We&apos;ll use this number to deliver
                   <br />
                   your reminder calls.
                 </p>
               </div>
 
-              <div className="flex items-center gap-3 pt-1">
+              <div className="flex items-center gap-2.5 pt-1">
+                {/* Country Code Picker */}
                 <div className="relative w-[110px] shrink-0">
-                  <div className="w-full h-[52px] bg-white border border-slate-200 rounded-2xl flex items-center justify-between px-3 shadow-sm pointer-events-none">
+                  <div className="w-full h-[52px] bg-[#1C1C1E] border border-white/10 rounded-2xl flex items-center justify-between px-3 shadow-inner active:bg-[#2C2C2E] transition-colors pointer-events-none">
                     <span className="flex items-center gap-1.5">
                       <span aria-hidden="true" className="text-base">
                         {country.flag}
                       </span>
-                      <span className="text-sm font-semibold text-slate-800">{country.code}</span>
+                      <span className="text-sm font-semibold text-white tracking-wide">{country.code}</span>
                     </span>
-                    <svg viewBox="0 0 320 512" fill="currentColor" className="h-2.5 w-2.5 text-slate-400" aria-hidden="true">
+                    <svg viewBox="0 0 320 512" fill="currentColor" className="h-2.5 w-2.5 text-neutral-400" aria-hidden="true">
                       <path d="M301.7 158.3l-137 137a23.9 23.9 0 0 1-33.9 0l-137-137a23.9 23.9 0 0 1 0-33.9l22.6-22.6a23.9 23.9 0 0 1 33.9 0L160 222.1 245.4 101.7a23.9 23.9 0 0 1 33.9 0l22.6 22.6a23.9 23.9 0 0 1-.2 34z" />
                     </svg>
                   </div>
                   <select
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer text-base"
                     aria-label="Country code"
                     value={countryIndex}
                     onChange={(e) => setCountryIndex(Number(e.target.value))}
                   >
                     {countries.map((c, i) => (
-                      <option key={`${c.code}-${i}`} value={i}>
+                      <option key={`${c.code}-${i}`} value={i} className="bg-neutral-900 text-white">
                         {c.flag} {c.name} ({c.code})
                       </option>
                     ))}
                   </select>
                 </div>
 
+                {/* Phone Input */}
                 <div className="flex-1">
                   <input
                     type="tel"
@@ -231,62 +239,62 @@ export default function PhoneVerifyOnboarding() {
                     value={raw}
                     maxLength={14}
                     onChange={(e) => setRaw(e.target.value.replace(/[^\d\s()-]/g, ''))}
-                    className="w-full h-[52px] bg-white border border-slate-200 rounded-2xl px-4 text-[15px] font-medium text-slate-900 placeholder:text-slate-300 focus:outline-none focus:border-blue-500 shadow-sm transition"
+                    className="w-full h-[52px] bg-[#1C1C1E] border border-white/10 rounded-2xl px-4 text-[15px] font-medium text-white placeholder:text-neutral-600 focus:outline-none focus:border-[#0A84FF] focus:ring-1 focus:ring-[#0A84FF] transition"
                   />
                 </div>
               </div>
 
-              <div className="pt-1">
+              {/* Action Button */}
+              <div className="pt-2">
                 <button
                   type="button"
                   onClick={() => void sendCode()}
                   disabled={busy}
-                  className="w-full h-[50px] rounded-2xl font-semibold text-[15px] text-white flex items-center justify-center gap-2 bg-blue-600 shadow-[0_4px_12px_rgba(59,130,246,0.25)] transition active:scale-[0.97] active:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full h-[52px] rounded-2xl font-semibold text-[15px] text-white flex items-center justify-center gap-2 bg-[#0A84FF] transition active:scale-[0.98] active:bg-[#0071E3] disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {busy ? <Spinner /> : 'Send verification code'}
                 </button>
               </div>
             </div>
 
-            <div className="pb-2 text-center space-y-6 mt-auto pt-6">
-              <p className="text-[12px] text-slate-400 font-normal">Standard call and data rates may apply.</p>
-              <div className="flex justify-center">
-                <div className="w-9 h-9 rounded-full bg-blue-50/80 text-blue-500 flex items-center justify-center">
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden="true">
-                    <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.93 6h-2.95a15.65 15.65 0 0 0-1.38-3.56A8.03 8.03 0 0 1 18.93 8ZM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96ZM4.26 14a8.1 8.1 0 0 1 0-4h3.38a17.6 17.6 0 0 0 0 4H4.26Zm.81 2h2.95c.25 1.28.72 2.48 1.38 3.56A8.03 8.03 0 0 1 5.07 16Zm2.95-8H5.07a8.03 8.03 0 0 1 4.33-3.56A15.65 15.65 0 0 0 8.02 8ZM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96Zm2.6-5.96h-5.2a15.38 15.38 0 0 1 0-4h5.2a15.38 15.38 0 0 1 0 4Zm.33 6.56A15.65 15.65 0 0 0 16.9 16h2.03a8.03 8.03 0 0 1-4 3.56ZM16.98 14a17.6 17.6 0 0 0 0-4h3.38a8.1 8.1 0 0 1 0 4h-3.38Z" />
-                  </svg>
-                </div>
-              </div>
+            <div className="pb-2 text-center space-y-5 mt-10">
+              <p className="text-[12px] text-neutral-500 font-normal">Standard call and data rates may apply.</p>
             </div>
           </div>
 
-          <div className="w-full shrink-0 flex flex-col items-center">
+          {/* STEP 2: OTP INPUT */}
+          <div
+            className={`w-1/2 shrink-0 flex flex-col justify-between transition-opacity duration-300 ease-out pl-3 ${
+              step === 'otp' ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+            }`}
+          >
             <div className="w-full flex items-center h-8 shrink-0">
               <button
                 type="button"
                 onClick={changeNumber}
-                className="w-8 h-8 rounded-full flex items-center justify-start text-slate-800 active:opacity-60 transition"
+                className="w-8 h-8 rounded-full  flex items-center justify-center text-white active:bg-[#2C2C2E] transition active:scale-95"
                 aria-label="Change number"
               >
-                <svg viewBox="0 0 320 512" fill="currentColor" className="h-4 w-4" aria-hidden="true">
+                <svg viewBox="0 0 320 512" fill="currentColor" className="h-3.5 w-3.5" aria-hidden="true">
                   <path d="M206.7 470.6L22.6 286.5a31.9 31.9 0 0 1 0-45.3L206.7 57.4c12.5-12.5 32.8-12.5 45.3 0l22.6 22.6c12.5 12.5 12.5 32.8 0 45.3L162.1 256l112.5 130.7c12.5 12.5 12.5 32.8 0 45.3l-22.6 22.6c-12.5 12.5-32.8 12.5-45.3 0z" />
                 </svg>
               </button>
             </div>
 
-            <div className="my-auto space-y-7 px-1">
+            <div className="space-y-6 pt-2 my-auto">
               <div className="space-y-2">
-                <h1 className="text-[28px] font-bold text-[#0f172a] tracking-tight leading-tight">
+                <h1 className="text-[28px] font-bold text-white tracking-tight leading-snug">
                   Enter the 6-digit code
                   <br />
                   we sent.
                 </h1>
-                <p className="text-[14px] text-[#64748b] font-normal leading-relaxed">
+                <p className="text-[14px] text-neutral-400 font-normal leading-relaxed">
                   We sent a code to{' '}
-                  <span className="font-bold text-slate-900">{verifying ? verifying.e164 : (otpRef.current?.e164 ?? '')}</span>
+                  <span className="font-semibold text-white">{verifying ? verifying.e164 : (otpRef.current?.e164 ?? '')}</span>
                 </p>
               </div>
 
+              {/* OTP Input Grid */}
               <div className="grid grid-cols-6 gap-2 pt-1">
                 {otp.map((d, i) => (
                   <input
@@ -303,14 +311,14 @@ export default function PhoneVerifyOnboarding() {
                     onKeyDown={(e) => onOtpKey(i, e)}
                     onPaste={onOtpPaste}
                     aria-label={`Digit ${i + 1}`}
-                    className="w-full h-[54px] bg-[#f8fafc] border border-blue-200/80 rounded-2xl text-center font-bold text-lg text-slate-900 focus:ring-[3px] focus:ring-blue-500/15 focus:border-blue-500 focus:bg-white outline-none transition"
+                    className="w-full h-[52px] bg-[#1C1C1E] border border-white/10 rounded-2xl text-center font-semibold text-xl text-white focus:ring-1 focus:ring-[#0A84FF] focus:border-[#0A84FF] focus:bg-[#2C2C2E] outline-none transition-all"
                   />
                 ))}
               </div>
 
               <div className="text-center space-y-3 pt-1">
                 {remaining > 0 ? (
-                  <p className="text-xs text-slate-400 font-medium">
+                  <p className="text-xs text-neutral-500 font-medium tracking-wide">
                     Resend code (<span>{formatTimer(remaining)}</span>)
                   </p>
                 ) : (
@@ -318,7 +326,7 @@ export default function PhoneVerifyOnboarding() {
                     <button
                       type="button"
                       onClick={() => void resend()}
-                      className="text-xs text-blue-600 font-semibold hover:underline cursor-pointer"
+                      className="text-xs text-[#0A84FF] font-semibold hover:underline cursor-pointer tracking-wide"
                     >
                       {canResend ? 'Resend code now' : 'Sending…'}
                     </button>
@@ -326,7 +334,7 @@ export default function PhoneVerifyOnboarding() {
                       <button
                         type="button"
                         onClick={changeNumber}
-                        className="text-xs font-semibold text-blue-600 hover:text-blue-700 active:opacity-75 cursor-pointer"
+                        className="text-xs font-semibold text-[#0A84FF] active:opacity-75 cursor-pointer tracking-wide"
                       >
                         Change number
                       </button>
@@ -335,7 +343,7 @@ export default function PhoneVerifyOnboarding() {
                 )}
               </div>
 
-              <div className="flex justify-center">
+              <div className="flex justify-center min-h-[24px]">
                 {codeBusy ? <Spinner label="Verifying code…" /> : null}
               </div>
             </div>
