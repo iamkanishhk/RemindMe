@@ -23,7 +23,7 @@ export default function AppLayout() {
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={location.pathname}
-          className="min-h-screen bg-black"
+          className="min-h-screen bg-[color:var(--bg)]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

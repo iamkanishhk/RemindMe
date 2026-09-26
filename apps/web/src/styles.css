@@ -1,24 +1,111 @@
 @import "tailwindcss";
 
+/* =========================================================
+   THEME — single source of truth for app colors.
+
+   Brand palette:   edit --primary / --secondary / --danger
+                    (and their -strong / -soft pairs) once and
+                    the whole app re-skins from those values.
+   Dark mode:       the default, defined below.
+   Light mode:      add  data-theme="light"  to the <html> tag
+                    to flip the app to the light palette.
+   Auth screens:    always render light (.auth-wrap overrides).
+========================================================= */
+
 :root {
-  --bg: #f7f7fb;
-  --surface: #ffffff;
-  --surface-2: #f1f0f7;
-  --border: #e6e5ee;
-  --text: #1c1b22;
-  --text-dim: #6b6a76;
-  --accent: #5b5bd6;
-  --accent-strong: #4545be;
-  --accent-soft: #ecebfd;
-  --danger: #d64545;
-  --danger-soft: #fdecec;
-  --ok: #1f9d5c;
-  --ok-soft: #e7f7ee;
+  /* ---- Brand palette (edit these) ---- */
+  --primary: #D95F59;
+  --primary-strong:#D95F59;
+  --primary-soft: color-mix(in srgb, var(--primary) 14%, transparent);
+
+  --secondary: #98989f;
+
+  --danger: #ff453a;
+  --danger-strong: #dc1c12;
+  --danger-soft: color-mix(in srgb, var(--danger) 14%, transparent);
+
+  --success: #30d158;
+  --success-soft: color-mix(in srgb, var(--success) 12%, transparent);
+
+  --warning: #ff9f0a;
+  --warning-soft: color-mix(in srgb, var(--warning) 12%, transparent);
+
+  /* ---- Shape & type ---- */
   --radius: 12px;
   --radius-sm: 8px;
   --shadow: 0 1px 2px rgba(28, 27, 34, 0.05), 0 6px 20px rgba(28, 27, 34, 0.05);
   --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* ---- Dark theme (default) ---- */
+  color-scheme: dark;
+
+  --bg: #000000;
+  --surface: #1c1c1e;
+  --surface-2: #2c2c2e;
+  --surface-3: #3a3a3c;
+  --border: rgba(84, 84, 88, 0.55);
+  --border-soft: rgba(255, 255, 255, 0.08);
+  --text: #f5f5f7;
+  --text-muted: #aeaeb2;
+  --text-dim: #8e8e93;
+  --text-faint: #636366;
+  --on-primary: #ffffff;
+
+  --overlay: rgba(0, 0, 0, 0.6);
+  --toast-bg: rgba(28, 28, 30, 0.94);
+
+  --gradient-primary: linear-gradient(to bottom, var(--primary), var(--primary-strong));
+  --gradient-danger: linear-gradient(to bottom, var(--danger), var(--danger-strong));
+  --gradient-neutral: linear-gradient(to bottom, #41464e, #373c43);
+
+  /* ---- Semantic aliases (auth + legacy components) ---- */
+  --accent: var(--primary);
+  --accent-strong: var(--primary-strong);
+  --accent-soft: var(--primary-soft);
+  --ok: var(--success);
+  --ok-soft: var(--success-soft);
+
+  /* ---- iOS screens (Profile / Settings / Subscriptions / Detail / History) ---- */
+  --ios-bg: var(--bg);
+  --ios-black: var(--bg);
+  --ios-card: var(--surface);
+  --ios-card-elevated: var(--surface-2);
+  --ios-card-secondary: var(--surface-2);
+  --ios-text: var(--text);
+  --ios-secondary: var(--text-dim);
+  --ios-tertiary: var(--text-faint);
+  --ios-separator: var(--border);
+  --ios-blue: var(--primary);
+  --ios-green: var(--success);
+  --ios-orange: var(--warning);
+  --ios-red: var(--danger);
+  --ios-purple: #bf5af2;
+  --ios-pink: #ff375f;
+  --ios-cyan: #64d2ff;
+}
+
+/* ---- Light theme (opt-in app-wide; always applied to auth screens) ---- */
+[data-theme='light'],
+.auth-wrap {
+  color-scheme: light;
+
+  --bg: #f7f7fb;
+  --surface: #ffffff;
+  --surface-2: #f1f0f7;
+  --surface-3: #e8e8ee;
+  --border: #e6e5ee;
+  --border-soft: rgba(0, 0, 0, 0.08);
+  --text: #1c1b22;
+  --text-muted: #6b6a76;
+  --text-dim: #6b6a76;
+  --text-faint: #98989f;
+  --on-primary: #ffffff;
+
+  --overlay: rgba(0, 0, 0, 0.4);
+  --toast-bg: rgba(250, 250, 252, 0.94);
+
+  --shadow: 0 1px 2px rgba(28, 27, 34, 0.04), 0 6px 20px rgba(28, 27, 34, 0.04);
 }
 
 * {
@@ -29,13 +116,13 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background: #000000;
+  background: var(--bg);
 }
 
 body {
   font-family: var(--font);
   color: var(--text);
-  background: #000000;
+  background: var(--bg);
   font-size: 15px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -183,7 +270,7 @@ code {
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: #b93838;
+  background: color-mix(in srgb, var(--danger) 82%, #000);
 }
 
 .btn-danger-outline {

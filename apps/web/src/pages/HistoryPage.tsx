@@ -1,21 +1,24 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Fragment, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCalls } from '../hooks/queries';
 import { formatDateTimeLocal } from '../lib/format';
 import { StatusChip } from '../components/StatusChip';
 import { Spinner } from '../components/Spinner';
 import { Skeleton } from '../components/Skeleton';
 import ErrorPage from '../components/ErrorPage';
-import { EmptyState } from '../components/EmptyState';
+import CallDetailSheet from '../components/CallDetailSheet';
 import LiquidGlass from 'liquid-glass-react';
+import type { CallAttempt } from '../lib/types';
 
 export default function HistoryPage() {
   const calls = useCalls();
   const navigate = useNavigate();
+  const [selected, setSelected] = useState<CallAttempt | null>(null);
 
   if (calls.isLoading) {
     return (
       <section
-        className="min-h-screen w-full bg-black text-[#f5f5f7]"
+        className="min-h-screen w-full bg-[color:var(--bg)] text-[color:var(--text)]"
         aria-busy="true"
       >
         <div className="mx-auto w-full max-w-[920px] px-4 pb-24 pt-9">
@@ -31,23 +34,20 @@ export default function HistoryPage() {
               <Skeleton className="h-3 w-28" />
             </div>
 
-            <div className="flex flex-col gap-3">
+            <div className="overflow-hidden rounded-[17px] bg-[color:var(--surface)] skeleton-area">
               {[0, 1, 2].map((i) => (
                 <div
                   key={i}
-                  className="overflow-hidden rounded-[17px] bg-[#18181A] skeleton-area"
+                  className="flex min-h-[60px] items-center justify-between gap-4 px-[17px] py-3"
                 >
-                  <div className="flex min-h-[58px] items-center justify-between gap-4 px-[17px] py-3.5">
-                    <div className="flex items-center gap-2.5">
-                      <Skeleton className="h-6 w-12 rounded-full" />
-                    </div>
-                    <Skeleton className="h-3 w-12" />
+                  <div className="min-w-0 flex-1">
+                    <Skeleton className="h-4 w-2/3" />
+                    <Skeleton className="mt-2 h-3 w-1/3" />
                   </div>
-                  <div className="flex items-center gap-3 px-[17px] pb-4">
-                    <Skeleton className="h-[38px] w-[38px] rounded-[10px]" />
-                    <div className="min-w-0 flex-1">
-                      <Skeleton className="h-4 w-2/3" />
-                    </div>
+
+                  <div className="flex shrink-0 items-center gap-2">
+                    <Skeleton className="h-6 w-16 rounded-full" />
+                    <Skeleton className="h-3 w-10" />
                   </div>
                 </div>
               ))}
@@ -77,7 +77,7 @@ export default function HistoryPage() {
         {/* Page Header */}
         <header className="ios-page-header">
 
-        <div className="flex">
+        <div className="flex mt-15">
               <span className="w-full text-4xl">Call history</span>
            <div className="flex items-center justify-center w-fit">
               <LiquidGlass 
@@ -91,9 +91,10 @@ export default function HistoryPage() {
             style={{ 
               width: 20,
               height: 20,
-              top: 15,
+              top: 25,
               right: 50,
               position: 'fixed',
+              zIndex: 9999,
              }}
               >
               <svg width="40" height="40" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
@@ -122,117 +123,45 @@ export default function HistoryPage() {
 
         {/* Empty State */}
         {attempts.length === 0 ? (
-          <div className="ios-empty-card">
-            <EmptyState
-              title="No calls yet"
-              hint="Call attempts will appear here once reminders fire."
-            />
+          <div className="w-full flex flex-col items-center justify-center gap-3  p-6 text-center">
+             <img src="./assets/call.png" width="auto" height="10vh" className="opacity-70" alt="Call icon">
+</img>
+            <div> no call history yet</div>
+           
           </div>
         ) : (
           <>
-            {/* Mobile / iOS grouped history */}
-            <section className="ios-history-section">
-              <div className="ios-section-label">
-                RECENT CALLS
-              </div>
-
-              <div className="ios-call-list stagger">
+            {/* Grouped history list, settings-card style */}
+            <section className="ios-history-section ">
+              <div className="ios-settings-card stagger">
                 {attempts.map((a, index) => (
-                  <article className="ios-call-card" key={a.id}>
-                    {/* Top row */}
-                    <div className="ios-call-top">
-                      <div className="ios-status-wrapper">
+                  <Fragment key={a.id}>
+                    {index > 0 && <div className="ios-divider" />}
+
+                    <button
+                      type="button"
+                      className="ios-call-row"
+                      onClick={() => setSelected(a)}
+                    >
+                      <div className="ios-call-row-leading">
+                        <div className="ios-call-row-title">
+                          {a.reminderTitle ?? a.reminderId ?? 'Untitled reminder'}
+                        </div>
+                        <div className="ios-call-row-sub">
+                          {formatDateTimeLocal(a.startedAt)}
+                        </div>
+                      </div>
+
+                      <div className="ios-call-row-trailing">
                         <StatusChip status={a.status} />
-                      </div>
 
-                      <div className="ios-call-index">
-                        #{attempts.length - index}
-                      </div>
-                    </div>
-
-                    {/* Reminder */}
-                    <div className="ios-call-reminder">
-                      <div className="ios-call-icon purple">
-                        <span>◷</span>
-                      </div>
-
-                      <div className="ios-call-reminder-content">
-                        <span className="ios-field-label">
-                          REMINDER
-                        </span>
-
-                        {a.reminderId ? (
-                          <Link
-                            to={`/reminders/${a.reminderId}`}
-                            className="ios-reminder-link"
-                          >
-                            {a.reminderTitle ?? a.reminderId}
-                            <span className="ios-chevron">›</span>
-                          </Link>
-                        ) : (
-                          <span className="ios-value">—</span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="ios-card-divider" />
-
-                    {/* Call details */}
-                    <div className="ios-call-grid">
-                      <div className="ios-call-field">
-                        <div className="ios-field-icon blue">
-                          <span>☎</span>
-                        </div>
-
-                        <div className="ios-field-content">
-                          <span className="ios-field-label">
-                            NUMBER
-                          </span>
-
-                          <span className="ios-field-value ios-mono">
-                            {a.destinationE164 ?? '—'}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="ios-call-field">
-                        <div className="ios-field-icon orange">
-                          <span>■</span>
-                        </div>
-
-                        <div className="ios-field-content">
-                          <span className="ios-field-label">
-                            ENDED
-                          </span>
-
-                          <span className="ios-field-value">
-                            {a.endedAt
-                              ? formatDateTimeLocal(a.endedAt)
-                              : '—'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Detail */}
-                    <div className="ios-card-divider" />
-
-                    <div className="ios-detail-row">
-                      <div className="ios-detail-icon">
-                        <span>i</span>
-                      </div>
-
-                      <div className="ios-detail-content">
-                        <span className="ios-field-label">
-                          DETAIL
-                        </span>
-
-                        <span className="ios-detail-value">
-                          {a.detail ?? '—'}
+                        <span className="ios-call-row-detail">Detail</span>
+                        <span className="ios-chevron" aria-hidden="true">
+                          ›
                         </span>
                       </div>
-                    </div>
-                  </article>
+                    </button>
+                  </Fragment>
                 ))}
               </div>
             </section>
@@ -261,28 +190,16 @@ export default function HistoryPage() {
         )}
       </div>
 
+      <CallDetailSheet
+        attempt={selected}
+        onClose={() => setSelected(null)}
+        onViewReminder={(reminderId) => {
+          setSelected(null);
+          navigate(`/reminders/${reminderId}`);
+        }}
+      />
+
       <style>{`
-        :root {
-          color-scheme: dark;
-
-          --ios-black: #000000;
-          --ios-card: #18181A;
-          --ios-card-elevated: #2c2c2e;
-
-          --ios-text: #f5f5f7;
-          --ios-secondary: #98989f;
-          --ios-tertiary: #636366;
-
-          --ios-separator: rgba(84, 84, 88, 0.55);
-
-          --ios-blue: #0a84ff;
-          --ios-green: #30d158;
-          --ios-orange: #ff9f0a;
-          --ios-red: #ff453a;
-          --ios-purple: #bf5af2;
-          --ios-cyan: #64d2ff;
-        }
-
         .ios-history-page {
           min-height: 100vh;
           width: 100%;
@@ -399,16 +316,10 @@ export default function HistoryPage() {
         }
 
         /* --------------------------------
-           Call List
+           Grouped card (settings style)
         -------------------------------- */
 
-        .ios-call-list {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .ios-call-card {
+        .ios-settings-card {
           overflow: hidden;
 
           background: var(--ios-card);
@@ -418,119 +329,91 @@ export default function HistoryPage() {
           box-shadow:
             inset 0 1px 0 rgba(255, 255, 255, 0.025),
             0 8px 30px rgba(0, 0, 0, 0.16);
-
-          transition:
-            background 0.15s ease,
-            transform 0.15s ease;
         }
 
+        .ios-divider {
+          height: 1px;
+
+          margin-left: 17px;
+
+          background: var(--ios-separator);
+        }
 
         /* --------------------------------
-           Card top
+           Call row
         -------------------------------- */
 
-        .ios-call-top {
-          min-height: 58px;
+        .ios-call-row {
+          width: 100%;
 
-          padding: 14px 17px;
+          min-height: 60px;
+
+          padding: 11px 17px;
 
           display: flex;
           align-items: center;
           justify-content: space-between;
 
-          gap: 16px;
-        }
-
-        .ios-status-wrapper {
-          display: flex;
-          align-items: center;
-        }
-
-        .ios-call-index {
-          color: var(--ios-tertiary);
-
-          font-size: 12px;
-          font-weight: 500;
-
-          font-variant-numeric: tabular-nums;
-        }
-
-        /* --------------------------------
-           Reminder
-        -------------------------------- */
-
-        .ios-call-reminder {
-          display: flex;
-          align-items: center;
-
           gap: 12px;
 
-          padding: 0 17px 16px;
+          background: none;
+          border: 0;
+
+          text-align: left;
+
+          color: var(--ios-text);
+
+          cursor: pointer;
+
+          transition: background 0.15s ease;
         }
 
-        .ios-call-icon {
-          width: 38px;
-          height: 38px;
-
-          flex: 0 0 38px;
-
-          display: flex;
-          align-items: center;
-          justify-content: center;
-
-          border-radius: 10px;
-
-          font-size: 16px;
-          font-weight: 600;
+        .ios-call-row:hover {
+          background: color-mix(in srgb, var(--ios-text) 4%, transparent);
         }
 
-        .ios-call-icon.purple {
-          background: rgba(191, 90, 242, 0.16);
-          color: var(--ios-purple);
+        .ios-call-row:active {
+          transform: scale(0.995);
         }
 
-        .ios-call-reminder-content {
+        .ios-call-row-leading {
           min-width: 0;
 
           display: flex;
           flex-direction: column;
-          gap: 3px;
+          gap: 2px;
         }
 
-        .ios-field-label {
-          display: block;
-
-          color: var(--ios-tertiary);
-
-          font-size: 10px;
-          line-height: 1.2;
-
-          font-weight: 700;
-          letter-spacing: 0.055em;
-
-          text-transform: uppercase;
-        }
-
-        .ios-reminder-link {
-          display: inline-flex;
-          align-items: center;
-          gap: 7px;
-
-          max-width: 100%;
-
-          color: var(--ios-blue);
+        .ios-call-row-title {
+          color: var(--ios-text);
 
           font-size: 16px;
-          line-height: 1.35;
+          line-height: 1.3;
           font-weight: 500;
-
-          text-decoration: none;
 
           overflow-wrap: anywhere;
         }
 
-        .ios-reminder-link:hover {
-          text-decoration: underline;
+        .ios-call-row-sub {
+          color: var(--ios-secondary);
+
+          font-size: 12px;
+          line-height: 1.3;
+        }
+
+        .ios-call-row-trailing {
+          flex: 0 0 auto;
+
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .ios-call-row-detail {
+          color: var(--ios-secondary);
+
+          font-size: 14px;
+          font-weight: 500;
         }
 
         .ios-chevron {
@@ -543,168 +426,6 @@ export default function HistoryPage() {
           font-weight: 300;
         }
 
-        .ios-value {
-          color: var(--ios-text);
-          font-size: 16px;
-        }
-
-        /* --------------------------------
-           Separators
-        -------------------------------- */
-
-        .ios-card-divider {
-          height: 1px;
-
-          margin-left: 67px;
-
-          background: var(--ios-separator);
-        }
-
-        /* --------------------------------
-           Fields
-        -------------------------------- */
-
-        .ios-call-grid {
-          display: grid;
-
-          grid-template-columns:
-            repeat(3, minmax(0, 1fr));
-
-          padding: 16px 17px;
-        }
-
-        .ios-call-field {
-          min-width: 0;
-
-          display: flex;
-          align-items: flex-start;
-
-          gap: 10px;
-
-          padding-right: 16px;
-        }
-
-        .ios-call-field + .ios-call-field {
-          padding-left: 16px;
-
-          border-left: 1px solid var(--ios-separator);
-        }
-
-        .ios-field-icon {
-          width: 28px;
-          height: 28px;
-
-          flex: 0 0 28px;
-
-          display: flex;
-          align-items: center;
-          justify-content: center;
-
-          border-radius: 8px;
-
-          font-size: 11px;
-          font-weight: 700;
-        }
-
-        .ios-field-icon.blue {
-          color: var(--ios-blue);
-          background: rgba(10, 132, 255, 0.16);
-        }
-
-        .ios-field-icon.green {
-          color: var(--ios-green);
-          background: rgba(48, 209, 88, 0.16);
-        }
-
-        .ios-field-icon.orange {
-          color: var(--ios-orange);
-          background: rgba(255, 159, 10, 0.16);
-        }
-
-        .ios-field-content {
-          min-width: 0;
-
-          display: flex;
-          flex-direction: column;
-
-          gap: 4px;
-        }
-
-        .ios-field-value {
-          color: var(--ios-text);
-
-          font-size: 13px;
-          line-height: 1.4;
-
-          overflow-wrap: anywhere;
-        }
-
-        .ios-mono {
-          font-family:
-            ui-monospace,
-            SFMono-Regular,
-            Menlo,
-            Monaco,
-            Consolas,
-            monospace;
-
-          font-size: 12px;
-        }
-
-        /* --------------------------------
-           Detail
-        -------------------------------- */
-
-        .ios-detail-row {
-          min-height: 64px;
-
-          padding: 13px 17px;
-
-          display: flex;
-          align-items: flex-start;
-
-          gap: 11px;
-        }
-
-        .ios-detail-icon {
-          width: 28px;
-          height: 28px;
-
-          flex: 0 0 28px;
-
-          display: flex;
-          align-items: center;
-          justify-content: center;
-
-          margin-top: 1px;
-
-          border-radius: 8px;
-
-          background: rgba(142, 142, 147, 0.14);
-          color: #aeaeb2;
-
-          font-size: 14px;
-          font-weight: 600;
-          font-family: Georgia, serif;
-        }
-
-        .ios-detail-content {
-          min-width: 0;
-
-          display: flex;
-          flex-direction: column;
-
-          gap: 4px;
-        }
-
-        .ios-detail-value {
-          color: var(--ios-secondary);
-
-          font-size: 14px;
-          line-height: 1.45;
-
-          overflow-wrap: anywhere;
-        }
 
         /* --------------------------------
            Pagination
@@ -731,7 +452,7 @@ export default function HistoryPage() {
           border: 0;
           border-radius: 12px;
 
-          background: #2c2c2e;
+          background: var(--surface-2);
           color: var(--ios-blue);
 
           font-family: inherit;
@@ -748,7 +469,7 @@ export default function HistoryPage() {
         }
 
         .ios-load-more:hover {
-          background: #38383a;
+          background: var(--surface-3);
         }
 
         .ios-load-more:active {
@@ -796,7 +517,7 @@ export default function HistoryPage() {
 
           border-radius: 16px;
 
-          background: rgba(10, 132, 255, 0.14);
+          background: color-mix(in srgb, var(--ios-blue) 14%, transparent);
           color: var(--ios-blue);
 
           font-size: 25px;
@@ -811,9 +532,9 @@ export default function HistoryPage() {
 
           padding: 16px;
 
-          background: rgba(255, 69, 58, 0.08);
+          background: color-mix(in srgb, var(--ios-red) 8%, transparent);
 
-          border: 1px solid rgba(255, 69, 58, 0.16);
+          border: 1px solid color-mix(in srgb, var(--ios-red) 16%, transparent);
 
           border-radius: 16px;
         }
@@ -838,56 +559,6 @@ export default function HistoryPage() {
           .ios-history-container {
             width: min(100% - 24px, 920px);
             padding-top: 24px;
-          }
-
-          .ios-call-grid {
-            grid-template-columns: 1fr;
-            gap: 0;
-
-            padding: 7px 17px;
-          }
-
-          .ios-call-field {
-            min-height: 56px;
-
-            align-items: center;
-
-            padding: 9px 0;
-          }
-
-          .ios-call-field + .ios-call-field {
-            padding-left: 0;
-
-            border-left: 0;
-            border-top: 1px solid var(--ios-separator);
-          }
-
-          .ios-field-icon {
-            width: 30px;
-            height: 30px;
-            flex-basis: 30px;
-          }
-
-          .ios-field-content {
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-
-            width: 100%;
-
-            gap: 12px;
-          }
-
-          .ios-field-label {
-            flex: 0 0 auto;
-          }
-
-          .ios-field-value {
-            text-align: right;
-          }
-
-          .ios-mono {
-            max-width: 65%;
           }
         }
 
@@ -923,41 +594,22 @@ export default function HistoryPage() {
             padding-left: 13px;
           }
 
-          .ios-call-card {
+          .ios-settings-card {
             border-radius: 15px;
           }
 
-          .ios-call-top {
-            padding: 13px 14px;
-          }
-
-          .ios-call-reminder {
+          .ios-call-row {
             padding-left: 14px;
             padding-right: 14px;
           }
 
-          .ios-card-divider {
-            margin-left: 60px;
-          }
-
-          .ios-call-grid {
-            padding-left: 14px;
-            padding-right: 14px;
-          }
-
-          .ios-detail-row {
-            padding-left: 14px;
-            padding-right: 14px;
-          }
-
-          .ios-mono {
-            max-width: 60%;
-            font-size: 11px;
+          .ios-divider {
+            margin-left: 14px;
           }
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .ios-call-card,
+          .ios-call-row,
           .ios-load-more {
             transition: none;
           }

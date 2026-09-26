@@ -4,7 +4,7 @@ import { useAuth, useSignIn } from '@clerk/react';
 import { Spinner } from '../components/Spinner';
 import { Skeleton } from '../components/Skeleton';
 import { useErrorToast } from '../components/Toast';
-import illustration from '../../assets/2.png';
+import illustration from '../../assets/welcome.png';
 
 export default function SignInPage() {
   const { isLoaded, isSignedIn } = useAuth();
@@ -43,7 +43,7 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-300 flex flex-col items-center justify-center p-6 select-none">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 select-none">
       <div className="flex-1 min-h-0 w-full max-w-[310px] flex flex-col items-center justify-center gap-2 animate-fade-in">
         <img
           src={illustration}
@@ -52,7 +52,7 @@ export default function SignInPage() {
         />
 
         <div className="text-center px-2 space-y-3 my-2">
-          <h1 className="text-[26px] font-bold text-slate-900 tracking-tight leading-tight">
+          <h1 className="text-[26px] font-bold text-white tracking-tight leading-tight">
             Welcome to RemindMe
           </h1>
           <p className="text-[13px] text-slate-400 font-normal leading-relaxed px-2 max-w-[300px] mx-auto">
@@ -61,10 +61,10 @@ export default function SignInPage() {
         </div>
       </div>
 
-      <div className="w-full max-w-[310px] space-y-3.5 pb-4">
+      <div className="w-full mb-10 max-w-[310px] bottom-20 space-y-3.5 pb-4">
         <button
           type="button"
-          className="w-full py-3.5 rounded-full font-semibold text-[14px] flex items-center justify-center gap-3 bg-[#e9ecef] text-[#2b303a] transition active:scale-[0.97] active:bg-[#dee2e6] disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+          className="w-full  py-3.5 rounded-full font-semibold text-[14px] flex items-center justify-center gap-3 bg-white text-black transition active:scale-[0.97] active:bg-[color:var(--surface-3)] disabled:opacity-60 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--primary)]"
           disabled={busy || !isLoaded}
           onClick={() => void handleGoogle()}
         >

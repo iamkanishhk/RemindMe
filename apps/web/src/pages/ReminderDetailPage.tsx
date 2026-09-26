@@ -24,7 +24,7 @@ export default function ReminderDetailPage() {
   if (reminder.isLoading) {
     return (
       <section
-        className="min-h-screen w-full bg-black text-[#f5f5f7]"
+        className="min-h-screen w-full bg-[color:var(--bg)] text-[color:var(--text)]"
         aria-busy="true"
       >
         <div className="mx-auto w-full max-w-[920px] px-4 pb-24 pt-9">
@@ -39,7 +39,7 @@ export default function ReminderDetailPage() {
             <div className="px-4 pb-2.5">
               <Skeleton className="h-3 w-24" />
             </div>
-            <div className="overflow-hidden rounded-[16px] bg-[#1c1c1e] skeleton-area">
+            <div className="overflow-hidden rounded-[16px] bg-[color:var(--surface)] skeleton-area">
               <div className="grid grid-cols-[minmax(130px,0.75fr)_minmax(0,1.5fr)] items-center gap-5 px-[17px] py-3">
                 <div className="flex items-center gap-[11px]">
                   <Skeleton className="h-7 w-7 rounded-lg" />
@@ -57,7 +57,7 @@ export default function ReminderDetailPage() {
             <div className="px-4 pb-2.5">
               <Skeleton className="h-3 w-28" />
             </div>
-            <div className="overflow-hidden rounded-[16px] bg-[#1c1c1e] skeleton-area">
+            <div className="overflow-hidden rounded-[16px] bg-[color:var(--surface)] skeleton-area">
               {[
                 ['w-32', 'w-48'],
                 ['w-44', 'w-36'],
@@ -83,7 +83,7 @@ export default function ReminderDetailPage() {
             <div className="px-4 pb-2.5">
               <Skeleton className="h-3 w-[120px]" />
             </div>
-            <div className="overflow-hidden rounded-[16px] bg-[#1c1c1e] skeleton-area">
+            <div className="overflow-hidden rounded-[16px] bg-[color:var(--surface)] skeleton-area">
               {[0, 1].map((i) => (
                 <div
                   key={i}
@@ -148,13 +148,15 @@ export default function ReminderDetailPage() {
     <section className="ios-page">
       <div className="ios-container rise-in">
         {/* Header */}
-        <header className="ios-header mt-10">
-          <div className="ios-title-row">
+        <header className="ios-header mt-30 mb-20">
+          <div className="">
             <div className="ios-title-wrap">
               <span className={`ios-status-dot ${r.isEnabled ? 'active' : 'paused'}`} />
 
-              <div>
-                <h1>{r.title}</h1>
+              <div className="w-full h-[20vh] flex flex-col items-center justify-center gap-3  p-6 text-center">
+                <img src="./../assets/done.png" width="200" height="20vh" className="opacity-70" alt="Call icon">
+                </img>
+                <h1>We'll Call You for {r.title} on {formatDateTimeLocal(r.scheduledAt)} at  {r.phoneNumber?.e164 ?? '—'} </h1>
                <LiquidGlass
                            displacementScale={64}
                            saturation={130}
@@ -189,30 +191,30 @@ export default function ReminderDetailPage() {
                                 xmlns="http://www.w3.org/2000/svg">
 
                               <path d="M5 7H19"
-                                    stroke="#FF3B30"
+                                    style={{ stroke: 'var(--danger)' }}
                                     stroke-width="1.8"
                                     stroke-linecap="round"/>
 
                               <path d="M9 4H15"
-                                    stroke="#FF3B30"
+                                    style={{ stroke: 'var(--danger)' }}
                                     stroke-width="1.8"
                                     stroke-linecap="round"/>
 
 
                               <path d="M7 7.5L7.7 19C7.77 20.1 8.68 21 9.78 21H14.22C15.32 21 16.23 20.1 16.3 19L17 7.5"
-                                    stroke="#FF3B30"
+                                    style={{ stroke: 'var(--danger)' }}
                                     stroke-width="1.8"
                                     stroke-linecap="round"
                                     stroke-linejoin="round"/>
 
 
                               <path d="M10 11V17"
-                                    stroke="#FF3B30"
+                                    style={{ stroke: 'var(--danger)' }}
                                     stroke-width="1.6"
                                     stroke-linecap="round"/>
 
                               <path d="M14 11V17"
-                                    stroke="#FF3B30"
+                                    style={{ stroke: 'var(--danger)' }}
                                     stroke-width="1.6"
                                     stroke-linecap="round"/>
                             </svg>
@@ -241,7 +243,7 @@ export default function ReminderDetailPage() {
              }}
               >
               <Link to="/" className="ios-back">
-            <span className="ios-back-icon text-white p-2">‹</span>
+            <span className="ios-back-icon text-[color:var(--text)] p-2">‹</span>
           </Link>
                     </LiquidGlass>
               </div>
@@ -251,14 +253,16 @@ export default function ReminderDetailPage() {
          
         </header>
 
-        {/* Overview */}
-        <section className="ios-section">
-          <div className="ios-section-label">REMINDER</div>
+    
 
+        {/* Call information */}
+
+        
+        <section className="ios-section ">
+          <div className="ios-section-label">CALL INFORMATION</div>
+              
           <div className="ios-card">
-            <div className="ios-divider" />
-
-            <div className="ios-row ios-row-top">
+                <div className="ios-row ">
               <div className="ios-row-label">
                 <span className="ios-row-icon blue">✦</span>
                 Message
@@ -268,60 +272,7 @@ export default function ReminderDetailPage() {
                 {r.message}
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* Schedule */}
-        <section className="ios-section">
-          <div className="ios-section-label">SCHEDULE</div>
-
-          <div className="ios-card">
-            <div className="ios-row">
-              <div className="ios-row-label">
-                <span className="ios-row-icon orange">◷</span>
-                Next call
-              </div>
-
-              <div className="ios-row-value">
-                {r.nextLocal ? (
-                  <div className="ios-primary-value">
-                    <strong>
-                      {formatTime(r.timezone, r.nextLocal)}
-                    </strong>
-
-                 
-
-                    <span className="ios-relative-value">
-                      {formatRelative(r.nextLocal)}
-                    </span>
-                  </div>
-                ) : (
-                  '—'
-                )}
-              </div>
             </div>
-
-            <div className="ios-divider" />
-
-            <div className="ios-row">
-              <div className="ios-row-label">
-                <span className="ios-row-icon pink">↻</span>
-                Repeats
-              </div>
-
-              <div className="ios-row-value">
-                {repeatLabel(r.repeatRule)}
-              </div>
-            </div>
-
-            <div className="ios-divider" />
-
-          </div>
-        </section>
-
-        {/* Call information */}
-        <section className="ios-section">
-          <div className="ios-section-label">CALL INFORMATION</div>
 
           <div className="ios-card">
             <div className="ios-row">
@@ -368,28 +319,6 @@ export default function ReminderDetailPage() {
         />
 
       <style>{`
-        :root {
-          color-scheme: dark;
-
-          --ios-bg: #000000;
-          --ios-card: #1c1c1e;
-          --ios-card-secondary: #2c2c2e;
-
-          --ios-text: #f5f5f7;
-          --ios-secondary: #98989f;
-          --ios-tertiary: #636366;
-
-          --ios-separator: rgba(84, 84, 88, 0.55);
-
-          --ios-blue: #0a84ff;
-          --ios-green: #30d158;
-          --ios-orange: #ff9f0a;
-          --ios-red: #ff453a;
-          --ios-purple: #bf5af2;
-          --ios-pink: #ff375f;
-          --ios-cyan: #64d2ff;
-        }
-
         .ios-page {
           min-height: 100vh;
           width: 100%;
@@ -553,18 +482,18 @@ export default function ReminderDetailPage() {
 
         .ios-action-button.secondary {
           color: var(--ios-text);
-          background: #2c2c2e;
+          background: var(--surface-2);
           box-shadow:
             inset 0 0 0 1px rgba(255, 255, 255, 0.035),
             0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .ios-action-button.secondary:hover {
-          background: #38383a;
+          background: var(--surface-3);
         }
 
         .ios-action-button.green {
-          color: #061b0b;
+          color: var(--success);
           background: var(--ios-green);
         }
 
@@ -575,11 +504,11 @@ export default function ReminderDetailPage() {
 
         .ios-action-button.destructive-outline {
           color: var(--ios-red);
-          background: rgba(255, 69, 58, 0.11);
+          background: color-mix(in srgb, var(--ios-red) 11%, transparent);
         }
 
         .ios-action-button.destructive-outline:hover {
-          background: rgba(255, 69, 58, 0.18);
+          background: color-mix(in srgb, var(--ios-red) 18%, transparent);
         }
 
         .ios-action-icon {
@@ -694,31 +623,31 @@ export default function ReminderDetailPage() {
           font-size: 13px;
           font-weight: 700;
           color: white;
-          background: #3a3a3c;
+          background: var(--surface-3);
         }
 
         .ios-row-icon.blue {
-          background: rgba(10, 132, 255, 0.22);
+          background: color-mix(in srgb, var(--ios-blue) 22%, transparent);
           color: var(--ios-blue);
         }
 
         .ios-row-icon.green {
-          background: rgba(48, 209, 88, 0.18);
+          background: color-mix(in srgb, var(--ios-green) 18%, transparent);
           color: var(--ios-green);
         }
 
         .ios-row-icon.orange {
-          background: rgba(255, 159, 10, 0.18);
+          background: color-mix(in srgb, var(--ios-orange) 18%, transparent);
           color: var(--ios-orange);
         }
 
         .ios-row-icon.purple {
-          background: rgba(191, 90, 242, 0.18);
+          background: color-mix(in srgb, var(--ios-purple) 18%, transparent);
           color: var(--ios-purple);
         }
 
         .ios-row-icon.pink {
-          background: rgba(255, 55, 95, 0.18);
+          background: color-mix(in srgb, var(--ios-pink) 18%, transparent);
           color: var(--ios-pink);
         }
 
@@ -729,7 +658,7 @@ export default function ReminderDetailPage() {
 
         .ios-row-icon.gray {
           background: rgba(142, 142, 147, 0.18);
-          color: #aeaeb2;
+          color: var(--text-muted);
         }
 
         .ios-primary-value {
@@ -778,7 +707,7 @@ export default function ReminderDetailPage() {
           justify-content: center;
           border-radius: 999px;
           color: var(--ios-secondary);
-          background: #2c2c2e;
+          background: var(--surface-2);
           font-size: 13px;
           font-weight: 600;
         }
@@ -831,7 +760,7 @@ export default function ReminderDetailPage() {
           padding: 11px 12px;
           border-radius: 10px;
           color: var(--ios-secondary);
-          background: #2c2c2e;
+          background: var(--surface-2);
           font-size: 13px;
           line-height: 1.45;
           overflow-wrap: anywhere;

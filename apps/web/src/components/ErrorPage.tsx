@@ -28,28 +28,16 @@ export default function ErrorPage({
     >
       <div
         aria-hidden="true"
-        className="flex h-16 w-16 items-center justify-center rounded-[18px] bg-[rgba(255,69,58,0.14)] text-[30px] font-bold leading-none text-[#ff453a]"
+        className="flex h-16 w-16 items-center justify-center rounded-[18px] bg-[color:var(--danger-soft)] text-[30px] font-bold leading-none text-[color:var(--danger)]"
       >
         !
       </div>
 
-      <h1
-        className={
-          light
-            ? 'mt-5 text-[22px] font-bold tracking-[-0.02em] text-[#1c1b22]'
-            : 'mt-5 text-[22px] font-bold tracking-[-0.02em] text-[#f5f5f7]'
-        }
-      >
+      <h1 className="mt-5 text-[22px] font-bold tracking-[-0.02em] text-[color:var(--text)]">
         {title ?? 'Something went wrong'}
       </h1>
 
-      <p
-        className={
-          light
-            ? 'mt-2.5 max-w-[320px] text-[14px] leading-relaxed text-[#6b6a76]'
-            : 'mt-2.5 max-w-[320px] text-[14px] leading-relaxed text-[#98989f]'
-        }
-      >
+      <p className="mt-2.5 max-w-[320px] text-[14px] leading-relaxed text-[color:var(--text-dim)]">
         {message}
       </p>
 
@@ -57,7 +45,7 @@ export default function ErrorPage({
         <button
           type="button"
           onClick={onRetry}
-          className="pressable mt-8 inline-flex min-h-[44px] items-center justify-center rounded-[12px] bg-gradient-to-b from-[#168cff] to-[#087cf0] px-7 text-[15px] font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]"
+          className="pressable mt-8 inline-flex min-h-[44px] items-center justify-center rounded-[12px] bg-[image:var(--gradient-primary)] px-7 text-[15px] font-semibold text-[color:var(--on-primary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]"
         >
           {retryLabel}
         </button>
@@ -67,7 +55,7 @@ export default function ErrorPage({
         <button
           type="button"
           onClick={secondary.onClick}
-          className="pressable mt-3 text-[15px] font-medium text-[#0A84FF]"
+          className="pressable mt-3 text-[15px] font-medium text-[color:var(--primary)]"
         >
           {secondary.label}
         </button>
@@ -84,7 +72,7 @@ export default function ErrorPage({
   }
 
   return (
-    <section className="flex min-h-screen w-full items-center justify-center bg-black px-6">
+    <section className="flex min-h-screen w-full items-center justify-center bg-[color:var(--bg)] px-6">
       {content}
     </section>
   );

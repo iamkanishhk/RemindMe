@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useClerk, useUser } from '@clerk/react';
 import { useDeleteMe, useMe } from '../hooks/queries';
 import { formatDateTimeLocal } from '../lib/format';
@@ -8,6 +8,7 @@ import { SkeletonRow } from '../components/Skeleton';
 import { useErrorToast } from '../components/Toast';
 import ConfirmSheet from '../components/ConfirmSheet';
 import { iosTheme } from './iosTheme';
+import LiquidGlass from 'liquid-glass-react';
 
 function displayNameFromEmail(email: string): string {
   const local = email.split('@')[0] ?? '';
@@ -68,9 +69,30 @@ export default function ProfilePage() {
   return (
     <section className="ios-settings-page">
       <div className="ios-settings-container">
+          <LiquidGlass 
+                       displacementScale={64}
+                       saturation={130}
+                       aberrationIntensity={2}
+                       elasticity={0.35}
+                       cornerRadius={100}
+                      blurAmount={0.1}
+                      padding="15px"
+                      style={{ 
+                        width: 15,
+                        height: 15,
+                        top: 20,
+                        left: 30,
+                        position: 'fixed',
+                       }}
+                        >
+                        <Link to="/settings" className="ios-back">
+                      <span className="ios-back-icon text-[color:var(--text)] p-2">‹</span>
+                    </Link>
+                              </LiquidGlass>
         {/* Header */}
-        <header className="ios-settings-header">
+        <header className="ios-settings-header mt-15">
           <h1>Profile</h1>
+         
         </header>
 
         {/* =========================================
@@ -149,7 +171,7 @@ export default function ProfilePage() {
           
                 <button
                   type="button"
-                  className="ios-settings-card w-full h-[5vh] text-[#DC3E35]"
+                  className="ios-settings-card w-full h-[5vh] text-[color:var(--danger)]"
                   disabled={signingOut}
                   onClick={() => setConfirmingSignOut(true)}
                 >

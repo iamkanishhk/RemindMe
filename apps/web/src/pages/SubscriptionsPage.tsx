@@ -7,6 +7,8 @@ import { useErrorToast } from '../components/Toast';
 import ConfirmSheet from '../components/ConfirmSheet';
 import { iosTheme } from './iosTheme';
 import type { SubscriptionStatus } from '../lib/types';
+import LiquidGlass from 'liquid-glass-react';
+import { Link } from 'react-router-dom';
 
 const STATUS_LABEL: Record<SubscriptionStatus, string> = {
   ACTIVE: 'Active',
@@ -69,9 +71,7 @@ export default function SubscriptionsPage() {
     <section className="ios-settings-page">
       <div className="ios-settings-container">
         {/* Header */}
-        <header className="ios-settings-header">
-          <div className="ios-settings-eyebrow">SUBSCRIPTION</div>
-
+        <header className="ios-settings-header mt-15">
           <h1>Subscriptions</h1>
         </header>
 
@@ -79,7 +79,26 @@ export default function SubscriptionsPage() {
             SUBSCRIPTION
         ========================================== */}
         <section className="ios-settings-section">
-          <div className="ios-section-label">SUBSCRIPTION</div>
+            <LiquidGlass 
+                       displacementScale={64}
+                       saturation={130}
+                       aberrationIntensity={2}
+                       elasticity={0.35}
+                       cornerRadius={100}
+                      blurAmount={0.1}
+                      padding="15px"
+                      style={{ 
+                        width: 15,
+                        height: 15,
+                        top: 20,
+                        left: 30,
+                        position: 'fixed',
+                       }}
+                        >
+                        <Link to="/settings" className="ios-back">
+                      <span className="ios-back-icon text-[color:var(--text)] p-2">‹</span>
+                    </Link>
+                              </LiquidGlass>
 
           <div
             className={`ios-settings-card${billing.isLoading ? ' skeleton-area' : ''}`}

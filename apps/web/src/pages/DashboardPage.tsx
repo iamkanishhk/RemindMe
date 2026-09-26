@@ -245,7 +245,7 @@ function PauseIcon() {
 
     fadeDuration: 0.14,
 
-    background: '#FFFFFF',
+    background: 'var(--on-primary)',
 
   },
 
@@ -279,11 +279,11 @@ function PauseIcon() {
   // COLORS
   // ─────────────────────────────────────────────
   colors: {
-    on: '#34C759',
-    off: '#C6C6C6',
+    on: 'var(--success)',
+    off: 'var(--surface-3)',
 
-    onGlow: 'rgba(52,199,89,0.45)',
-    offGlow: 'rgba(255,255,255,0.18)',
+    onGlow: 'color-mix(in srgb, var(--success) 45%, transparent)',
+    offGlow: 'rgba(255, 255, 255, 0.18)',
 
     onAmbientOpacity: 0.35,
 
@@ -507,7 +507,7 @@ export function IOSSwitch({
             SOLID RESTING KNOB
             ========================================== */}
         <motion.div
-          className="absolute inset-0 flex items-center justify-center bg-white"
+          className="absolute inset-0 flex items-center justify-center bg-[color:var(--on-primary)]"
           animate={{
             opacity: isLiquidActive ? 0 : 1,
             scale: isLiquidActive
@@ -697,7 +697,7 @@ function ScheduleItem({ reminder }: { reminder: Reminder }) {
         border-[#38383a61]
         transition-colors
         duration-150
-        active:bg-[#141416]
+        active:bg-[color:var(--surface-2)]
       `}
     >
       <Link
@@ -710,7 +710,7 @@ function ScheduleItem({ reminder }: { reminder: Reminder }) {
                 text-[48px]
                 leading-none
                 tracking-[-0.045em]
-                text-[#8E8E93]
+                text-[color:var(--text-dim)]
                 tabular-nums
               "
             >
@@ -721,7 +721,7 @@ function ScheduleItem({ reminder }: { reminder: Reminder }) {
               className="
                 text-[19px]
                 tracking-[-0.01em]
-                text-[#8E8E93]
+                text-[color:var(--text-dim)]
               "
             >
               {meridiem}
@@ -735,7 +735,7 @@ function ScheduleItem({ reminder }: { reminder: Reminder }) {
             text-[14px]
             leading-[18px]
             font-medium
-          text-[#8E8E93]
+          text-[color:var(--text-dim)]
           `}
         >
           {reminder.title}
@@ -772,7 +772,7 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
       rise-in
       border-b
       border-t
-      border-[#2C2C2E]
+      border-[color:var(--surface-2)]
 
       "
     >
@@ -786,7 +786,7 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
             leading-[22px]
             font-semibold
             tracking-[-0.01em]
-            text-[#F2F2F7]
+            text-[color:var(--text)]
           "
         >
           {reminder.title}
@@ -799,7 +799,7 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
                 text-[48px]
                 leading-none
                 tracking-[-0.045em]
-                text-white
+                text-[color:var(--text)]
                 tabular-nums
               "
             >
@@ -810,7 +810,7 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
               className="
                 text-[19px]
                 tracking-[-0.01em]
-                text-white
+                text-[color:var(--text)]
               "
             >
               {meridiem}
@@ -827,8 +827,7 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
               items-center
               justify-center
               rounded-full
-              text-white
-
+              text-[color:var(--text)]
               active:scale-90
             "
           >
@@ -844,7 +843,7 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
               text-[11px]
               font-semibold
              bg-[#3f576f50]
-              text-[#0A84FF]
+              text-[color:var(--primary)]
             `}
           >
             VIEW
@@ -854,7 +853,7 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
         </div>
 
       
-          <span className="text-[13px] font-medium text-[#0A84FF]">
+          <span className="text-[13px] font-medium text-[color:var(--primary)]">
             {relative}
           </span>
 
@@ -914,11 +913,11 @@ export default function DashboardPage() {
         relative
         min-h-screen
         overflow-x-hidden
-        bg-[#000000]
+        bg-[color:var(--bg)]
         px-4
         pb-44
         pt-3
-        text-[#F2F2F7]
+        text-[color:var(--text)]
         antialiased
       "
     >
@@ -932,7 +931,7 @@ export default function DashboardPage() {
                 flex
                 text-[25px]
                 font-semibold
-                text-white
+                text-[color:var(--text)]
             
               "
             >
@@ -944,7 +943,7 @@ export default function DashboardPage() {
               className="
                 pressable-round
                 inline-flex
-                text-[#0A84FF]
+                text-[color:var(--primary)]
                 text-[35px]
               "
             >
@@ -959,7 +958,7 @@ export default function DashboardPage() {
         {reminders.isLoading ? (
           <div className="mt-5 flex flex-col gap-6 skeleton-area" aria-busy="true">
             {/* Hero */}
-            <div className="border-b border-t border-[#2C2C2E] p-5">
+            <div className="border-b border-t border-[color:var(--surface-2)] p-5">
               <Skeleton className="mt-4 h-[22px] w-2/5" />
               <div className="mt-4 flex items-center justify-between gap-4">
                 <div className="flex min-w-0 items-baseline gap-2">
@@ -998,60 +997,11 @@ export default function DashboardPage() {
           /* -------------------------------------------------------------- */
           /* Empty State                                                    */
           /* -------------------------------------------------------------- */
-          <div
-            className="
-              mt-5
-              rounded-[28px]
-              border
-              border-[#2C2C2E]
-              bg-[#1C1C1E]
-              px-6
-              py-10
-              text-center
-            "
-          >
-            <div
-              className="
-                mx-auto
-                flex
-                h-16
-                w-16
-                items-center
-                justify-center
-                rounded-full
-                bg-[#0A84FF]/15
-                text-[#0A84FF]
-              "
-            >
-              <BellIcon />
-            </div>
-
-            <h3
-              className="
-                mt-5
-                text-[17px]
-                font-semibold
-                tracking-[-0.01em]
-                text-[#F2F2F7]
-              "
-            >
-              No schedules today
-            </h3>
-
-            <p
-              className="
-                mx-auto
-                mt-1.5
-                max-w-[280px]
-                text-[14px]
-                leading-5
-                font-normal
-                text-[#8E8E93]
-              "
-            >
-              Nothing planned yet. Schedule a call reminder to get started.
-            </p>
-
+        <div className="w-full flex flex-col items-center justify-center gap-3  p-6 text-center">
+             <img src="./assets/schedule.png" width="auto" height="10vh" className="opacity-70" alt="Call icon">
+</img>
+            <div> No  Schedules Yet</div>
+           
           </div>
         ) : (
           <div className="mt-5 flex flex-col gap-6">
@@ -1076,7 +1026,7 @@ export default function DashboardPage() {
                       leading-6
                       font-semibold
                       tracking-[-0.02em]
-                      text-[#F2F2F7]
+                      text-[color:var(--text)]
                     "
                   >
                    Other

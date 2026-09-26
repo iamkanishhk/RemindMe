@@ -114,22 +114,22 @@ function ToastViewport({
             exit={reduceMotion ? { opacity: 0 } : 'exit'}
             variants={toastVariants}
             role="alert"
-            className="pointer-events-auto flex items-center gap-3 rounded-[18px] border border-white/10 bg-[rgba(28,28,30,0.94)] px-4 py-3 shadow-[0_10px_34px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-xl"
+            className="pointer-events-auto flex items-center gap-3 rounded-[18px] border border-[color:var(--border-soft)] bg-[color:var(--toast-bg)] px-4 py-3 shadow-[0_10px_34px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.05)] backdrop-blur-xl"
           >
             <span
               aria-hidden="true"
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[rgba(255,69,58,0.16)] text-[15px] font-bold leading-none text-[#ff453a]"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[color:var(--danger-soft)] text-[15px] font-bold leading-none text-[color:var(--danger)]"
             >
               !
             </span>
-            <p className="min-w-0 flex-1 text-[14px] font-medium leading-snug text-[#f5f5f7]">
+            <p className="min-w-0 flex-1 text-[14px] font-medium leading-snug text-[color:var(--text)]">
               {toast.message}
             </p>
             <button
               type="button"
               aria-label="Dismiss notification"
               onClick={() => onDismiss(toast.id)}
-              className="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-full text-[17px] leading-none text-[#98989f] transition hover:text-[#f5f5f7] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0A84FF]"
+              className="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-full text-[17px] leading-none text-[color:var(--text-dim)] transition hover:text-[color:var(--text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:[outline-color:var(--primary)]"
             >
               ×
             </button>

@@ -1,7 +1,6 @@
+import React, { useState, useEffect, useRef, useLayoutEffect, type JSX } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import LiquidGlass from 'liquid-glass-react';
-import { motion } from 'framer-motion';
-import type { JSX } from 'react';
+import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 interface Tab {
   to: string;
@@ -9,6 +8,44 @@ interface Tab {
   end: boolean;
   Icon: () => JSX.Element;
 }
+
+const NAV_GLASS_CONFIG = {
+  physics: {
+    stiffness: 380,
+    damping: 28,
+    mass: 0.85,
+    animationDuration: 400,
+    velocityThreshold: 2,
+    velocityReference: 500,
+  },
+  glass: {
+    scale: 1.08,
+    transmission: 0.95,
+    blur: 6,
+    saturation: 160,
+    contrast: 480,
+    borderOpacity: 0.8,
+    shadowOpacity: 1.8,
+  },
+  stretch: {
+    factorX: 0.85,
+    factorY: 0.18,
+    minY: 0.75,
+    maxVelocity: 2.2,
+    anisotropy: 1.0,
+  },
+  chromatic: {
+    base: 1,
+    velocityAmount: 3.5,
+    overlayOpacity: 0.2,
+    red: 'rgba(255, 0, 90, 0.3)',
+    blue: 'rgba(0, 240, 255, 0.3)',
+  },
+  animation: {
+    liquidFadeDuration: 0.12,
+    liquidEase: [0.16, 1, 0.3, 1],
+  },
+} as const;
 
 function HomeIcon() {
   return (
@@ -45,8 +82,8 @@ const tabs: Tab[] = [
 
 export default function BottomNav() {
   const location = useLocation();
+  const tabRefs = useRef<(HTMLAnchorElement | null)[]>([]);
 
-  // Find active tab index for layout calculation
   const activeIndex = tabs.findIndex((tab) =>
     tab.end
       ? location.pathname === tab.to
@@ -58,55 +95,186 @@ export default function BottomNav() {
 
   const activeTab = activeIndex !== -1 ? activeIndex : 0;
 
+  const [pillBounds, setPillBounds] = useState<{ left: number; width: number } | null>(null);
+
+  const x = useMotionValue(0);
+  const widthVal = useMotionValue(0);
+
+  const springX = useSpring(x, {
+    stiffness: NAV_GLASS_CONFIG.physics.stiffness,
+    damping: NAV_GLASS_CONFIG.physics.damping,
+    mass: NAV_GLASS_CONFIG.physics.mass,
+  });
+
+  const springWidth = useSpring(widthVal, {
+    stiffness: NAV_GLASS_CONFIG.physics.stiffness,
+    damping: NAV_GLASS_CONFIG.physics.damping,
+    mass: NAV_GLASS_CONFIG.physics.mass,
+  });
+
+  const [velocity, setVelocity] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const updateLayout = () => {
+    const activeEl = tabRefs.current[activeTab];
+    if (activeEl) {
+      const left = activeEl.offsetLeft;
+      const width = activeEl.offsetWidth;
+
+      x.set(left);
+      widthVal.set(width);
+      setPillBounds({ left, width });
+    }
+  };
+
+  useLayoutEffect(() => {
+    updateLayout();
+
+    setIsAnimating(true);
+    const timer = window.setTimeout(() => {
+      setIsAnimating(false);
+    }, NAV_GLASS_CONFIG.physics.animationDuration);
+
+    return () => window.clearTimeout(timer);
+  }, [activeTab]);
+
+  useEffect(() => {
+    updateLayout();
+    window.addEventListener('resize', updateLayout);
+    return () => window.removeEventListener('resize', updateLayout);
+  }, []);
+
+  useEffect(() => {
+    return springX.on('change', () => {
+      setVelocity(springX.getVelocity());
+    });
+  }, [springX]);
+
+  const isLiquidActive = isAnimating || Math.abs(velocity) > NAV_GLASS_CONFIG.physics.velocityThreshold;
+
+  const normalizedVelocity = Math.min(
+    Math.abs(velocity) / NAV_GLASS_CONFIG.physics.velocityReference,
+    NAV_GLASS_CONFIG.stretch.maxVelocity
+  );
+
+  const stretchX = isLiquidActive
+    ? 1 + normalizedVelocity * NAV_GLASS_CONFIG.stretch.factorX * NAV_GLASS_CONFIG.stretch.anisotropy
+    : 1;
+
+  const stretchY = isLiquidActive
+    ? Math.max(
+        NAV_GLASS_CONFIG.stretch.minY,
+        1 - normalizedVelocity * NAV_GLASS_CONFIG.stretch.factorY * NAV_GLASS_CONFIG.stretch.anisotropy
+      )
+    : 1;
+
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40">
+    <div className="fixed bottom-20 w-[90vw] max-w-md left-1/2 -translate-x-1/2 z-40">
       <nav
         aria-label="Primary"
-        className="relative flex items-center justify-between gap-1 px-2 py-1.5 rounded-full border border-white/20 bg-white/10 backdrop-blur-2xl shadow-2xl ring-1 ring-white/10"
+        className="relative flex items-center justify-between gap-1 p-1.5 rounded-full border border-white/20 bg-[#1c1c1e]/80 backdrop-blur-2xl shadow-2xl overflow-visible"
       >
-        {/* Single Sliding Liquid Glass Bubble */}
-        <motion.div
-          className="absolute top-1.5 bottom-1.5 rounded-full pointer-events-none z-0"
-          style={{ width: `calc((100% - 16px) / ${tabs.length})` }}
-          animate={{ x: `${activeTab * 100}%` }}
-          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-        >
-          <LiquidGlass
+        {/* ==========================================
+            LIQUID GLASS MOVING BACKDROP
+            ========================================== */}
+        {pillBounds && (
+          <motion.div
+            className="absolute top-1.5 bottom-1.5 pointer-events-none z-10"
             style={{
-              width: '100%',
-              height: '100%',
-              top: -80,
-              left: 40,
-              borderRadius: '9999px',
-              backdropFilter: 'blur(8px) saturate(180%)',
-              boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.6), 0 4px 12px rgba(0, 0, 0, 0.25)',
-              border: '1px solid rgba(255, 255, 255, 0.3)'
+              x: springX,
+              width: 100,
             }}
-            displacementScale={64}
-            saturation={130}
-            aberrationIntensity={5}
-            elasticity={9.35}
-            blurAmount={0.1}
           >
-            {null}
-          </LiquidGlass>
-        </motion.div>
+            {/* SOLID RESTING TAB BACKGROUND */}
+            <motion.div
+              className="w-full h-full rounded-full bg-white/15 shadow-sm border border-white/10"
+              animate={{
+                opacity: isLiquidActive ? 0 : 1,
+                scale: isLiquidActive ? 0.92 : 1,
+              }}
+              transition={{
+                duration: 0.15,
+                ease: 'easeOut',
+              }}
+            />
+
+            {/* LIQUID GLASS ACTIVE STATE */}
+            <motion.div
+              className="absolute inset-0 pointer-events-none z-20 rounded-full"
+              animate={{
+                opacity: isLiquidActive ? NAV_GLASS_CONFIG.glass.transmission : 0,
+                scale: isLiquidActive ? NAV_GLASS_CONFIG.glass.scale : 0.85,
+                scaleX: stretchX,
+                scaleY: stretchY,
+              }}
+              transition={{
+                duration: NAV_GLASS_CONFIG.animation.liquidFadeDuration,
+                ease: NAV_GLASS_CONFIG.animation.liquidEase,
+              }}
+              style={{
+                backdropFilter: `
+                  blur(${NAV_GLASS_CONFIG.glass.blur}px)
+                  saturate(${NAV_GLASS_CONFIG.glass.saturation}%)
+                  contrast(${NAV_GLASS_CONFIG.glass.contrast}%)
+                `,
+                WebkitBackdropFilter: `
+                  blur(${NAV_GLASS_CONFIG.glass.blur}px)
+                  saturate(${NAV_GLASS_CONFIG.glass.saturation}%)
+                  contrast(${NAV_GLASS_CONFIG.glass.contrast}%)
+                `,
+                background: 'rgba(255, 255, 255, 0.22)',
+                border: `1px solid rgba(255, 255, 255, ${NAV_GLASS_CONFIG.glass.borderOpacity})`,
+                boxShadow: `
+                  inset 0 2px 4px rgba(255,255,255,0.95),
+                  inset 0 -2px 4px rgba(0,0,0,${NAV_GLASS_CONFIG.glass.shadowOpacity}),
+                  0 6px 16px rgba(0,0,0,0.25)
+                `,
+              }}
+            >
+              {/* RGB dispersion overlay */}
+              <motion.div
+                className="absolute inset-0 overflow-hidden rounded-full pointer-events-none"
+                animate={{
+                  opacity: isLiquidActive ? NAV_GLASS_CONFIG.chromatic.overlayOpacity : 0,
+                }}
+              >
+                <div
+                  className="w-full h-full"
+                  style={{
+                    background: `
+                      linear-gradient(
+                        90deg,
+                        ${NAV_GLASS_CONFIG.chromatic.red} 0%,
+                        transparent 40%,
+                        transparent 60%,
+                        ${NAV_GLASS_CONFIG.chromatic.blue} 100%
+                      )
+                    `,
+                  }}
+                />
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
 
         {/* Navigation Items */}
-        {tabs.map(({ to, label, end, Icon }) => (
+        {tabs.map(({ to, label, end, Icon }, idx) => (
           <NavLink
             key={to}
             to={to}
             end={end}
-            className="relative flex-1 z-10"
+            ref={(el) => {
+              tabRefs.current[idx] = el;
+            }}
+            className="relative flex-1 z-20"
           >
             {({ isActive }) => (
-              <div className="flex flex-col items-center justify-center py-2 px-6 min-w-[80px]">
+              <div className="flex flex-col items-center justify-center py-2 px-3 min-w-[70px]">
                 <div
                   className={`flex flex-col items-center justify-center transition-all duration-300 ${
                     isActive
-                      ? 'text-blue-400 font-semibold scale-105'
-                      : 'text-gray-300 hover:text-white font-normal'
+                      ? 'text-white font-semibold scale-105'
+                      : 'text-white/60 hover:text-white font-normal'
                   }`}
                 >
                   <Icon />

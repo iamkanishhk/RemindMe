@@ -307,14 +307,14 @@ function SectionHeader({
 }) {
   return (
     <div className="mb-2 flex items-center justify-between px-2">
-      <div className="flex items-center gap-2 text-[#0A84FF]">
+      <div className="flex items-center gap-2 text-[color:var(--primary)]">
         {icon}
-        <span className="text-[13px] font-semibold uppercase tracking-[0.05em] text-[#8E8E93]">
+        <span className="text-[13px] font-semibold uppercase tracking-[0.05em] text-[color:var(--text-dim)]">
           {title}
         </span>
       </div>
       {trailing && (
-        <span className="text-[12px] font-medium text-[#636366]">
+        <span className="text-[12px] font-medium text-[color:var(--text-faint)]">
           {trailing}
         </span>
       )}
@@ -427,15 +427,15 @@ function ScrubBox({
       
       `}
     >
-      <span className="pointer-events-none mb-1 text-[10px] font-bold uppercase tracking-[0.08em] text-[#8E8E93]">
+      <span className="pointer-events-none mb-1 text-[10px] font-bold uppercase tracking-[0.08em] text-[color:var(--text-dim)]">
         {label}
       </span>
 
-      <span className="pointer-events-none text-[32px] font-bold tracking-tight text-white tabular-nums">
+      <span className="pointer-events-none text-[32px] font-bold tracking-tight text-[color:var(--text)] tabular-nums">
         {format(current)}
       </span>
 
-      <div className="absolute right-2 top-1/2 flex -translate-y-1/2 flex-col gap-0.5 text-[#8E8E93]">
+      <div className="absolute right-2 top-1/2 flex -translate-y-1/2 flex-col gap-0.5 text-[color:var(--text-dim)]">
         <button
           type="button"
           tabIndex={-1}
@@ -445,7 +445,7 @@ function ScrubBox({
             e.stopPropagation();
             apply(current + 1);
           }}
-          className="rounded-lg p-1.5 transition active:scale-90 hover:bg-[#3A3A3C] hover:text-[#0A84FF]"
+          className="rounded-lg p-1.5 transition active:scale-90 hover:bg-[color:var(--surface-3)] hover:text-[color:var(--primary)]"
         >
           <ChevronUpIcon />
         </button>
@@ -459,7 +459,7 @@ function ScrubBox({
             e.stopPropagation();
             apply(current - 1);
           }}
-          className="rounded-lg p-1.5 transition active:scale-90 hover:bg-[#3A3A3C] hover:text-[#0A84FF]"
+          className="rounded-lg p-1.5 transition active:scale-90 hover:bg-[color:var(--surface-3)] hover:text-[color:var(--primary)]"
         >
           <ChevronDownIcon />
         </button>
@@ -628,7 +628,7 @@ export default function ReminderNewPage() {
   }
 
   return (
-    <section className="min-h-screen bg-[#000000] pb-28 pt-2 text-[#F2F2F7] antialiased selection:bg-[#0A84FF]/30">
+      <section className="min-h-screen bg-[color:var(--bg)] pb-28 pt-2 text-[color:var(--text)] antialiased selection:bg-[color:color-mix(in_srgb,var(--primary)_30%,transparent)]">
      
 
       <div className="relative z-10 mx-auto max-w-lg px-4">
@@ -638,7 +638,7 @@ export default function ReminderNewPage() {
 
         <header className="mt-20">
 
-          <h1 className="text-[17px] font-bold tracking-tight text-white">
+          <h1 className="text-[17px] font-bold tracking-tight text-[color:var(--text)]">
             New Reminder
           </h1>
           <div>
@@ -655,11 +655,11 @@ export default function ReminderNewPage() {
                                       display: 'flex',
                                       alignItems: 'center',
                                       justifyContent: 'center',
-                                      border: '1px solid #0A92FF',
+                                      border: '1px solid var(--primary)',
                                       top: 15,
                                       right: 15,
                                       position: 'fixed',
-                                      backgroundColor: '#0A84FF',
+                                      backgroundColor: 'var(--primary)',
                                       fontSize: 24,
                                       color: 'white',
                                       lineHeight: 1,
@@ -691,7 +691,7 @@ export default function ReminderNewPage() {
                          }}
                           >
                           <Link to="/" className="ios-back">
-                        <span className="ios-back-icon text-white p-2">‹</span>
+                        <span className="ios-back-icon text-[color:var(--text)] p-2">‹</span>
                       </Link>
                                 </LiquidGlass>
           </div>
@@ -722,7 +722,7 @@ export default function ReminderNewPage() {
                   />
 
                   <span
-                    className="select-none text-[28px] font-light text-[#8E8E93]"
+                    className="select-none text-[28px] font-light text-[color:var(--text-dim)]"
                     aria-hidden="true"
                   >
                     :
@@ -741,10 +741,10 @@ export default function ReminderNewPage() {
                     aria-pressed={ampm === 'PM'}
                     aria-label="Toggle AM/PM"
                     onClick={() => setAmpm((a) => (a === 'AM' ? 'PM' : 'AM'))}
-                    className="flex h-[84px] w-[76px] shrink-0 flex-col items-center justify-center rounded-[20px] border transition-all duration-200 active:scale-95 hover:border-[#0A84FF]/50 hover:bg-[#2C2C2E]/80"
+                    className="flex h-[84px] w-[76px] shrink-0 flex-col items-center justify-center rounded-[20px] border transition-all duration-200 active:scale-95 hover:border-[color:color-mix(in_srgb,var(--primary)_50%,transparent)] hover:bg-[color:color-mix(in_srgb,var(--surface-2)_80%,transparent)]"
                   >
                   
-                    <span className="mt-0.5 text-[20px] font-bold text-[#0A84FF]">
+                    <span className="mt-0.5 text-[20px] font-bold text-[color:var(--primary)]">
                       {ampm}
                     </span>
                   </button>
@@ -787,14 +787,16 @@ export default function ReminderNewPage() {
                         active:scale-95
                         ${
                           isSelected
-                            ? 'border-[#abd5ff] bg-[#0A84FF] text-white '
+                            ? 'border-[color:color-mix(in_srgb,var(--primary)_70%,var(--on-primary))] bg-[color:var(--primary)] text-[color:var(--on-primary)] '
                             : ''
                         }
                       `}
                     >
                       <span
                         className={`text-[11px] font-bold uppercase tracking-wider ${
-                          isSelected ? 'text-white/80' : 'text-[#8E8E93]'
+                          isSelected
+          ? 'text-[color:color-mix(in_srgb,var(--on-primary)_80%,transparent)]'
+          : 'text-[color:var(--text-dim)]'
                         }`}
                       >
                         {d.label}
@@ -802,7 +804,7 @@ export default function ReminderNewPage() {
 
                       <span
                         className={`mt-1 text-[13px] font-bold ${
-                          isSelected ? 'text-white' : 'text-[#F2F2F7]'
+                          isSelected ? 'text-[color:var(--on-primary)]' : 'text-[color:var(--text)]'
                         }`}
                       >
                         {d.sub}
@@ -819,11 +821,11 @@ export default function ReminderNewPage() {
 
             <section>
 
-              <div className="overflow-hidden rounded-[26px] border border-white/10 bg-[#1C1C1E]/60 backdrop-blur-2xl">
+              <div className="overflow-hidden rounded-[26px] border border-white/10 bg-[color:color-mix(in_srgb,var(--surface)_60%,transparent)] backdrop-blur-2xl">
                 <div className="p-4">
                   <label
                     htmlFor="reminder-title"
-                    className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-[#8E8E93]"
+                    className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-[color:var(--text-dim)]"
                   >
                     Title
                   </label>
@@ -834,7 +836,7 @@ export default function ReminderNewPage() {
                     maxLength={80}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="e.g. Take the cake out of the oven"
-                    className="w-full rounded-[16px] border border-white/10 bg-[#000000]/40 px-4 py-3 text-[16px] font-medium text-white placeholder:text-[#636366] outline-none transition focus:border-[#0A84FF] focus:ring-2 focus:ring-[#0A84FF]/30"
+                    className="w-full rounded-[16px] border border-white/10 bg-[color:color-mix(in_srgb,var(--bg)_40%,transparent)] px-4 py-3 text-[16px] font-medium text-[color:var(--text)] placeholder:text-[color:var(--text-faint)] outline-none transition focus:border-[color:var(--primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--primary)_30%,transparent)]"
                   />
                 </div>
 
@@ -844,12 +846,12 @@ export default function ReminderNewPage() {
                   <div className="mb-1.5 flex items-center justify-between">
                     <label
                       htmlFor="reminder-message"
-                      className="text-[11px] font-bold uppercase tracking-wider text-[#8E8E93]"
+                      className="text-[11px] font-bold uppercase tracking-wider text-[color:var(--text-dim)]"
                     >
                       Message
                     </label>
 
-                    <span className="text-[11px] font-semibold text-[#636366]">
+                    <span className="text-[11px] font-semibold text-[color:var(--text-faint)]">
                       {message.length}/500
                     </span>
                   </div>
@@ -861,7 +863,7 @@ export default function ReminderNewPage() {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="What we'll read over the call"
-                    className="w-full resize-none rounded-[16px] border border-white/10 bg-[#000000]/40 px-4 py-3 text-[16px] font-medium text-white placeholder:text-[#636366] outline-none transition focus:border-[#0A84FF] focus:ring-2 focus:ring-[#0A84FF]/30"
+                    className="w-full resize-none rounded-[16px] border border-white/10 bg-[color:color-mix(in_srgb,var(--bg)_40%,transparent)] px-4 py-3 text-[16px] font-medium text-[color:var(--text)] placeholder:text-[color:var(--text-faint)] outline-none transition focus:border-[color:var(--primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--primary)_30%,transparent)]"
                   />
                 </div>
               </div>
@@ -874,7 +876,7 @@ export default function ReminderNewPage() {
             <section>
 
 
-              <div className="rounded-[20px] border border-white/10 bg-[#1C1C1E]/60 p-1.5 backdrop-blur-xl">
+              <div className="rounded-[20px] border border-white/10 bg-[color:color-mix(in_srgb,var(--surface)_60%,transparent)] p-1.5 backdrop-blur-xl">
                 <div className="grid grid-cols-3 gap-1">
                   {REPEAT_OPTIONS.map((opt) => {
                     const isSelected = repeatRule === opt.value;
@@ -897,8 +899,8 @@ export default function ReminderNewPage() {
                           active:scale-95
                           ${
                             isSelected
-                              ? 'bg-[#3A3A3C] text-white shadow-md'
-                              : 'text-[#8E8E93] hover:text-white'
+        ? 'bg-[color:var(--surface-3)] text-[color:var(--text)] shadow-md'
+        : 'text-[color:var(--text-dim)] hover:text-[color:var(--text)]'
                           }
                         `}
                       >
@@ -922,16 +924,16 @@ export default function ReminderNewPage() {
                   id="reminder-timezone"
                   value={timezone}
                   onChange={(e) => setTimezone(e.target.value)}
-                  className="w-full appearance-none rounded-[20px] border border-white/10 bg-[#1C1C1E]/60 px-4 py-3.5 text-[15px] font-semibold text-white outline-none transition focus:border-[#0A84FF] focus:ring-2 focus:ring-[#0A84FF]/30"
+                  className="w-full appearance-none rounded-[20px] border border-white/10 bg-[color:color-mix(in_srgb,var(--surface)_60%,transparent)] px-4 py-3.5 text-[15px] font-semibold text-[color:var(--text)] outline-none transition focus:border-[color:var(--primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--primary)_30%,transparent)]"
                 >
                   {timezoneList().map((tz) => (
-                    <option key={tz} value={tz} className="bg-[#1C1C1E] text-white">
+                    <option key={tz} value={tz} className="bg-[color:var(--surface)] text-[color:var(--text)]">
                       {tz}
                     </option>
                   ))}
                 </select>
 
-                <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#8E8E93]">
+                <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[color:var(--text-dim)]">
                   <ChevronDownIcon />
                 </div>
               </div>

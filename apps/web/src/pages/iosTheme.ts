@@ -1,26 +1,4 @@
 export const iosTheme = `
-  :root {
-    color-scheme: dark;
-
-    --ios-black: #000000;
-    --ios-card: #1c1c1e;
-    --ios-card-elevated: #2c2c2e;
-
-    --ios-text: #f5f5f7;
-    --ios-secondary: #98989f;
-    --ios-tertiary: #636366;
-
-    --ios-separator: rgba(84, 84, 88, 0.55);
-
-    --ios-blue: #0a84ff;
-    --ios-green: #30d158;
-    --ios-orange: #ff9f0a;
-    --ios-red: #ff453a;
-    --ios-purple: #bf5af2;
-    --ios-pink: #ff375f;
-    --ios-cyan: #64d2ff;
-  }
-
   .ios-settings-page {
     min-height: 100vh;
     width: 100%;
@@ -286,26 +264,26 @@ export const iosTheme = `
 
   .ios-setting-icon.blue {
     color: var(--ios-blue);
-    background: rgba(10, 132, 255, 0.17);
+    background: color-mix(in srgb, var(--ios-blue) 17%, transparent);
   }
 
   .ios-setting-icon.green {
     color: var(--ios-green);
-    background: rgba(48, 209, 88, 0.17);
+    background: color-mix(in srgb, var(--ios-green) 17%, transparent);
   }
 
   .ios-setting-icon.orange {
     color: var(--ios-orange);
-    background: rgba(255, 159, 10, 0.17);
+    background: color-mix(in srgb, var(--ios-orange) 17%, transparent);
   }
 
   .ios-setting-icon.purple {
     color: var(--ios-purple);
-    background: rgba(191, 90, 242, 0.17);
+    background: color-mix(in srgb, var(--ios-purple) 17%, transparent);
   }
 
   .ios-setting-icon.gray {
-    color: #aeaeb2;
+    color: var(--text-muted);
     background: rgba(142, 142, 147, 0.16);
   }
 
@@ -344,8 +322,8 @@ export const iosTheme = `
     background:
       linear-gradient(
         135deg,
-        rgba(10, 132, 255, 0.35),
-        rgba(191, 90, 242, 0.35)
+        color-mix(in srgb, var(--ios-blue) 35%, transparent),
+        color-mix(in srgb, var(--ios-purple) 35%, transparent),
       );
 
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
@@ -408,12 +386,12 @@ export const iosTheme = `
 
   .ios-status-pill.active {
     color: var(--ios-green);
-    background: rgba(48, 209, 88, 0.12);
+    background: color-mix(in srgb, var(--ios-green) 12%, transparent);
   }
 
   .ios-status-pill.on-hold {
     color: var(--ios-orange);
-    background: rgba(255, 159, 10, 0.12);
+    background: color-mix(in srgb, var(--ios-orange) 12%, transparent);
   }
 
   .ios-status-pill.cancelled,
@@ -424,7 +402,7 @@ export const iosTheme = `
 
   .ios-status-pill.failed {
     color: var(--ios-red);
-    background: rgba(255, 69, 58, 0.12);
+    background: color-mix(in srgb, var(--ios-red) 12%, transparent);
   }
 
   .ios-status-dot {
@@ -464,7 +442,7 @@ export const iosTheme = `
     border-radius: 10px;
 
     color: var(--ios-blue);
-    background: rgba(10, 132, 255, 0.14);
+    background: color-mix(in srgb, var(--ios-blue) 14%, transparent);
 
     font-size: 16px;
   }
@@ -554,10 +532,10 @@ export const iosTheme = `
 
     gap: 6px;
 
-    border: 1px solid rgba(10, 132, 255, 0.35);
+    border: 1px solid color-mix(in srgb, var(--ios-blue) 35%, transparent);
     border-radius: 10px;
 
-    background: rgba(10, 132, 255, 0.12);
+    background: color-mix(in srgb, var(--ios-blue) 12%, transparent);
     color: var(--ios-blue);
 
     font-family: inherit;
@@ -572,7 +550,7 @@ export const iosTheme = `
   }
 
   .ios-signout-button:hover:not(:disabled) {
-    background: rgba(10, 132, 255, 0.2);
+    background: color-mix(in srgb, var(--ios-blue) 20%, transparent);
   }
 
   .ios-signout-button:active:not(:disabled) {
@@ -599,9 +577,9 @@ export const iosTheme = `
   .ios-danger-card {
     overflow: hidden;
 
-    background: rgba(255, 69, 58, 0.055);
+    background: color-mix(in srgb, var(--ios-red) 5.5%, transparent);
 
-    border: 1px solid rgba(255, 69, 58, 0.13);
+    border: 1px solid color-mix(in srgb, var(--ios-red) 13%, transparent);
 
     border-radius: 17px;
   }
@@ -627,7 +605,7 @@ export const iosTheme = `
 
     border-radius: 10px;
 
-    background: rgba(255, 69, 58, 0.14);
+    background: color-mix(in srgb, var(--ios-red) 14%, transparent);
     color: var(--ios-red);
 
     font-size: 17px;
@@ -712,12 +690,12 @@ export const iosTheme = `
   }
 
   .ios-delete-confirm input:focus {
-    border-color: rgba(255, 69, 58, 0.55);
+    border-color: color-mix(in srgb, var(--ios-red) 55%, transparent);
 
     background: rgba(0, 0, 0, 0.4);
 
     box-shadow:
-      0 0 0 3px rgba(255, 69, 58, 0.1);
+      0 0 0 3px color-mix(in srgb, var(--ios-red) 10%, transparent);
   }
 
   .ios-input-hint {
@@ -773,7 +751,7 @@ export const iosTheme = `
   }
 
   .ios-delete-button:hover:not(:disabled) {
-    background: #ff554d;
+    background: color-mix(in srgb, var(--ios-red) 88%, white);
   }
 
   .ios-delete-button:active:not(:disabled) {
