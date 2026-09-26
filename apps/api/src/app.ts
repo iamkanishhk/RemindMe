@@ -22,7 +22,8 @@ export function createApp(): Express {
   const origins = corsOriginList();
   app.use(
     cors({
-      origin: origins.length > 0 ? origins : '*'
+      origin: origins.length > 0 ? origins : '*',
+      
     })
   );
 
