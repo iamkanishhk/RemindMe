@@ -25,12 +25,6 @@
     "prisma:seed": "npm run prisma:seed -w @remindme/api",
     "prisma:deploy": "npm run prisma:deploy -w @remindme/api"
   },
-  "devDependencies": {
-    "@esbuild/win32-x64": "^0.28.2"
-  },
-  "optionalDependencies": {
-    "@esbuild/linux-x64": "^0.28.2"
-  },
   "dependencies": {
     "esbuild": "^0.28.2",
     "framer-motion": "^13.4.3"
