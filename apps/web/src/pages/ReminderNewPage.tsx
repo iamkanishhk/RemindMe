@@ -12,7 +12,7 @@ import {
 } from '../hooks/queries';
 import { timezoneList } from '../lib/format';
 import type { RepeatRule } from '../lib/types';
-import { SubscribePrompt } from '../components/SubscribePrompt';
+import SubscribeSheet from '../components/SubscribeSheet';
 import { useErrorToast } from '../components/Toast';
 import { Spinner } from '../components/Spinner';
 import { ApiError } from '../lib/api';
@@ -545,7 +545,18 @@ export default function ReminderNewPage() {
   const [localError, setLocalError] = useState('');
   const [subscriptionRequired, setSubscriptionRequired] = useState(false);
 
+  const messageRef = useRef<HTMLTextAreaElement | null>(null);
+
   useErrorToast(error || localError);
+
+  useEffect(() => {
+    const el = messageRef.current;
+
+    if (!el) return;
+
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, [message]);
 
   const verifiedPhones = (phoneQuery.data ?? []).filter((p) => p.verified);
   const verifiedPhone = verifiedPhones[0];
@@ -635,7 +646,6 @@ export default function ReminderNewPage() {
         {/* ---------------------------------------------------------------- */}
         {/* Navigation Bar                                                   */}
         {/* ---------------------------------------------------------------- */}
-
         <header className="mt-20">
 
           <h1 className="text-[17px] font-bold tracking-tight text-[color:var(--text)]">
@@ -671,10 +681,11 @@ export default function ReminderNewPage() {
                                     {busy ? <Spinner /> : '✓'}
                         </button>
                                     
-                                      
-                                    
+                                       
+                                     
                                              
-                                               <LiquidGlass 
+                                               
+                                                <LiquidGlass 
                          displacementScale={64}
                          saturation={130}
                          aberrationIntensity={2}
@@ -699,12 +710,7 @@ export default function ReminderNewPage() {
           <div className="h-10 w-10" aria-hidden="true" />
         </header>
 
-        {subscriptionRequired ? (
-          <div className="mt-4">
-            <SubscribePrompt />
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             {/* ---------------------------------------------------------- */}
             {/* Time Picker                                                */}
             {/* ---------------------------------------------------------- */}
@@ -741,10 +747,10 @@ export default function ReminderNewPage() {
                     aria-pressed={ampm === 'PM'}
                     aria-label="Toggle AM/PM"
                     onClick={() => setAmpm((a) => (a === 'AM' ? 'PM' : 'AM'))}
-                    className="flex h-[84px] w-[76px] shrink-0 flex-col items-center justify-center rounded-[20px] border transition-all duration-200 active:scale-95 hover:border-[color:color-mix(in_srgb,var(--primary)_50%,transparent)] hover:bg-[color:color-mix(in_srgb,var(--surface-2)_80%,transparent)]"
+                    className="flex h-[84px] w-[76px] shrink-0 flex-col items-center justify-center rounded-[20px] border transition-all duration-200 active:scale-95 hover:border-[color:color-mix(in_srgb,var(--primary)_50%,transparent)] "
                   >
                   
-                    <span className="mt-0.5 text-[20px] font-bold text-[color:var(--primary)]">
+                    <span className="mt-0.5 text-[20px] font-bold text-[color:var(--secodary)] tabular-nums">
                       {ampm}
                     </span>
                   </button>
@@ -787,7 +793,7 @@ export default function ReminderNewPage() {
                         active:scale-95
                         ${
                           isSelected
-                            ? 'border-[color:color-mix(in_srgb,var(--primary)_70%,var(--on-primary))] bg-[color:var(--primary)] text-[color:var(--on-primary)] '
+                            ? 'border-[color:color-mix(in_srgb,var(--primary)_70%,var(--on-primary))]  text-[color:var(--on-primary)] '
                             : ''
                         }
                       `}
@@ -821,49 +827,64 @@ export default function ReminderNewPage() {
 
             <section>
 
-              <div className="overflow-hidden rounded-[26px] border border-white/10 bg-[color:color-mix(in_srgb,var(--surface)_60%,transparent)] backdrop-blur-2xl">
+              <div className="overflow-hidden rounded-[20px] border border-[color:var(--border-soft)] bg-[color:var(--surface)]">
                 <div className="p-4">
-                  <label
-                    htmlFor="reminder-title"
-                    className="mb-1.5 block text-[11px] font-bold uppercase tracking-wider text-[color:var(--text-dim)]"
-                  >
-                    Title
-                  </label>
+                  <div className="mb-2 flex items-baseline justify-between gap-3">
+                    <label
+                      htmlFor="reminder-title"
+                      className="text-[13px] font-semibold text-[color:var(--text-dim)]"
+                    >
+                      Title
+                    </label>
+
+                    <span className="text-[12px] tabular-nums text-[color:var(--text-faint)]">
+                      {title.length}/80
+                    </span>
+                  </div>
+
                   <input
                     id="reminder-title"
                     type="text"
                     value={title}
                     maxLength={80}
+                    enterKeyHint="next"
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g. Take the cake out of the oven"
-                    className="w-full rounded-[16px] border border-white/10 bg-[color:color-mix(in_srgb,var(--bg)_40%,transparent)] px-4 py-3 text-[16px] font-medium text-[color:var(--text)] placeholder:text-[color:var(--text-faint)] outline-none transition focus:border-[color:var(--primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--primary)_30%,transparent)]"
+                    placeholder="e.g. Take the cake out"
+                    className="w-full rounded-[14px] border border-[color:var(--border-soft)] bg-[color:var(--surface-2)] px-4 py-3 text-[16px] font-normal leading-[1.45] text-[color:var(--text)] placeholder:text-[color:var(--text-faint)] outline-none "
                   />
                 </div>
 
-                <div className="mx-4 border-t border-white/5" />
+                <div className="mx-4 border-t border-[color:var(--border-soft)]" />
 
                 <div className="p-4">
-                  <div className="mb-1.5 flex items-center justify-between">
+                  <div className="mb-2 flex items-baseline justify-between gap-3">
                     <label
                       htmlFor="reminder-message"
-                      className="text-[11px] font-bold uppercase tracking-wider text-[color:var(--text-dim)]"
+                      className="text-[13px] font-semibold text-[color:var(--text-dim)]"
                     >
                       Message
                     </label>
 
-                    <span className="text-[11px] font-semibold text-[color:var(--text-faint)]">
+                    <span
+                      className={`text-[12px] tabular-nums ${
+                        message.length > 450
+                          ? 'text-[color:var(--warning)]'
+                          : 'text-[color:var(--text-faint)]'
+                      }`}
+                    >
                       {message.length}/500
                     </span>
                   </div>
 
                   <textarea
                     id="reminder-message"
-                    rows={3}
+                    ref={messageRef}
+                    rows={2}
                     maxLength={500}
-                    value={message}
+                    enterKeyHint="done"
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="What we'll read over the call"
-                    className="w-full resize-none rounded-[16px] border border-white/10 bg-[color:color-mix(in_srgb,var(--bg)_40%,transparent)] px-4 py-3 text-[16px] font-medium text-[color:var(--text)] placeholder:text-[color:var(--text-faint)] outline-none transition focus:border-[color:var(--primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--primary)_30%,transparent)]"
+                    className="max-h-[40vh] min-h-[76px] w-full resize-none overflow-hidden rounded-[14px] border border-[color:var(--border-soft)] bg-[color:var(--surface-2)] px-4 py-3 text-[16px] font-normal leading-[1.5] text-[color:var(--text)] placeholder:text-[color:var(--text-faint)] outline-none transition focus:border-[color:var(--primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--primary)_30%,transparent)]"
                   />
                 </div>
               </div>
@@ -939,7 +960,11 @@ export default function ReminderNewPage() {
               </div>
             </section>
           </form>
-        )}
+
+        <SubscribeSheet
+          open={subscriptionRequired}
+          onClose={() => setSubscriptionRequired(false)}
+        />
       </div>
     </section>
   );
