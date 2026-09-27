@@ -42,7 +42,7 @@ export default function SubscribeSheet({
     ? { duration: 0 }
     : { type: 'spring', stiffness: 320, damping: 34, mass: 0.9 };
 
-  const height = expanded ? '99dvh' : String(collapsedHeight ?? 'auto');
+  const height = expanded ? '110dvh' : String(collapsedHeight ?? 'auto');
 
   return (
     <AnimatePresence>

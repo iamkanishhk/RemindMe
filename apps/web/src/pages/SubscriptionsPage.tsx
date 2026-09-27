@@ -9,6 +9,7 @@ import { iosTheme } from './iosTheme';
 import type { SubscriptionStatus } from '../lib/types';
 import LiquidGlass from 'liquid-glass-react';
 import { Link } from 'react-router-dom';
+import scheduleImage from '../../public/assets/not-found.png';
 
 const STATUS_LABEL: Record<SubscriptionStatus, string> = {
   ACTIVE: 'Active',
@@ -113,21 +114,14 @@ export default function SubscriptionsPage() {
                 <SkeletonRow />
               </>
             ) : !b || (!b.status && b.mode === 'none') ? (
-              <div className="ios-no-subscription">
-                <div className="ios-subscription-icon">
-                  <span>★</span>
-                </div>
-
-                <div>
-                  <div className="ios-no-subscription-title">
-                    No subscription yet
-                  </div>
-
-                  <div className="ios-no-subscription-description">
-                    Your subscription details will appear here.
-                  </div>
-                </div>
-              </div>
+   
+                <div className="w-full flex flex-col items-center justify-center gap-3 bg-transparent p-6 text-center">
+             <img src={scheduleImage} width="auto" height="10vh" className="opacity-70" alt="Call icon">
+</img>
+            <div> No Subscriptions Found</div>
+           
+          </div>
+           
             ) : (
               <>
                 {/* Status */}

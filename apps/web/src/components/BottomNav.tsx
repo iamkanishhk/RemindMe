@@ -169,7 +169,7 @@ export default function BottomNav() {
     : 1;
 
   return (
-    <div className="fixed bottom-10 w-[90vw] max-w-md left-1/2 -translate-x-1/2 z-40">
+    <div className="fixed bottom-5 w-[90vw] max-w-md left-1/2 -translate-x-1/2 z-40">
       <nav
         aria-label="Primary"
         className="relative flex items-center justify-between gap-1 p-1.5 rounded-full border border-white/20 bg-[#1c1c1e]/80 backdrop-blur-2xl shadow-2xl overflow-visible"

@@ -131,40 +131,41 @@ export function SubscribePrompt({ expanded }: SubscribePromptProps) {
         aria-hidden={!expanded}
       >
 
-        <div className="relative mt-4 w-full h-48 overflow-hidden bg-gradient-to-b from-[#D95F59]/20 via-zinc-900/40 to-black flex items-center justify-center">
+        <div className="relative mt-4 w-full h-35 overflow-hidden bg-gradient-to-b from-[#D95F59]/20 via-zinc-900/40 to-black flex items-center justify-center">
           <img
             src={happyIllustration}
             alt=""
-            className="w-75  h-full object-cover object-center"
+            className="w-80 h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
         </div>
 
         <div className="relative pl-4 space-y-6 mt-6 mx-5 before:absolute before:left-[27px] before:top-3 before:bottom-3 before:w-[2px] before:bg-zinc-800">
           <div className="relative flex items-start space-x-4">
             <div className="relative z-10 flex-shrink-0 w-10 h-10 rounded-full border border-[#D95F59] flex items-center justify-center text-[#D95F59] ">
               <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                />
-              </svg>
+  className="w-5 h-5"
+  fill="none"
+  viewBox="0 0 24 24"
+  stroke="currentColor"
+  strokeWidth={2}
+  aria-hidden="true"
+>
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M5 13l4 4L19 7"
+  />
+</svg>
+
             </div>
             <div>
               <h4 className="text-md font-semibold text-white">
                 Today
               </h4>
               <p className="text-sm text-zinc-400 mt-0.5 leading-normal">
-                Unlock full access to Call Reminders and  <br/> 
-                keep them active on daily basis.
+                (Free) Unlock full access to Call Reminders and 
+                keep them active.
               </p>
             </div>
           </div>
