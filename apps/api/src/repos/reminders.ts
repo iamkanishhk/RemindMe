@@ -10,6 +10,7 @@ export type ReminderCreateInput = {
   nextRunAt: Date;
   repeatRule: RepeatRule;
   phoneNumberId: string;
+  isFreeCall: boolean;
 };
 
 export async function createReminder(data: ReminderCreateInput) {

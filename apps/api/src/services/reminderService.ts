@@ -5,7 +5,7 @@ import * as reminderRepo from '../repos/reminders';
 import * as phoneRepo from '../repos/phoneNumbers';
 import { computeNextRun } from '../lib/schedule';
 import { enqueueReminder, cancelJob } from './schedulerService';
-import { assertEntitled } from './billingService';
+import { assertEntitled, assertReminderCreateAllowed } from './billingService';
 
 export interface ReminderInput {
   title: string;
@@ -34,7 +34,7 @@ function wallClockFor(existing: { scheduledAt: Date; timezone: string }): string
 
 export async function createReminder(userId: string, input: ReminderInput) {
   const phone = await assertCallablePhone(userId, input.phoneNumberId);
-  await assertEntitled(userId);
+  const isFreeCall = await assertReminderCreateAllowed(userId, input.repeatRule);
 
   const run = computeNextRun({ localDateTime: input.localDateTime, timezone: input.timezone });
   if (!run) throw badRequest('Invalid local date-time or timezone');
@@ -48,7 +48,8 @@ export async function createReminder(userId: string, input: ReminderInput) {
     scheduledAt,
     nextRunAt: scheduledAt,
     repeatRule: input.repeatRule,
-    phoneNumberId: phone.id
+    phoneNumberId: phone.id,
+    isFreeCall
   });
 
   await enqueueReminder({ id: reminder.id, nextRunAt: reminder.nextRunAt, isEnabled: reminder.isEnabled, status: reminder.status });
@@ -115,7 +116,7 @@ export async function updateReminder(userId: string, reminderId: string, patch: 
   const existing = await reminderRepo.findReminderOwned(userId, reminderId);
   if (!existing) throw notFound('Reminder not found');
 
-  if (patch.isEnabled === true) {
+  if (patch.isEnabled === true && !existing.isFreeCall) {
     await assertEntitled(userId);
   }
 

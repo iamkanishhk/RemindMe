@@ -42,6 +42,9 @@ model User {
   subscriptions Subscription[]
   // Set when the user finishes the post-signup Maya intro (onboarding step 2).
   onboardingCompletedAt DateTime?
+  // Consumed (atomically, at reminder creation) on the user's single free
+  // reminder/call. Never refunded, even if the reminder is later deleted.
+  freeCallUsed    Boolean        @default(false)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
@@ -106,6 +109,10 @@ model Reminder {
   nextRunAt     DateTime?
   repeatRule    RepeatRule     @default(NONE)
   isEnabled     Boolean        @default(true)
+  // True when this reminder is the account's one free reminder/call. Such a
+  // reminder bypasses the entitlement gate at fire time but is restricted to a
+  // single one-shot call (repeatRule NONE).
+  isFreeCall    Boolean        @default(false)
   status        ReminderStatus @default(SCHEDULED)
   lastCallAt    DateTime?
   phoneNumber   PhoneNumber?   @relation(fields: [phoneNumberId], references: [id], onDelete: SetNull)

@@ -40,13 +40,13 @@ export async function fireDueReminders(now = new Date()): Promise<number> {
       status: 'SCHEDULED',
       nextRunAt: { lte: now, gte: new Date(now.getTime() - FIRE_STALE_WINDOW_MS) }
     },
-    select: { id: true, nextRunAt: true, userId: true }
+    select: { id: true, nextRunAt: true, userId: true, isFreeCall: true }
   });
 
   let fired = 0;
   for (const r of due) {
     if (!r.nextRunAt) continue;
-    if (!(await isEntitled(r.userId))) {
+    if (!(await isEntitled(r.userId)) && !r.isFreeCall) {
       logger.info({ reminderId: r.id, userId: r.userId }, 'reminder skipped at fire time: no active subscription or trial');
       continue;
     }
@@ -76,7 +76,7 @@ async function performCall(reminderId: string, nextRunIso: string): Promise<{ ou
   if (!reminder.isEnabled || reminder.status === 'CANCELED') return { outcome: 'skipped' };
   if (reminder.nextRunAt?.toISOString() !== nextRunIso) return { outcome: 'stale-job' };
 
-  if (!(await isEntitled(reminder.userId))) {
+  if (!(await isEntitled(reminder.userId)) && !reminder.isFreeCall) {
     logger.info({ reminderId, userId: reminder.userId }, 'call skipped at perform time: no active subscription or trial');
     return { outcome: 'no-subscription' };
   }

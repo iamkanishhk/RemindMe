@@ -207,6 +207,30 @@ export async function isEntitled(userId: string): Promise<boolean> {
   return Boolean(sub && subscriptionGrantsAccess(sub));
 }
 
+// Decide whether a reminder creation is allowed. Returns true when the reminder
+// should be flagged as the account's single free reminder/call.
+//
+// A user with access (paid or in-trial) may always create reminders. Anyone
+// else gets exactly one free reminder for the lifetime of the account: the
+// freeCallUsed flag is consumed atomically here, so deleting the reminder
+// later does not refund it. Once spent, further creates throw 402
+// PAYMENT_REQUIRED. Free reminders are restricted to a one-shot call, so a
+// recurring reminder is not eligible and does not burn the free call.
+export async function assertReminderCreateAllowed(userId: string, repeatRule: 'NONE' | 'DAILY' | 'WEEKLY'): Promise<boolean> {
+  if (await isEntitled(userId)) return false;
+  const reconciled = await reconcileSubscriptionFromProvider(userId);
+  if (reconciled && subscriptionGrantsAccess(reconciled)) return false;
+
+  if (repeatRule !== 'NONE') throw paymentRequired();
+
+  const consumed = await prisma.user.updateMany({
+    where: { id: userId, freeCallUsed: false },
+    data: { freeCallUsed: true }
+  });
+  if (consumed.count !== 1) throw paymentRequired();
+  return true;
+}
+
 export async function getBillingStatus(userId: string): Promise<BillingStatusPayload> {
   let sub = await latestSubscription(userId);
   if (!sub || !subscriptionGrantsAccess(sub)) {
