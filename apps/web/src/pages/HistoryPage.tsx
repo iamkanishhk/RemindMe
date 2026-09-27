@@ -124,7 +124,7 @@ export default function HistoryPage() {
         {/* Empty State */}
         {attempts.length === 0 ? (
           <div className="w-full flex flex-col items-center justify-center gap-3  p-6 text-center">
-             <img src="./assets/call.png" width="auto" height="10vh" className="opacity-70" alt="Call icon">
+             <img src="/public/assets/call.png" width="auto" height="10vh" className="opacity-70" alt="Call icon">
 </img>
             <div> no call history yet</div>
            

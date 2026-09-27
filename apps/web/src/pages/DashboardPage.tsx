@@ -998,7 +998,7 @@ export default function DashboardPage() {
           /* Empty State                                                    */
           /* -------------------------------------------------------------- */
         <div className="w-full flex flex-col items-center justify-center gap-3  p-6 text-center">
-             <img src="./assets/schedule.png" width="auto" height="10vh" className="opacity-70" alt="Call icon">
+             <img src="/public/assets/schedule.png" width="auto" height="10vh" className="opacity-70" alt="Call icon">
 </img>
             <div> No  Schedules Yet</div>
            

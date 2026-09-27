@@ -3,7 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { useCreateCheckoutSession, useBillingStatus } from '../hooks/queries';
 import { Skeleton } from './Skeleton';
 import { useErrorToast } from './Toast';
-import happyIllustration from '../../assets/happy.png';
+import happyIllustration from '../../public/assets/happy.png';
 
 export interface SubscribePromptProps {
   expanded: boolean;

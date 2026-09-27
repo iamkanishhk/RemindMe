@@ -4,7 +4,7 @@ import { useAuth, useSignIn } from '@clerk/react';
 import { Spinner } from '../components/Spinner';
 import { Skeleton } from '../components/Skeleton';
 import { useErrorToast } from '../components/Toast';
-import illustration from '../../assets/welcome.png';
+import illustration from '../../public/assets/welcome.png';
 
 export default function SignInPage() {
   const { isLoaded, isSignedIn } = useAuth();
