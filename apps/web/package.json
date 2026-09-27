@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@clerk/react": "^6.16.1",
+    "@sentry/react": "^11.0.0",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-query": "^5.103.2",
     "framer-motion": "^13.4.3",

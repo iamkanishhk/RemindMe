@@ -30,6 +30,7 @@ const envSchema = z.object({
   DODO_PAYMENTS_RETURN_URL: z.string().default('http://localhost:5173/'),
   TRIAL_PERIOD_DAYS: z.coerce.number().int().positive().default(2),
   TRIAL_CALL_LIMIT: z.coerce.number().int().positive().default(2),
+  DAILY_REMINDER_LIMIT: z.coerce.number().int().positive().default(4),
 
   GEO_ALLOW_PREFIXES: z.string().default(''),
   SENTRY_DSN: z.string().default(''),

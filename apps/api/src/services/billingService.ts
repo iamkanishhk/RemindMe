@@ -2,7 +2,7 @@ import { env } from '../config';
 import { logger } from '../lib/logger';
 import { prisma } from '../lib/prisma';
 import { getDodoClient } from '../lib/dodo';
-import { ApiError, notFound, conflict, paymentRequired, serviceUnavailable } from '../lib/errors';
+import { ApiError, notFound, conflict, paymentRequired, serviceUnavailable, unprocessable } from '../lib/errors';
 import type { SubscriptionStatus } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 
@@ -207,19 +207,45 @@ export async function isEntitled(userId: string): Promise<boolean> {
   return Boolean(sub && subscriptionGrantsAccess(sub));
 }
 
+// Enforce the daily reminder-creation quota for entitled (paid/trial)
+// accounts. A creation slot is consumed atomically here and never refunded, so
+// deleting a reminder does not free a slot for the rest of the day. The counter
+// resets at UTC midnight when the day bucket changes.
+export async function consumeDailyReminderSlot(userId: string): Promise<void> {
+  const bucket = new Date().toISOString().slice(0, 10);
+  await prisma.user.updateMany({
+    where: { id: userId, reminderDailyBucket: { not: bucket } },
+    data: { reminderDailyBucket: bucket, reminderDailyCount: 0 }
+  });
+  const claimed = await prisma.user.updateMany({
+    where: { id: userId, reminderDailyBucket: bucket, reminderDailyCount: { lt: env.DAILY_REMINDER_LIMIT } },
+    data: { reminderDailyCount: { increment: 1 } }
+  });
+  if (claimed.count !== 1) {
+    throw unprocessable(`Daily limit of ${env.DAILY_REMINDER_LIMIT} reminders reached. New slots reset tomorrow.`);
+  }
+}
+
 // Decide whether a reminder creation is allowed. Returns true when the reminder
 // should be flagged as the account's single free reminder/call.
 //
-// A user with access (paid or in-trial) may always create reminders. Anyone
-// else gets exactly one free reminder for the lifetime of the account: the
-// freeCallUsed flag is consumed atomically here, so deleting the reminder
-// later does not refund it. Once spent, further creates throw 402
-// PAYMENT_REQUIRED. Free reminders are restricted to a one-shot call, so a
-// recurring reminder is not eligible and does not burn the free call.
+// A user with access (paid or in-trial) may create reminders up to the daily
+// quota, enforced atomically by consumeDailyReminderSlot. Anyone else gets
+// exactly one free reminder for the lifetime of the account: the freeCallUsed
+// flag is consumed atomically here, so deleting the reminder later does not
+// refund it. Once spent, further creates throw 402 PAYMENT_REQUIRED. Free
+// reminders are restricted to a one-shot call, so a recurring reminder is not
+// eligible and does not burn the free call.
 export async function assertReminderCreateAllowed(userId: string, repeatRule: 'NONE' | 'DAILY' | 'WEEKLY'): Promise<boolean> {
-  if (await isEntitled(userId)) return false;
+  if (await isEntitled(userId)) {
+    await consumeDailyReminderSlot(userId);
+    return false;
+  }
   const reconciled = await reconcileSubscriptionFromProvider(userId);
-  if (reconciled && subscriptionGrantsAccess(reconciled)) return false;
+  if (reconciled && subscriptionGrantsAccess(reconciled)) {
+    await consumeDailyReminderSlot(userId);
+    return false;
+  }
 
   if (repeatRule !== 'NONE') throw paymentRequired();
 

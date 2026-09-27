@@ -26,6 +26,7 @@
     "prisma:deploy": "npm run prisma:deploy -w @remindme/api"
   },
   "dependencies": {
+    "@sentry/react": "^11.0.0",
     "esbuild": "^0.28.2",
     "framer-motion": "^13.4.3"
   }

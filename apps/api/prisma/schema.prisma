@@ -45,6 +45,11 @@ model User {
   // Consumed (atomically, at reminder creation) on the user's single free
   // reminder/call. Never refunded, even if the reminder is later deleted.
   freeCallUsed    Boolean        @default(false)
+  // Daily reminder creation quota for entitled (paid/trial) accounts. Bucket is
+  // the UTC day (YYYY-MM-DD) the count belongs to. Incremented atomically at
+  // creation and never decremented, so deleted reminders still count against it.
+  reminderDailyBucket String?
+  reminderDailyCount  Int          @default(0)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
