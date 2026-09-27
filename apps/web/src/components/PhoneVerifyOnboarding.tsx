@@ -25,7 +25,13 @@ function formatTimer(seconds: number): string {
   return `00:${String(Math.max(seconds, 0)).padStart(2, '0')}`;
 }
 
-export default function PhoneVerifyOnboarding() {
+export default function PhoneVerifyOnboarding({
+  onVerified,
+  onClose
+}: {
+  onVerified?: () => void | Promise<void>;
+  onClose?: () => void;
+}) {
   const { user } = useUser();
   const createPhone = useCreatePhoneNumber();
   const verifyPhone = useVerifyPhoneNumber();
@@ -66,6 +72,7 @@ export default function PhoneVerifyOnboarding() {
 
   async function completeVerify(e164p: string, clerkPhoneId: string) {
     await verifyPhone.mutateAsync({ e164: e164p, clerkVerificationId: clerkPhoneId });
+    await onVerified?.();
   }
 
   async function sendCode() {
@@ -176,6 +183,18 @@ export default function PhoneVerifyOnboarding() {
   return (
     <div className="min-h-screen bg-[color:var(--bg)] text-[color:var(--text)] flex flex-col items-center justify-center p-6 select-none font-[-apple-system,BlinkMacSystemFont,'SF_Pro_Display','SF_Pro_Text',sans-serif] antialiased">
       <div className="w-full max-w-[390px] overflow-hidden relative rounded-[38px]  shadow-[0_0_50px_rgba(0,0,0,0.8)] p-6">
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close phone verification"
+            className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full text-[color:var(--text)] active:bg-[color:var(--surface-2)] transition active:scale-95"
+          >
+            <svg viewBox="0 0 320 512" fill="currentColor" className="h-3.5 w-3.5" aria-hidden="true">
+              <path d="M310.6 361.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L160 301.3 54.6 406.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L114.7 256 9.4 150.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 210.7 265.4 105.4c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3L205.3 256l105.3 105.4z" />
+            </svg>
+          </button>
+        )}
         {/* Animated Container Slider */}
         <div
           className={`w-[200%] flex transition-transform duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] ${

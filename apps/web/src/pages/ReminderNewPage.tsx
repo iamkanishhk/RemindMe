@@ -12,6 +12,7 @@ import {
 } from '../hooks/queries';
 import type { RepeatRule } from '../lib/types';
 import SubscribeSheet from '../components/SubscribeSheet';
+import PhoneVerifyOnboarding from '../components/PhoneVerifyOnboarding';
 import { useErrorToast } from '../components/Toast';
 import { Spinner } from '../components/Spinner';
 import { ApiError } from '../lib/api';
@@ -543,6 +544,7 @@ export default function ReminderNewPage() {
   const [error, setError] = useState('');
   const [localError, setLocalError] = useState('');
   const [subscriptionRequired, setSubscriptionRequired] = useState(false);
+  const [verifyingPhone, setVerifyingPhone] = useState(false);
 
   const messageRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -561,7 +563,7 @@ export default function ReminderNewPage() {
   const verifiedPhone = verifiedPhones[0];
   const selected = dates[dateIndex] ?? dates[0]!;
 
-  function buildBody(): ReminderInputBody {
+  function buildBody(phoneNumberId: string): ReminderInputBody {
     const selectedDate = selected.date;
     const hh = pad(toHour24(hour, ampm));
     const mi = pad(minute);
@@ -576,7 +578,7 @@ export default function ReminderNewPage() {
       timezone,
       localDateTime,
       repeatRule,
-      phoneNumberId: verifiedPhone?.id ?? ''
+      phoneNumberId
     };
   }
 
@@ -597,27 +599,17 @@ export default function ReminderNewPage() {
       return 'Message must be 500 characters or fewer';
     }
 
-    if (!verifiedPhone) {
-      return 'Add and verify a phone number to schedule reminders';
-    }
-
     return '';
   }
 
-  async function createReminder() {
-    const problem = validate();
-    if (problem) {
-      setLocalError(problem);
-      return;
-    }
-
+  async function submitReminder(phoneNumberId: string) {
     setLocalError('');
     setBusy(true);
     setError('');
     setSubscriptionRequired(false);
 
     try {
-      const reminder = await create.mutateAsync(buildBody());
+      const reminder = await create.mutateAsync(buildBody(phoneNumberId));
       navigate(`/reminders/${reminder.id}`, { replace: true });
     } catch (err) {
       if (err instanceof ApiError && err.code === 'SUBSCRIPTION_REQUIRED') {
@@ -629,6 +621,31 @@ export default function ReminderNewPage() {
       }
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function createReminder() {
+    const problem = validate();
+    if (problem) {
+      setLocalError(problem);
+      return;
+    }
+    setLocalError('');
+
+    if (!verifiedPhone) {
+      setVerifyingPhone(true);
+      return;
+    }
+    await submitReminder(verifiedPhone.id);
+  }
+
+  async function handlePhoneVerified() {
+    setVerifyingPhone(false);
+
+    const phones = await phoneQuery.refetch();
+    const verified = (phones.data ?? []).find((p) => p.verified);
+    if (verified) {
+      await submitReminder(verified.id);
     }
   }
 
@@ -937,6 +954,15 @@ export default function ReminderNewPage() {
           open={subscriptionRequired}
           onClose={() => setSubscriptionRequired(false)}
         />
+
+        {verifyingPhone && (
+          <div className="fixed inset-0 z-50 overflow-y-auto bg-[color:var(--bg)]">
+            <PhoneVerifyOnboarding
+              onVerified={() => void handlePhoneVerified()}
+              onClose={() => setVerifyingPhone(false)}
+            />
+          </div>
+        )}
       </div>
     </section>
   );

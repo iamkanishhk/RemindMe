@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDeleteReminder, useReminder, useUpdateReminder } from '../hooks/queries';
-import { formatDateTimeLocal, formatRelative, formatTime, repeatLabel } from '../lib/format';
+import { formatDateTimeLocal } from '../lib/format';
 import { Skeleton } from '../components/Skeleton';
 import ErrorPage from '../components/ErrorPage';
 import { useErrorToast } from '../components/Toast';
@@ -24,79 +24,35 @@ export default function ReminderDetailPage() {
   if (reminder.isLoading) {
     return (
       <section
-        className="min-h-screen w-full bg-[color:var(--bg)] text-[color:var(--text)]"
+        className="min-h-screen w-full bg-[#000000] text-[#FFFFFF] px-4 pt-12 pb-24"
         aria-busy="true"
       >
-        <div className="mx-auto w-full max-w-[920px] px-4 pb-24 pt-9">
-          {/* Header */}
-          <div className="flex items-start gap-3.5 skeleton-area">
-            <Skeleton className="mt-[13px] h-3 w-3 rounded-full" />
-            <Skeleton className="h-[44px] w-3/5 rounded-xl" />
+        <div className="mx-auto max-w-md space-y-6">
+          {/* Header Skeleton */}
+          <div className="flex flex-col items-center gap-3 pt-6 pb-2 text-center">
+            <Skeleton className="h-20 w-20 rounded-full" />
+            <Skeleton className="h-6 w-3/4 rounded-lg" />
+            <Skeleton className="h-4 w-1/2 rounded-md" />
           </div>
 
-          {/* REMINDER */}
-          <div className="mt-7">
-            <div className="px-4 pb-2.5">
-              <Skeleton className="h-3 w-24" />
-            </div>
-            <div className="overflow-hidden rounded-[16px] bg-[color:var(--surface)] skeleton-area">
-              <div className="grid grid-cols-[minmax(130px,0.75fr)_minmax(0,1.5fr)] items-center gap-5 px-[17px] py-3">
-                <div className="flex items-center gap-[11px]">
-                  <Skeleton className="h-7 w-7 rounded-lg" />
-                  <Skeleton className="h-4 w-24" />
-                </div>
-                <div className="justify-self-end">
-                  <Skeleton className="h-4 w-40" />
-                </div>
+          {/* Grouped List Skeleton */}
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-28 ml-4 rounded" />
+            <div className="rounded-2xl bg-[#1C1C1E] p-4 space-y-4">
+              <div className="flex justify-between items-center">
+                <Skeleton className="h-4 w-20 rounded" />
+                <Skeleton className="h-4 w-32 rounded" />
               </div>
-            </div>
-          </div>
-
-          {/* SCHEDULE */}
-          <div className="mt-7">
-            <div className="px-4 pb-2.5">
-              <Skeleton className="h-3 w-28" />
-            </div>
-            <div className="overflow-hidden rounded-[16px] bg-[color:var(--surface)] skeleton-area">
-              {[
-                ['w-32', 'w-48'],
-                ['w-44', 'w-36'],
-                ['w-36', 'w-44'],
-              ].map(([label, value], i) => (
-                <div
-                  key={i}
-                  className={`grid grid-cols-[minmax(130px,0.75fr)_minmax(0,1.5fr)] items-center gap-5 px-[17px] py-3 ${
-                    i < 2 ? 'border-b border-[rgba(84,84,88,0.55)]' : ''
-                  }`}
-                >
-                  <Skeleton className={`h-4 ${label}`} />
-                  <div className="justify-self-end">
-                    <Skeleton className={`h-4 ${value}`} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* CALL INFORMATION */}
-          <div className="mt-7">
-            <div className="px-4 pb-2.5">
-              <Skeleton className="h-3 w-[120px]" />
-            </div>
-            <div className="overflow-hidden rounded-[16px] bg-[color:var(--surface)] skeleton-area">
-              {[0, 1].map((i) => (
-                <div
-                  key={i}
-                  className={`grid grid-cols-[minmax(130px,0.75fr)_minmax(0,1.5fr)] items-center gap-5 px-[17px] py-3 ${
-                    i === 0 ? 'border-b border-[rgba(84,84,88,0.55)]' : ''
-                  }`}
-                >
-                  <Skeleton className="h-4 w-24" />
-                  <div className="justify-self-end">
-                    <Skeleton className="h-4 w-40" />
-                  </div>
-                </div>
-              ))}
+              <div className="h-[0.5px] bg-[#38383A]" />
+              <div className="flex justify-between items-center">
+                <Skeleton className="h-4 w-24 rounded" />
+                <Skeleton className="h-4 w-28 rounded" />
+              </div>
+              <div className="h-[0.5px] bg-[#38383A]" />
+              <div className="flex justify-between items-center">
+                <Skeleton className="h-4 w-16 rounded" />
+                <Skeleton className="h-4 w-36 rounded" />
+              </div>
             </div>
           </div>
         </div>
@@ -146,736 +102,297 @@ export default function ReminderDetailPage() {
 
   return (
     <section className="ios-page">
-      <div className="ios-container rise-in">
-        {/* Header */}
-        <header className="ios-header mt-30 mb-20">
-          <div className="">
-            <div className="ios-title-wrap">
-              <span className={`ios-status-dot ${r.isEnabled ? 'active' : 'paused'}`} />
+      {/* Liquid Glass Floating Buttons (Unchanged) */}
+      <LiquidGlass
+        displacementScale={64}
+        saturation={130}
+        aberrationIntensity={2}
+        elasticity={0.35}
+        cornerRadius={100}
+        blurAmount={0.1}
+        padding="15px"
+        style={{
+          width: 50,
+          height: 20,
+          top: 15,
+          right: 60,
+          position: 'fixed',
+          zIndex: 50,
+        }}
+      >
+        <div className="flex items-center gap-5 justify-center">
+          <button
+            disabled={busy}
+            onClick={() => void toggle()}
+            className="w-10 text-white font-medium active:opacity-60 transition-opacity"
+          >
+            {r.isEnabled ? '| |' : '▶'}
+          </button>
 
-              <div className="w-full h-[20vh] flex flex-col items-center justify-center gap-3  p-6 text-center">
-                <img src="./../assets/done.png" width="200" height="20vh" className="opacity-70" alt="Call icon">
-                </img>
-                <h1>I'll Call You for {r.title} on {formatDateTimeLocal(r.scheduledAt)} at  {r.phoneNumber?.e164 ?? '—'} </h1>
-               <LiquidGlass
-                           displacementScale={64}
-                           saturation={130}
-                           aberrationIntensity={2}
-                           elasticity={0.35}
-                           cornerRadius={100}
-                          blurAmount={0.1}
-                          padding="15px"
-                          style={{ 
-                            width: 50,
-                            height: 20,
-                            top: 15,
-                            right: 60,
-                            position: 'fixed',
-                           }}
-                            >
-                           <div className="flex items-center gap-5 justify-center">
-                             <button
-                              disabled={busy}
-                              onClick={() => void toggle()}
-                              className="w-10">
-                              {r.isEnabled ? '| |' : '▶'}
-                            </button>
+          <button
+            type="button"
+            className="w-10 active:opacity-60 transition-opacity"
+            onClick={() => setConfirmingDelete(true)}
+          >
+            <svg
+              width="35"
+              height="35"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5 7H19"
+                style={{ stroke: 'var(--danger, #FF453A)' }}
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
+              <path
+                d="M9 4H15"
+                style={{ stroke: 'var(--danger, #FF453A)' }}
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              />
+              <path
+                d="M7 7.5L7.7 19C7.77 20.1 8.68 21 9.78 21H14.22C15.32 21 16.23 20.1 16.3 19L17 7.5"
+                style={{ stroke: 'var(--danger, #FF453A)' }}
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M10 11V17"
+                style={{ stroke: 'var(--danger, #FF453A)' }}
+                strokeWidth="1.6"
+                strokeLinecap="round"
+              />
+              <path
+                d="M14 11V17"
+                style={{ stroke: 'var(--danger, #FF453A)' }}
+                strokeWidth="1.6"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </LiquidGlass>
 
+      <LiquidGlass
+        displacementScale={64}
+        saturation={130}
+        aberrationIntensity={2}
+        elasticity={0.35}
+        cornerRadius={100}
+        blurAmount={0.1}
+        padding="15px"
+        style={{
+          width: 15,
+          height: 15,
+          top: 20,
+          left: 30,
+          position: 'fixed',
+          zIndex: 50,
+        }}
+      >
+        <Link to="/" className="ios-back flex items-center justify-center w-full h-full">
+          <span className="text-white text-xl font-light">‹</span>
+        </Link>
+      </LiquidGlass>
 
-                                <button
-                                  type="button"
-                                  className="w-10"
-                                  onClick={() => setConfirmingDelete(true)}
-                                >
-                                   <svg width="35" height="35" viewBox="0 0 24 24" fill="none " 
-                                xmlns="http://www.w3.org/2000/svg">
-
-                              <path d="M5 7H19"
-                                    style={{ stroke: 'var(--danger)' }}
-                                    stroke-width="1.8"
-                                    stroke-linecap="round"/>
-
-                              <path d="M9 4H15"
-                                    style={{ stroke: 'var(--danger)' }}
-                                    stroke-width="1.8"
-                                    stroke-linecap="round"/>
-
-
-                              <path d="M7 7.5L7.7 19C7.77 20.1 8.68 21 9.78 21H14.22C15.32 21 16.23 20.1 16.3 19L17 7.5"
-                                    style={{ stroke: 'var(--danger)' }}
-                                    stroke-width="1.8"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"/>
-
-
-                              <path d="M10 11V17"
-                                    style={{ stroke: 'var(--danger)' }}
-                                    stroke-width="1.6"
-                                    stroke-linecap="round"/>
-
-                              <path d="M14 11V17"
-                                    style={{ stroke: 'var(--danger)' }}
-                                    stroke-width="1.6"
-                                    stroke-linecap="round"/>
-                            </svg>
-                                </button>
-
-
-                             
-                            
-                            
-                              </div>
-                                  </LiquidGlass>
-                                   <LiquidGlass 
-             displacementScale={64}
-             saturation={130}
-             aberrationIntensity={2}
-             elasticity={0.35}
-             cornerRadius={100}
-            blurAmount={0.1}
-            padding="15px"
-            style={{ 
-              width: 15,
-              height: 15,
-              top: 20,
-              left: 30,
-              position: 'fixed',
-             }}
-              >
-              <Link to="/" className="ios-back">
-            <span className="ios-back-icon text-[color:var(--text)] p-2">‹</span>
-          </Link>
-                    </LiquidGlass>
-              </div>
-            </div>
+      {/* Main Mobile Screen Layout */}
+      <div className="ios-container">
+         <div className="flex justify-center items-center mt-5 mb-5">
+           <img
+                  src="./../assets/done.png"
+                  width="200"
+                  height="20vh"
+                  className="opacity-70"
+                  alt="Call icon"
+                />
+         </div>
+        {/* Header Hero Section */}
+        <header className="ios-hero-header">
+          <div className="ios-status-badge">
+            <span className={`ios-status-dot ${r.isEnabled ? 'active' : 'paused'}`} />
+            <span className="ios-status-text">{r.isEnabled ? 'Active' : 'Paused'}</span>
           </div>
 
-         
+          <h1 className="ios-title">
+            I'll Call You for <span className="text-white font-semibold">{r.title}</span>
+          </h1>
+          <p className="ios-subtitle">{formatDateTimeLocal(r.scheduledAt)}</p>
         </header>
 
-    
-
-        {/* Call information */}
-
-        
-        <section className="ios-section ">
-          <div className="ios-section-label">CALL INFORMATION</div>
-              
-          <div className="ios-card">
-                <div className="ios-row ">
-              <div className="ios-row-label">
-              
-                Message
-              </div>
-
-              <div className="ios-row-value ios-message">
-                {r.message}
-              </div>
-            </div>
-            </div>
+        {/* Formatted Inset Grouped Section */}
+        <section className="ios-group">
+          <div className="ios-group-label">CALL INFORMATION</div>
 
           <div className="ios-card">
             <div className="ios-row">
-              <div className="ios-row-label">
-               
-                Calls
-              </div>
-
-              <div className="ios-row-value ios-mono">
-                {r.phoneNumber?.e164 ?? '—'}
-              </div>
+              <span className="ios-row-label">Message</span>
+              <span className="ios-row-value">{r.message || '—'}</span>
             </div>
 
             <div className="ios-divider" />
 
-          
+            <div className="ios-row">
+              <span className="ios-row-label">Calls</span>
+              <span className="ios-row-value mono">{r.phoneNumber?.e164 ?? '—'}</span>
+            </div>
+
             <div className="ios-divider" />
 
             <div className="ios-row">
-              <div className="ios-row-label">
-           
-                Created
-              </div>
-
-              <div className="ios-row-value">
-                {formatDateTimeLocal(r.createdAt)}
-              </div>
+              <span className="ios-row-label">Created</span>
+              <span className="ios-row-value">{formatDateTimeLocal(r.createdAt)}</span>
             </div>
           </div>
         </section>
-
       </div>
 
-        {/* iOS Popup */}
-        <ConfirmSheet
-          open={confirmingDelete}
-          title="Delete Reminder"
-          message="Are you sure you want to delete this reminder? This action cannot be undone."
-          confirmLabel="Delete"
-          tone="destructive"
-          busy={busy}
-          onConfirm={() => void doDelete()}
-          onCancel={() => setConfirmingDelete(false)}
-        />
+      {/* iOS Modal Popup Sheet */}
+      <ConfirmSheet
+        open={confirmingDelete}
+        title="Delete Reminder"
+        message="Are you sure you want to delete this reminder? This action cannot be undone."
+        confirmLabel="Delete"
+        tone="destructive"
+        busy={busy}
+        onConfirm={() => void doDelete()}
+        onCancel={() => setConfirmingDelete(false)}
+      />
 
       <style>{`
         .ios-page {
           min-height: 100vh;
           width: 100%;
-          background:
-            radial-gradient(
-              circle at 50% -10%,
-              rgba(35, 35, 40, 0.8),
-              transparent 38%
-            ),
-            var(--ios-bg);
-          color: var(--ios-text);
-          font-family:
-            -apple-system,
-            BlinkMacSystemFont,
-            "SF Pro Display",
-            "SF Pro Text",
-            system-ui,
-            sans-serif;
+          background-color: #000000;
+          color: #FFFFFF;
+          font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
           -webkit-font-smoothing: antialiased;
-          text-rendering: optimizeLegibility;
-          box-sizing: border-box;
-        }
-
-        .ios-page *,
-        .ios-page *::before,
-        .ios-page *::after {
-          box-sizing: border-box;
+          padding-top: 80px;
+          padding-bottom: 40px;
         }
 
         .ios-container {
-          width: min(100% - 32px, 920px);
+          width: 100%;
+          max-width: 440px;
           margin: 0 auto;
-          padding: 20px 0 80px;
+          padding: 0 16px;
         }
 
-        /* Navigation */
-
-        .ios-nav {
-          height: 44px;
+        /* Hero Header Styling */
+        .ios-hero-header {
           display: flex;
+          flex-direction: column;
           align-items: center;
-          margin-bottom: 10px;
+          text-align: center;
+          margin-bottom: 32px;
+          padding: 0 8px;
         }
 
-        .ios-back {
+        .ios-status-badge {
           display: inline-flex;
           align-items: center;
-          gap: 3px;
-          color: var(--ios-blue);
-          text-decoration: none;
-          font-size: 17px;
-          font-weight: 400;
-          letter-spacing: -0.01em;
-          transition: opacity 0.15s ease;
-        }
-
-        .ios-back:hover {
-          opacity: 0.65;
-        }
-
-        .ios-back-icon {
-          font-size: 34px;
-          font-weight: 300;
-          line-height: 16px;
-          transform: translateY(-1px);
-        }
-
-        /* Header */
-
-        .ios-header {
-          padding: 18px 0 30px;
-        }
-
-        .ios-title-row {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 20px;
-        }
-
-        .ios-title-wrap {
-          display: flex;
-          align-items: flex-start;
-          gap: 14px;
-          min-width: 0;
+          gap: 6px;
+          background: #1C1C1E;
+          padding: 4px 12px;
+          border-radius: 20px;
+          margin-bottom: 16px;
         }
 
         .ios-status-dot {
-          width: 12px;
-          height: 12px;
-          min-width: 12px;
-          margin-top: 13px;
+          width: 8px;
+          height: 8px;
           border-radius: 50%;
-          box-shadow: 0 0 18px currentColor;
         }
 
         .ios-status-dot.active {
-          background: var(--ios-green);
-          color: var(--ios-green);
+          background-color: #30D158;
         }
 
         .ios-status-dot.paused {
-          background: var(--ios-tertiary);
-          color: var(--ios-tertiary);
-          box-shadow: none;
+          background-color: #8E8E93;
         }
 
-        .ios-header h1 {
+        .ios-status-text {
+          font-size: 13px;
+          font-weight: 500;
+          color: #8E8E93;
+          text-transform: uppercase;
+          letter-spacing: 0.02em;
+        }
+
+        .ios-title {
+          font-size: 24px;
+          line-height: 1.25;
+          font-weight: 400;
+          color: #8E8E93;
+          letter-spacing: -0.02em;
+          margin: 0 0 8px 0;
+        }
+
+        .ios-subtitle {
+          font-size: 15px;
+          color: #0A84FF;
+          font-weight: 500;
           margin: 0;
-          color: var(--ios-text);
-          font-size: clamp(30px, 5vw, 42px);
-          line-height: 1.1;
-          font-weight: 700;
-          letter-spacing: -0.035em;
-          overflow-wrap: anywhere;
         }
 
-        .ios-title-meta {
-          margin-top: 10px;
-        }
-
-        /* Actions */
-
-        .ios-actions {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 9px;
+        /* Grouped Card Styling */
+        .ios-group {
           margin-top: 24px;
         }
 
-        .ios-action-button {
-          appearance: none;
-          border: 0;
-          min-height: 42px;
-          padding: 0 15px;
-          border-radius: 12px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 7px;
-          font-family: inherit;
-          font-size: 15px;
-          font-weight: 600;
+        .ios-group-label {
+          padding: 0 0 8px 16px;
+          color: #8E8E93;
+          font-size: 13px;
+          font-weight: 400;
           letter-spacing: -0.01em;
-          text-decoration: none;
-          cursor: pointer;
-          transition:
-            transform 0.12s ease,
-            opacity 0.12s ease,
-            background 0.12s ease;
-        }
-
-        .ios-action-button:active {
-          transform: scale(0.97);
-        }
-
-        .ios-action-button:disabled {
-          cursor: default;
-          opacity: 0.45;
-        }
-
-        .ios-action-button.secondary {
-          color: var(--ios-text);
-          background: var(--surface-2);
-          box-shadow:
-            inset 0 0 0 1px rgba(255, 255, 255, 0.035),
-            0 1px 2px rgba(0, 0, 0, 0.3);
-        }
-
-        .ios-action-button.secondary:hover {
-          background: var(--surface-3);
-        }
-
-        .ios-action-button.green {
-          color: var(--success);
-          background: var(--ios-green);
-        }
-
-        .ios-action-button.destructive {
-          color: white;
-          background: var(--ios-red);
-        }
-
-        .ios-action-button.destructive-outline {
-          color: var(--ios-red);
-          background: color-mix(in srgb, var(--ios-red) 11%, transparent);
-        }
-
-        .ios-action-button.destructive-outline:hover {
-          background: color-mix(in srgb, var(--ios-red) 18%, transparent);
-        }
-
-        .ios-action-icon {
-          font-size: 15px;
-          line-height: 1;
-          opacity: 0.9;
-        }
-
-        /* Errors */
-
-        .ios-error-wrapper,
-        .ios-error-card {
-          margin-bottom: 22px;
-        }
-
-        /* Sections */
-
-        .ios-section {
-          margin-top: 28px;
-        }
-
-        .ios-section-label {
-          padding: 0 16px 9px;
-          color: var(--ios-secondary);
-          font-size: 12px;
-          font-weight: 600;
-          letter-spacing: 0.06em;
           text-transform: uppercase;
         }
 
-        .ios-section-heading {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0 16px 10px;
-        }
-
-        .ios-section-heading .ios-section-label {
-          padding: 0;
-        }
-
-        .ios-section-heading h2 {
-          margin: 4px 0 0;
-          font-size: 22px;
-          line-height: 1.2;
-          font-weight: 700;
-          letter-spacing: -0.025em;
-        }
-
-        /* Cards */
-
-        .ios-card,
-        .ios-history-card {
-          overflow: hidden;
-          background: var(--ios-card);
+        .ios-card {
+          background: #1C1C1E;
           border-radius: 16px;
-          box-shadow:
-            0 1px 0 rgba(255, 255, 255, 0.025) inset,
-            0 10px 30px rgba(0, 0, 0, 0.14);
+          overflow: hidden;
         }
 
         .ios-row {
-          min-height: 60px;
-          padding: 12px 17px;
-          display: grid;
-          grid-template-columns: minmax(130px, 0.75fr) minmax(0, 1.5fr);
-          align-items: center;
-          gap: 20px;
-        }
-
-        .ios-row-top {
-          align-items: start;
-        }
-
-        .ios-divider {
-          height: 1px;
-          margin-left: 17px;
-          background: var(--ios-separator);
-        }
-
-        .ios-row-label {
-          display: flex;
-          align-items: center;
-          gap: 11px;
-          color: var(--ios-secondary);
-          font-size: 15px;
-          font-weight: 400;
-        }
-
-        .ios-row-value {
-          min-width: 0;
-          color: var(--ios-text);
-          text-align: right;
-          font-size: 16px;
-          font-weight: 400;
-          line-height: 1.45;
-          overflow-wrap: anywhere;
-        }
-
-        .ios-message {
-          white-space: pre-wrap;
-        }
-
-        .ios-row-icon {
-          width: 28px;
-          height: 28px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          flex: 0 0 28px;
-          border-radius: 8px;
-          font-size: 13px;
-          font-weight: 700;
-          color: white;
-          background: var(--surface-3);
-        }
-
-        .ios-row-icon.blue {
-          background: color-mix(in srgb, var(--ios-blue) 22%, transparent);
-          color: var(--ios-blue);
-        }
-
-        .ios-row-icon.green {
-          background: color-mix(in srgb, var(--ios-green) 18%, transparent);
-          color: var(--ios-green);
-        }
-
-        .ios-row-icon.orange {
-          background: color-mix(in srgb, var(--ios-orange) 18%, transparent);
-          color: var(--ios-orange);
-        }
-
-        .ios-row-icon.purple {
-          background: color-mix(in srgb, var(--ios-purple) 18%, transparent);
-          color: var(--ios-purple);
-        }
-
-        .ios-row-icon.pink {
-          background: color-mix(in srgb, var(--ios-pink) 18%, transparent);
-          color: var(--ios-pink);
-        }
-
-        .ios-row-icon.cyan {
-          background: rgba(100, 210, 255, 0.18);
-          color: var(--ios-cyan);
-        }
-
-        .ios-row-icon.gray {
-          background: rgba(142, 142, 147, 0.18);
-          color: var(--text-muted);
-        }
-
-        .ios-primary-value {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          gap: 2px;
-        }
-
-        .ios-primary-value strong {
-          font-size: 17px;
-          font-weight: 600;
-          color: var(--ios-text);
-        }
-
-        .ios-secondary-value {
-          color: var(--ios-secondary);
-          font-size: 13px;
-        }
-
-        .ios-relative-value {
-          color: var(--ios-blue);
-          font-size: 13px;
-          font-weight: 500;
-        }
-
-        .ios-mono {
-          font-family:
-            ui-monospace,
-            SFMono-Regular,
-            Menlo,
-            Monaco,
-            Consolas,
-            monospace;
-          font-size: 14px;
-        }
-
-        /* History */
-
-        .ios-count {
-          min-width: 28px;
-          height: 28px;
-          padding: 0 8px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 999px;
-          color: var(--ios-secondary);
-          background: var(--surface-2);
-          font-size: 13px;
-          font-weight: 600;
-        }
-
-        .ios-history-item {
-          position: relative;
-          padding: 17px;
-        }
-
-        .ios-history-top {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 15px;
+          padding: 14px 16px;
+          min-height: 48px;
+          gap: 16px;
         }
 
-        .ios-history-duration {
-          color: var(--ios-secondary);
-          font-size: 14px;
-          font-variant-numeric: tabular-nums;
+        .ios-row-label {
+          color: #FFFFFF;
+          font-size: 16px;
+          font-weight: 400;
+          letter-spacing: -0.01em;
+          flex-shrink: 0;
         }
 
-        .ios-history-details {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 12px;
-          margin-top: 15px;
+        .ios-row-value {
+          color: #8E8E93;
+          font-size: 16px;
+          font-weight: 400;
+          text-align: right;
+          word-break: break-word;
         }
 
-        .ios-history-details > div {
-          display: flex;
-          flex-direction: column;
-          gap: 3px;
-          min-width: 0;
-          color: var(--ios-text);
-          font-size: 13px;
-          line-height: 1.35;
+        .ios-row-value.mono {
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-size: 15px;
         }
 
-        .ios-history-label {
-          color: var(--ios-tertiary);
-          font-size: 11px;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.04em;
-        }
-
-        .ios-history-detail {
-          margin-top: 14px;
-          padding: 11px 12px;
-          border-radius: 10px;
-          color: var(--ios-secondary);
-          background: var(--surface-2);
-          font-size: 13px;
-          line-height: 1.45;
-          overflow-wrap: anywhere;
-        }
-
-        .ios-history-divider {
-          height: 1px;
-          position: absolute;
-          left: 17px;
-          right: 0;
-          bottom: 0;
-          background: var(--ios-separator);
-        }
-
-        .ios-empty-card {
-          padding: 30px 20px;
-        }
-
-        .ios-loading {
-          min-height: 60vh;
-          display: flex;
-align-items: center;
-            justify-content: center;
-          }
-
-          /* Responsive */
-
-        @media (max-width: 680px) {
-          .ios-container {
-            width: min(100% - 24px, 920px);
-            padding-top: 10px;
-          }
-
-          .ios-header {
-            padding-top: 14px;
-            padding-bottom: 22px;
-          }
-
-          .ios-header h1 {
-            font-size: 30px;
-          }
-
-          .ios-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-          }
-
-          .ios-action-button {
-            width: 100%;
-          }
-
-          .ios-action-button.destructive,
-          .ios-action-button.destructive-outline {
-            grid-column: 1 / -1;
-          }
-
-          .ios-row {
-            grid-template-columns: minmax(115px, 0.8fr) minmax(0, 1.2fr);
-            gap: 14px;
-            padding: 13px 14px;
-          }
-
-          .ios-divider {
-            margin-left: 14px;
-          }
-
-          .ios-row-label {
-            font-size: 14px;
-          }
-
-          .ios-row-value {
-            font-size: 15px;
-          }
-
-          .ios-row-icon {
-            width: 26px;
-            height: 26px;
-            flex-basis: 26px;
-          }
-
-          .ios-history-item {
-            padding: 15px;
-          }
-
-          .ios-history-divider {
-            left: 15px;
-          }
-        }
-
-        @media (max-width: 430px) {
-          .ios-row {
-            grid-template-columns: 1fr;
-            gap: 7px;
-            min-height: 0;
-          }
-
-          .ios-row-value {
-            padding-left: 39px;
-            text-align: left;
-          }
-
-          .ios-primary-value {
-            align-items: flex-start;
-          }
-
-          .ios-history-details {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .ios-action-button,
-          .ios-back {
-            transition: none;
-          }
+        .ios-divider {
+          height: 0.5px;
+          background-color: #38383A;
+          margin-left: 16px;
         }
       `}</style>
     </section>
