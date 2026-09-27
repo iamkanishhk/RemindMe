@@ -16,6 +16,7 @@ import HistoryPage from './pages/HistoryPage';
 import SettingsPage from './pages/SettingsPage';
 import ProfilePage from './pages/ProfilePage';
 import OnboardingMayaPage from './pages/OnboardingMayaPage';
+import PlansPage from './pages/PlansPage';
 import SubscriptionsPage from './pages/SubscriptionsPage';
 
 export default function App() {
@@ -43,6 +44,7 @@ export default function App() {
                 </Route>
               </Route>
               <Route path="/onboarding/maya" element={<OnboardingMayaPage />} />
+              <Route path="/plans" element={<PlansPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

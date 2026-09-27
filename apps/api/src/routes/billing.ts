@@ -3,6 +3,7 @@ import { env } from '../config';
 import { logger } from '../lib/logger';
 import { getDodoClient } from '../lib/dodo';
 import { asyncHandler } from '../lib/errors';
+import { checkoutSchema } from '../lib/validators';
 import { requireAuth } from '../middleware/auth';
 import * as billingService from '../services/billingService';
 import type { DodoSubscriptionWebhook } from '../services/billingService';
@@ -19,10 +20,19 @@ billingRouter.get(
   })
 );
 
+billingRouter.get(
+  '/plans',
+  asyncHandler(async (_req, res) => {
+    const plans = await billingService.listPlans();
+    res.json({ plans });
+  })
+);
+
 billingRouter.post(
   '/checkout',
   asyncHandler(async (req, res) => {
-    const result = await billingService.createCheckoutSession(req.user!.id, req.user!.email);
+    const { planId } = checkoutSchema.parse(req.body ?? {});
+    const result = await billingService.createCheckoutSession(req.user!.id, req.user!.email, planId);
     res.status(201).json(result);
   })
 );

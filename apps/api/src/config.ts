@@ -25,6 +25,7 @@ const envSchema = z.object({
   DODO_PAYMENTS_API_KEY: z.string().default(''),
   DODO_PAYMENTS_WEBHOOK_KEY: z.string().default(''),
   DODO_PAYMENTS_PRODUCT_ID: z.string().default(''),
+  DODO_PAYMENTS_ANUAL_PRODUCT_ID: z.string().default(''),
   DODO_PAYMENTS_ENVIRONMENT: z.enum(['test_mode', 'live_mode']).default('test_mode'),
   DODO_PAYMENTS_RETURN_URL: z.string().default('http://localhost:5173/'),
   TRIAL_PERIOD_DAYS: z.coerce.number().int().positive().default(2),

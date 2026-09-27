@@ -44,3 +44,9 @@ export const listRemindersQuerySchema = z.object({
     .optional()
     .transform((v) => v === 'true' || v === '1')
 });
+
+export const PLAN_IDS = ['monthly', 'annual'] as const;
+
+export const checkoutSchema = z.object({
+  planId: z.enum(PLAN_IDS).default('monthly')
+});

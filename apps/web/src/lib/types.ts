@@ -23,6 +23,23 @@ export interface BillingStatus {
   trial: { endsAt: string | null; callsUsed: number; callLimit: number } | null;
 }
 
+export type PlanId = 'monthly' | 'annual';
+
+export interface BillingPlan {
+  id: PlanId;
+  productId: string;
+  name: string;
+  amountMinorUnits: number;
+  currency: string;
+  interval: string;
+  intervalCount: number;
+  monthsPerCharge: number;
+  monthlyEquivalentMinorUnits: number | null;
+  savingsPercent: number | null;
+  trialDays: number;
+  taxInclusive: boolean;
+}
+
 export type ReminderStatus =
   | 'SCHEDULED'
   | 'CALLING'

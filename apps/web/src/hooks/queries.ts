@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuthedFetch } from './useAuthedFetch';
-import type { BillingStatus, CallAttempt, Me, PhoneNumber, Reminder, ReminderDetail, ReminderStatus, RepeatRule } from '../lib/types';
+import type { BillingPlan, BillingStatus, CallAttempt, Me, PhoneNumber, PlanId, Reminder, ReminderDetail, ReminderStatus, RepeatRule } from '../lib/types';
 
 export interface ReminderInputBody {
   title: string;
@@ -22,11 +22,25 @@ export function useBillingStatus() {
   });
 }
 
+export function useBillingPlans() {
+  const authed = useAuthedFetch();
+  return useQuery({
+    // Prices live in Dodo, so keep them fresh for a while rather than
+    // pinning them to the default stale window.
+    queryKey: ['billing', 'plans'],
+    staleTime: 60_000,
+    queryFn: async () => {
+      const res = await authed<{ plans: BillingPlan[] }>('/api/billing/plans');
+      return res.plans;
+    }
+  });
+}
+
 export function useCreateCheckoutSession() {
   const authed = useAuthedFetch();
   return useMutation({
-    mutationFn: async () => {
-      const res = await authed<{ sessionId: string; checkoutUrl: string | null }>('/api/billing/checkout', { method: 'POST', body: JSON.stringify({}) });
+    mutationFn: async (planId: PlanId) => {
+      const res = await authed<{ sessionId: string; checkoutUrl: string | null }>('/api/billing/checkout', { method: 'POST', body: JSON.stringify({ planId }) });
       return res;
     }
   });

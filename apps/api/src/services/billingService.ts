@@ -251,14 +251,137 @@ export async function getBillingStatus(userId: string): Promise<BillingStatusPay
   };
 }
 
-export async function createCheckoutSession(userId: string, email: string, name?: string) {
-  if (!env.DODO_PAYMENTS_API_KEY || !env.DODO_PAYMENTS_PRODUCT_ID) {
+export type PlanId = 'monthly' | 'annual';
+
+export interface BillingPlan {
+  id: PlanId;
+  productId: string;
+  name: string;
+  amountMinorUnits: number;
+  currency: string;
+  /** Provider interval, e.g. 'Month' or 'Year'. */
+  interval: string;
+  intervalCount: number;
+  /** How many months of access one payment buys, used to normalize yearly cost. */
+  monthsPerCharge: number;
+  /** Yearly plans only: the monthly-equivalent price, for a "x /mo" line. */
+  monthlyEquivalentMinorUnits: number | null;
+  /** Annual plan only: percent saved against paying monthly for 12 months. */
+  savingsPercent: number | null;
+  trialDays: number;
+  taxInclusive: boolean;
+}
+
+const MONTHS_PER_INTERVAL: Record<string, number> = {
+  Day: 1 / 30,
+  Week: 0.25,
+  Month: 1,
+  Year: 12
+};
+
+// Plan prices come from Dodo, not from here, so this is a cache rather than a
+// source of truth. Short TTL keeps the plans screen snappy without serving
+// stale prices for long after a dashboard change.
+const plansCache = new Map<string, { at: number; plans: BillingPlan[] }>();
+const PLANS_TTL_MS = 60_000;
+
+function planProductId(planId: PlanId): string {
+  return planId === 'annual' ? env.DODO_PAYMENTS_ANUAL_PRODUCT_ID : env.DODO_PAYMENTS_PRODUCT_ID;
+}
+
+async function fetchPlan(client: ReturnType<typeof getDodoClient>, planId: PlanId): Promise<BillingPlan | null> {
+  const productId = planProductId(planId);
+  if (!productId) return null;
+
+  const product = await client.products.retrieve(productId);
+  const price = product.price;
+  // Only recurring products can back a subscription plan; one-time and
+  // usage-based pricing would charge differently than the UI advertises.
+  if (price.type !== 'recurring_price') return null;
+
+  const intervalCount = Number.isFinite(price.payment_frequency_count) ? price.payment_frequency_count : 1;
+  const interval = String(price.payment_frequency_interval);
+  const monthsPerCharge = (MONTHS_PER_INTERVAL[interval] ?? 1) * intervalCount;
+
+  return {
+    id: planId,
+    productId,
+    name: product.name?.trim() || (planId === 'annual' ? 'RemindMe Pro (yearly)' : 'RemindMe Pro (monthly)'),
+    amountMinorUnits: price.price,
+    currency: price.currency,
+    interval,
+    intervalCount,
+    monthsPerCharge,
+    monthlyEquivalentMinorUnits:
+      monthsPerCharge > 0 ? Math.round(price.price / monthsPerCharge) : null,
+    // Filled in by listPlans once both prices are known.
+    savingsPercent: null,
+    trialDays: typeof price.trial_period_days === 'number' ? price.trial_period_days : 0,
+    taxInclusive: price.tax_inclusive === true
+  };
+}
+
+export async function listPlans(): Promise<BillingPlan[]> {
+  if (!env.DODO_PAYMENTS_API_KEY) {
     throw serviceUnavailable('Billing is not configured yet');
+  }
+
+  const cacheKey = `${env.DODO_PAYMENTS_ENVIRONMENT}:${env.DODO_PAYMENTS_PRODUCT_ID}:${env.DODO_PAYMENTS_ANUAL_PRODUCT_ID}`;
+  const cached = plansCache.get(cacheKey);
+  if (cached && Date.now() - cached.at < PLANS_TTL_MS) {
+    return cached.plans;
+  }
+
+  const client = getDodoClient();
+  const resolved = await Promise.all(
+    (['monthly', 'annual'] as PlanId[]).map((id) => fetchPlan(client, id).catch((err) => {
+      logger.warn({ err: err instanceof Error ? err.message : String(err), planId: id }, 'could not fetch plan from provider');
+      return null;
+    }))
+  );
+
+  const monthly = resolved.find((p) => p?.id === 'monthly') ?? null;
+  const annual = resolved.find((p) => p?.id === 'annual') ?? null;
+
+  // The plans screen advertises exactly two options, so a partial read would
+  // silently drop one of them. Surface it as a provider outage instead and let
+  // the client offer a retry.
+  if (!monthly || !annual) {
+    throw serviceUnavailable('Could not load both plans from the billing provider');
+  }
+
+  const plans: BillingPlan[] = [monthly, annual];
+  if (monthly.monthsPerCharge < annual.monthsPerCharge) {
+    const monthlyBaseline = monthly.amountMinorUnits * (annual.monthsPerCharge / monthly.monthsPerCharge);
+    if (monthlyBaseline > 0) {
+      annual.savingsPercent = Math.round((1 - annual.amountMinorUnits / monthlyBaseline) * 100);
+    }
+  }
+
+  plansCache.set(cacheKey, { at: Date.now(), plans });
+  return plans;
+}
+
+export async function createCheckoutSession(userId: string, email: string, planId: PlanId = 'monthly', name?: string) {
+  if (!env.DODO_PAYMENTS_API_KEY) {
+    throw serviceUnavailable('Billing is not configured yet');
+  }
+
+  // Resolve the product server-side from the plan id so a client can never
+  // check out an arbitrary Dodo product.
+  if (!planProductId(planId)) {
+    throw serviceUnavailable('Billing is not configured yet');
+  }
+
+  const plans = await listPlans();
+  const plan = plans.find((p) => p.id === planId);
+  if (!plan) {
+    throw serviceUnavailable(`Plan "${planId}" is not available`);
   }
 
   const client = getDodoClient();
   const resp = await client.checkoutSessions.create({
-    product_cart: [{ product_id: env.DODO_PAYMENTS_PRODUCT_ID, quantity: 1 }],
+    product_cart: [{ product_id: plan.productId, quantity: 1 }],
     customer: { email, name: name ?? email.split('@')[0] ?? email },
     return_url: env.DODO_PAYMENTS_RETURN_URL,
     cancel_url: env.DODO_PAYMENTS_RETURN_URL,

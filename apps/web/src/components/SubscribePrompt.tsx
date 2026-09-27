@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
-import { useCreateCheckoutSession, useBillingStatus } from '../hooks/queries';
+import { useBillingPlans, useBillingStatus } from '../hooks/queries';
+import { formatMoney } from '../lib/format';
 import { Skeleton } from './Skeleton';
-import { useErrorToast } from './Toast';
 import happyIllustration from '../../public/assets/happy.png';
 
 export interface SubscribePromptProps {
@@ -11,13 +11,11 @@ export interface SubscribePromptProps {
 
 export function SubscribePrompt({ expanded }: SubscribePromptProps) {
   const billing = useBillingStatus();
-  const checkout = useCreateCheckoutSession();
+  const plans = useBillingPlans();
+  const navigate = useNavigate();
   const reduceMotion = useReducedMotion();
-  const [error, setError] = useState('');
 
-  useErrorToast(error);
-
-  if (billing.isLoading) {
+  if (billing.isLoading || plans.isLoading) {
     return (
       <div
         className="px-5 pb-5 pt-4 text-white font-sans"
@@ -38,60 +36,25 @@ export function SubscribePrompt({ expanded }: SubscribePromptProps) {
     );
   }
 
-  async function onClick() {
-    setError('');
-
-    try {
-      const res = await checkout.mutateAsync();
-
-      if (res.checkoutUrl) {
-        window.location.assign(res.checkoutUrl);
-      } else {
-        setError('Checkout could not be started.');
-      }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Could not start checkout');
-    }
-  }
-
   const trial = billing.data?.trial;
   const trialExhausted =
     Boolean(trial) && !trial?.endsAt && trial!.callsUsed >= trial!.callLimit;
 
+  // Prices and trial length come from the billing provider, never from constants.
+  const monthly = plans.data?.find((p) => p.id === 'monthly') ?? null;
+  const monthlyPrice = monthly ? formatMoney(monthly.amountMinorUnits, monthly.currency) : '';
+  const trialDays = monthly?.trialDays ?? 0;
+  const firstChargeDate = new Date(
+    Date.now() + trialDays * 24 * 60 * 60 * 1000
+  ).toLocaleDateString();
+
   const cta = (
     <button
       type="button"
-      onClick={onClick}
-      disabled={checkout.isPending}
-      className="w-full py-4 px-4 bg-gradient-to-r from-[#D95F59] to-[#ff4a40] active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 text-white font-semibold rounded-2xl text-base  transition-all duration-150 flex items-center justify-center space-x-2"
+      onClick={() => navigate('/plans')}
+      className="w-full py-4 px-4 bg-gradient-to-r from-[#D95F59] to-[#ff4a40] active:scale-[0.98] text-white font-semibold rounded-2xl text-base transition-all duration-150 flex items-center justify-center space-x-2"
     >
-      {checkout.isPending ? (
-        <span className="flex items-center space-x-2">
-          <svg
-            className="animate-spin h-5 w-5 text-white"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
-          >
-            <circle
-              className="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              strokeWidth="4"
-            />
-            <path
-              className="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-            />
-          </svg>
-          <span>Starting…</span>
-        </span>
-      ) : (
-        <span>Start my free trail now</span>
-      )}
+      <span>Start my free trial now</span>
     </button>
   );
 
@@ -105,7 +68,9 @@ export function SubscribePrompt({ expanded }: SubscribePromptProps) {
 
         <div className="mt-1 text-sm text-zinc-300">
           Pro Access for{' '}
-          <span className="font-bold text-white">$7 per month</span>
+          <span className="font-bold text-white">
+            {monthlyPrice ? `${monthlyPrice} per month` : 'every month'}
+          </span>
         </div>
 
         {trialExhausted && (
@@ -214,12 +179,17 @@ export function SubscribePrompt({ expanded }: SubscribePromptProps) {
               </svg>
             </div>
             <div>
-              <h4 className="text-md font-semibold text-white">
-                Day 2
-              </h4>
+              {trialDays > 0 ? (
+                <h4 className="text-md font-semibold text-white">
+                  Day {trialDays}
+                </h4>
+              ) : null}
               <p className="text-sm text-zinc-400 mt-0.5 leading-normal">
-             Your first charge of $7/mo begins on <br/>
-              {new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString()}.
+                {monthlyPrice ? `Your first charge of ${monthlyPrice}/mo begins on ` : 'Your first charge begins on '}
+                {trialDays > 0 ? (
+                  <br />
+                ) : null}
+                {trialDays > 0 ? firstChargeDate : 'your trial’s end date'}.
               </p>
             </div>
           </div>
