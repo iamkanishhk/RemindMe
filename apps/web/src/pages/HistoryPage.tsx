@@ -9,6 +9,7 @@ import ErrorPage from '../components/ErrorPage';
 import CallDetailSheet from '../components/CallDetailSheet';
 import LiquidGlass from 'liquid-glass-react';
 import type { CallAttempt } from '../lib/types';
+import Image from '../../public/assets/call.png';
 
 export default function HistoryPage() {
   const calls = useCalls();
@@ -124,7 +125,7 @@ export default function HistoryPage() {
         {/* Empty State */}
         {attempts.length === 0 ? (
           <div className="w-full flex flex-col items-center justify-center gap-3  p-6 text-center">
-             <img src="/public/assets/call.png" width="auto" height="10vh" className="opacity-70" alt="Call icon">
+             <img src={Image} width="auto" height="10vh" className="opacity-70" alt="Call icon">
 </img>
             <div> no call history yet</div>
            

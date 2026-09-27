@@ -12,6 +12,7 @@ import {
   useSpring,
   useTransform,
 } from 'framer-motion';
+import scheduleImage from '../../public/assets/schedule.png';
 
 function sortKey(r: Reminder): number {
   return r.nextRunAt ? new Date(r.nextRunAt).getTime() : Number.MAX_SAFE_INTEGER;
@@ -998,7 +999,7 @@ export default function DashboardPage() {
           /* Empty State                                                    */
           /* -------------------------------------------------------------- */
         <div className="w-full flex flex-col items-center justify-center gap-3  p-6 text-center">
-             <img src="/public/assets/schedule.png" width="auto" height="10vh" className="opacity-70" alt="Call icon">
+             <img src={scheduleImage} width="auto" height="10vh" className="opacity-70" alt="Call icon">
 </img>
             <div> No  Schedules Yet</div>
            
