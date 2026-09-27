@@ -10,7 +10,6 @@ import {
   usePhoneNumbers,
   type ReminderInputBody
 } from '../hooks/queries';
-import { timezoneList } from '../lib/format';
 import type { RepeatRule } from '../lib/types';
 import SubscribeSheet from '../components/SubscribeSheet';
 import { useErrorToast } from '../components/Toast';
@@ -539,7 +538,7 @@ export default function ReminderNewPage() {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
   const [repeatRule, setRepeatRule] = useState<RepeatRule>('NONE');
-  const [timezone, setTimezone] = useState(DEFAULT_TZ);
+  const timezone = DEFAULT_TZ;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [localError, setLocalError] = useState('');
@@ -929,33 +928,6 @@ export default function ReminderNewPage() {
                       </button>
                     );
                   })}
-                </div>
-              </div>
-            </section>
-
-            {/* ---------------------------------------------------------- */}
-            {/* Timezone                                                   */}
-            {/* ---------------------------------------------------------- */}
-
-            <section>
-              <SectionHeader title="Timezone" />
-
-              <div className="relative">
-                <select
-                  id="reminder-timezone"
-                  value={timezone}
-                  onChange={(e) => setTimezone(e.target.value)}
-                  className="w-full appearance-none rounded-[20px] border border-white/10 bg-[color:color-mix(in_srgb,var(--surface)_60%,transparent)] px-4 py-3.5 text-[15px] font-semibold text-[color:var(--text)] outline-none transition focus:border-[color:var(--primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--primary)_30%,transparent)]"
-                >
-                  {timezoneList().map((tz) => (
-                    <option key={tz} value={tz} className="bg-[color:var(--surface)] text-[color:var(--text)]">
-                      {tz}
-                    </option>
-                  ))}
-                </select>
-
-                <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[color:var(--text-dim)]">
-                  <ChevronDownIcon />
                 </div>
               </div>
             </section>

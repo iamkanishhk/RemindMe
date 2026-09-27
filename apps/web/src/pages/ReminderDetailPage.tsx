@@ -156,7 +156,7 @@ export default function ReminderDetailPage() {
               <div className="w-full h-[20vh] flex flex-col items-center justify-center gap-3  p-6 text-center">
                 <img src="./../assets/done.png" width="200" height="20vh" className="opacity-70" alt="Call icon">
                 </img>
-                <h1>We'll Call You for {r.title} on {formatDateTimeLocal(r.scheduledAt)} at  {r.phoneNumber?.e164 ?? '—'} </h1>
+                <h1>I'll Call You for {r.title} on {formatDateTimeLocal(r.scheduledAt)} at  {r.phoneNumber?.e164 ?? '—'} </h1>
                <LiquidGlass
                            displacementScale={64}
                            saturation={130}
@@ -264,7 +264,7 @@ export default function ReminderDetailPage() {
           <div className="ios-card">
                 <div className="ios-row ">
               <div className="ios-row-label">
-                <span className="ios-row-icon blue">✦</span>
+              
                 Message
               </div>
 
@@ -277,7 +277,7 @@ export default function ReminderDetailPage() {
           <div className="ios-card">
             <div className="ios-row">
               <div className="ios-row-label">
-                <span className="ios-row-icon green">☎</span>
+               
                 Calls
               </div>
 
@@ -293,7 +293,7 @@ export default function ReminderDetailPage() {
 
             <div className="ios-row">
               <div className="ios-row-label">
-                <span className="ios-row-icon gray">＋</span>
+           
                 Created
               </div>
 

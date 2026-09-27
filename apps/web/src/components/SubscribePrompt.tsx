@@ -4,6 +4,8 @@ import { useBillingPlans, useBillingStatus } from '../hooks/queries';
 import { formatMoney } from '../lib/format';
 import { Skeleton } from './Skeleton';
 import happyIllustration from '../../public/assets/happy.png';
+import { Status,Alarm, } from 'reicon-react';
+
 
 export interface SubscribePromptProps {
   expanded: boolean;
@@ -41,9 +43,20 @@ export function SubscribePrompt({ expanded }: SubscribePromptProps) {
     Boolean(trial) && !trial?.endsAt && trial!.callsUsed >= trial!.callLimit;
 
   // Prices and trial length come from the billing provider, never from constants.
-  const monthly = plans.data?.find((p) => p.id === 'monthly') ?? null;
-  const monthlyPrice = monthly ? formatMoney(monthly.amountMinorUnits, monthly.currency) : '';
-  const trialDays = monthly?.trialDays ?? 0;
+  // Lead with the annual plan's per-month equivalent; the first-charge line still
+  // shows the real amount so the headline rate is never mistaken for the bill.
+  const plan = plans.data?.find((p) => p.id === 'annual') ?? plans.data?.[0] ?? null;
+  const perMonth =
+    plan?.monthlyEquivalentMinorUnits != null
+      ? formatMoney(plan.monthlyEquivalentMinorUnits, plan.currency)
+      : '';
+  const chargeAmount = plan ? formatMoney(plan.amountMinorUnits, plan.currency) : '';
+  const chargeInterval = plan
+    ? plan.intervalCount === 1
+      ? plan.interval.toLowerCase()
+      : `${plan.intervalCount} ${plan.interval.toLowerCase()}s`
+    : '';
+  const trialDays = plan?.trialDays ?? 0;
   const firstChargeDate = new Date(
     Date.now() + trialDays * 24 * 60 * 60 * 1000
   ).toLocaleDateString();
@@ -69,8 +82,14 @@ export function SubscribePrompt({ expanded }: SubscribePromptProps) {
         <div className="mt-1 text-sm text-zinc-300">
           Pro Access for{' '}
           <span className="font-bold text-white">
-            {monthlyPrice ? `${monthlyPrice} per month` : 'every month'}
+            {perMonth ? `${perMonth} per month` : 'every month'}
           </span>
+          {chargeAmount && chargeInterval ? (
+            <span className="text-zinc-400">
+              {' '}
+              (billed {chargeInterval}ly)
+            </span>
+          ) : null}
         </div>
 
         {trialExhausted && (
@@ -185,7 +204,9 @@ export function SubscribePrompt({ expanded }: SubscribePromptProps) {
                 </h4>
               ) : null}
               <p className="text-sm text-zinc-400 mt-0.5 leading-normal">
-                {monthlyPrice ? `Your first charge of ${monthlyPrice}/mo begins on ` : 'Your first charge begins on '}
+                {chargeAmount && chargeInterval
+                  ? `Your first charge per ${chargeInterval} begins on `
+                  : 'Your first charge begins on '}
                 {trialDays > 0 ? (
                   <br />
                 ) : null}

@@ -110,14 +110,7 @@ export default function CallDetailSheet({
                 </dd>
               </div>
 
-              <div className="flex items-start justify-between gap-4 py-3">
-                <dt className="shrink-0 text-[11px] font-bold uppercase tracking-[0.055em] text-[color:var(--text-faint)]">
-                  Detail
-                </dt>
-                <dd className="min-w-0 text-right text-[15px] leading-[1.4] text-[color:var(--text)] [overflow-wrap:anywhere]">
-                  {attempt.detail ?? '—'}
-                </dd>
-              </div>
+             
             </dl>
 
             {/* Actions */}

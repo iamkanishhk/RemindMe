@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef, useLayoutEffect, type JSX } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { Home6,History3,Settings2,type IconComponent  } from 'reicon-react';
 
 interface Tab {
   to: string;
   label: string;
   end: boolean;
-  Icon: () => JSX.Element;
+  Icon: IconComponent;
 }
 
 const NAV_GLASS_CONFIG = {
@@ -47,37 +48,12 @@ const NAV_GLASS_CONFIG = {
   },
 } as const;
 
-function HomeIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M3 10.5 12 3l9 7.5" />
-      <path d="M5.5 9.5V21h4.5v-5.5h4V21h4.5V9.5" />
-    </svg>  
-  );
-}
 
-function ClockIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="8.5" />
-      <path d="M12 7.25V12l3.25 1.9" />
-    </svg>
-  );
-}
-
-function GearIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-      <circle cx="12" cy="12" r="3.2" />
-    </svg>
-  );
-}
 
 const tabs: Tab[] = [
-  { to: '/', label: 'Dashboard', end: true, Icon: HomeIcon },
-  { to: '/history', label: 'History', end: false, Icon: ClockIcon },
-  { to: '/settings', label: 'Settings', end: false, Icon: GearIcon }
+  { to: '/', label: 'Dashboard', end: true, Icon: Home6 },
+  { to: '/history', label: 'History', end: false, Icon: History3 },
+  { to: '/settings', label: 'Settings', end: false, Icon: Settings2 }
 ];
 
 export default function BottomNav() {

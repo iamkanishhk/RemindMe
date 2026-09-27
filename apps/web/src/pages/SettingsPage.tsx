@@ -1,11 +1,12 @@
-import { Fragment } from 'react';
+import { Fragment, JSX } from 'react';
 import { Link } from 'react-router-dom';
 import { iosTheme } from './iosTheme';
+import { User, Dollar } from 'reicon-react';
+import type { ComponentType } from 'react';
 
 interface MenuRow {
   to: string;
-  icon: string;
-  color: string;
+  icon: ComponentType<any>;
   title: string;
   description: string;
 }
@@ -13,19 +14,18 @@ interface MenuRow {
 const rows: MenuRow[] = [
   {
     to: '/profile',
-    icon: '☻',
-    color: 'purple',
+    icon: User,
     title: 'Profile',
-    description: 'Photo, sign out, delete account'
+    description: 'Photo, sign out, delete account',
   },
   {
     to: '/subscriptions',
-    icon: '▣',
-    color: 'blue',
+    icon: Dollar,
     title: 'Subscriptions',
-    description: 'Plan and billing details'
-  }
+    description: 'Plan and billing details',
+  },
 ];
+
 
 export default function SettingsPage() {
   return (
@@ -45,30 +45,35 @@ export default function SettingsPage() {
           <div className="ios-section-label">ACCOUNT</div>
 
           <div className="ios-settings-card">
-            {rows.map((row) => (
-              <Fragment key={row.to}>
-                {rows.indexOf(row) > 0 && <div className="ios-divider" />}
+           {rows.map((row, index) => {
+  const Icon = row.icon;
 
-                <Link to={row.to} className="ios-link-row">
-                  <div className="ios-row-leading">
-                    <div className={`ios-setting-icon ${row.color}`}>
-                      <span>{row.icon}</span>
-                    </div>
+  return (
+    <Fragment key={row.to}>
+      {index > 0 && <div className="ios-divider" />}
 
-                    <div>
-                      <div className="ios-row-title">{row.title}</div>
-                      <div className="ios-link-description">
-                        {row.description}
-                      </div>
-                    </div>
-                  </div>
+      <Link to={row.to} className="ios-link-row">
+        <div className="ios-row-leading">
+          <div className={`ios-setting-icon`}>
+            <Icon />
+          </div>
 
-                  <span className="ios-chevron" aria-hidden="true">
-                    ›
-                  </span>
-                </Link>
-              </Fragment>
-            ))}
+          <div>
+            <div className="ios-row-title">{row.title}</div>
+            <div className="ios-link-description">
+              {row.description}
+            </div>
+          </div>
+        </div>
+
+        <span className="ios-chevron" aria-hidden="true">
+          ›
+        </span>
+      </Link>
+    </Fragment>
+  );
+})}
+
           </div>
         </section>
 

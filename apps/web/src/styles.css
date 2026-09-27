@@ -1,6 +1,22 @@
 @import "tailwindcss";
 
 /* =========================================================
+   APP FONT — SF Pro Display, served from /public/assets.
+
+   Only the Regular weight ships, so browsers synthesize
+   medium/semibold/bold from these outlines. Declaring the
+   heavier weights as real faces would flatten the hierarchy.
+   ========================================================= */
+
+@font-face {
+  font-family: 'SF Pro Display';
+  src: url('/assets/SFPRODISPLAYREGULAR.OTF') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* =========================================================
    THEME — single source of truth for app colors.
 
    Brand palette:   edit --primary / --secondary / --danger
@@ -34,7 +50,10 @@
   --radius: 12px;
   --radius-sm: 8px;
   --shadow: 0 1px 2px rgba(28, 27, 34, 0.05), 0 6px 20px rgba(28, 27, 34, 0.05);
-  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  /* Keeps Tailwind's font-sans utility on the same stack as --font,
+     instead of the framework default. */
+  --font-sans: var(--font);
   --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 
   /* ---- Dark theme (default) ---- */
@@ -117,6 +136,8 @@ body {
   margin: 0;
   padding: 0;
   background: var(--bg);
+  height: 100%;
+  overflow-x: hidden;
 }
 
 body {

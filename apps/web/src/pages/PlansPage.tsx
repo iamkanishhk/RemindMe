@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useBillingPlans, useCreateCheckoutSession } from '../hooks/queries';
+import { useUser } from '@clerk/react';
+import { useBillingPlans, useCreateCheckoutSession, useMe } from '../hooks/queries';
+import { resolveDisplayName } from '../lib/displayName';
 import { formatMoney } from '../lib/format';
 import { Spinner } from '../components/Spinner';
 import { Skeleton } from '../components/Skeleton';
 import { useErrorToast } from '../components/Toast';
+import { IOSSwitch } from './DashboardPage';
 import type { BillingPlan, PlanId } from '../lib/types';
 
 function intervalLabel(plan: BillingPlan): string {
@@ -12,10 +15,61 @@ function intervalLabel(plan: BillingPlan): string {
   return plan.intervalCount === 1 ? unit : `${plan.intervalCount} ${unit}s`;
 }
 
+const STAR_PATH =
+  'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z';
+
+// Social proof is editorial content, not billing data from the provider.
+const PLAN_RATINGS: Record<PlanId, number> = {
+  monthly: 4,
+  annual: 4.9
+};
+
+/**
+ * Five stars, with the filled layer clipped to the rating so a fractional
+ * score like 4.9 fills the last star most of the way.
+ */
+function StarRating({ rating }: { rating: number }) {
+  const clamped = Math.max(0, Math.min(5, rating));
+
+  return (
+    <span
+      role="img"
+      aria-label={`Rated ${clamped} out of 5`}
+      className="relative inline-flex items-center gap-0.5"
+    >
+      <span className="flex items-center gap-0.5 text-zinc-600">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <svg key={i} viewBox="0 0 24 24" className="h-3.5 w-3.5 shrink-0" aria-hidden="true">
+            <path d={STAR_PATH} fill="none" stroke="currentColor" strokeWidth={1.5} />
+          </svg>
+        ))}
+      </span>
+
+      <span
+            className="absolute inset-y-0 left-0 flex items-center gap-0.5 overflow-hidden text-yellow-400"
+        style={{ width: `${(clamped / 5) * 100}%` }}
+      >
+        {[0, 1, 2, 3, 4].map((i) => (
+          <svg key={i} viewBox="0 0 24 24" className="h-3.5 w-3.5 shrink-0" aria-hidden="true">
+            <path d={STAR_PATH} fill="currentColor" />
+          </svg>
+        ))}
+      </span>
+    </span>
+  );
+}
+
 export default function PlansPage() {
   const plansQuery = useBillingPlans();
   const checkout = useCreateCheckoutSession();
   const navigate = useNavigate();
+  const me = useMe();
+  const { user } = useUser();
+
+  // Real signed-in user, not a placeholder photo. Falls back to initials
+  // because Clerk users can sign up with an email and no avatar.
+  const name = resolveDisplayName(user?.fullName, me.data?.email) ?? 'RemindMe';
+  const avatarUrl = user?.imageUrl;
 
   // Annual is the better-value default, but only when the provider offers it.
   const [preferred, setPreferred] = useState<PlanId>('annual');
@@ -55,130 +109,156 @@ export default function PlansPage() {
   const trialDays = plans.find((p) => p.id === selected)?.trialDays ?? 0;
 
   return (
-    <div className="min-h-screen bg-[color:var(--bg)] text-[color:var(--text)] flex flex-col">
-      {/* Header */}
-      <header className="flex items-center gap-2 px-4 pt-5 pb-2 shrink-0">
-        <button
+    <div className="h-[85vh] bg-zinc-950 text-zinc-100 flex flex-col justify-between selection:bg-[color:var(--primary)] selection:text-white">
+
+      <div className="flex-1 flex flex-col items-center justify-center px-4 max-w-md mx-auto w-full">
+         <button
           type="button"
           onClick={goBack}
           aria-label="Go back"
-          className="h-10 w-10 -ml-1 flex items-center justify-center rounded-full text-[color:var(--text-dim)] active:scale-95 transition"
+          className="h-10 fixed top-4 left-5 w-10 flex items-center justify-center rounded-full bg-zinc-900  text-zinc-400 hover:text-white active:scale-95 transition"
         >
-          <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h1 className="text-[17px] font-semibold tracking-tight">Choose a plan</h1>
-      </header>
-
-      {/* Intro */}
-      <div className="px-5 pt-2 pb-5 shrink-0">
-        <p className="text-[13px] leading-relaxed text-[color:var(--text-dim)]">
-          Every plan starts with a free trial. Pick the rhythm that suits you —
-          switch or cancel whenever you want.
-        </p>
-      </div>
-
-      {/* Plans */}
-      <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-4">
-        {plansQuery.isLoading ? (
-          <div className="space-y-3" aria-busy="true">
-            <Skeleton className="h-[104px] w-full rounded-2xl" />
-            <Skeleton className="h-[104px] w-full rounded-2xl" />
+        {/* Top Avatar Illustration */}
+        <div className="relative mb-6">
+          <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-[color:var(--primary)] to-[color:var(--primary-strong)] opacity-30 blur-md" />
+          <div className="relative w-28 h-28 rounded-full border-2 border-[color:var(--primary)]/40 p-1 bg-zinc-900 shadow-xl overflow-hidden">
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={name}
+                className="w-full h-full object-cover rounded-full"
+              />
+            ) : (
+              <span className="flex w-full h-full items-center justify-center rounded-full bg-zinc-800 text-3xl font-semibold text-[color:var(--primary)]">
+                {name.charAt(0).toUpperCase()}
+              </span>
+            )}
           </div>
-        ) : plansQuery.isError ? (
-          <div className="rounded-2xl border border-[color:var(--border-soft)] p-5 text-center">
-            <p className="text-sm text-[color:var(--text-dim)]">
-              {plansQuery.error?.message ?? 'Could not load plans.'}
-            </p>
-            <button
-              type="button"
-              onClick={() => void plansQuery.refetch()}
-              className="mt-3 text-sm font-semibold text-[color:var(--primary)]"
-            >
-              Try again
-            </button>
-          </div>
-        ) : (
-          <fieldset className="space-y-3">
-            <legend className="sr-only">Billing plan</legend>
-            {plans.map((plan) => {
-              const isSelected = plan.id === selected;
-              return (
-                <label
-                  key={plan.id}
-                  className={`relative flex items-center gap-3 rounded-2xl border p-4 transition active:scale-[0.99] ${
-                    isSelected
-                      ? 'border-[color:var(--primary)] bg-[color-mix(in_srgb,var(--primary)_12%,transparent)]'
-                      : 'border-[color:var(--border-soft)]'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="plan"
-                    value={plan.id}
-                    checked={isSelected}
-                    onChange={() => setPreferred(plan.id)}
-                    className="sr-only"
-                  />
+        </div>
 
-                  <span
-                    aria-hidden="true"
-                    className={`h-5 w-5 shrink-0 rounded-full border-2 flex items-center justify-center ${
+       
+
+        {/* Main Card Container */}
+        <div className="w-full bg-zinc-900/90  rounded-3xl p-6 ">
+          {plansQuery.isLoading ? (
+            <div className="space-y-4" aria-busy="true">
+              <Skeleton className="h-[72px] w-full rounded-2xl bg-zinc-800" />
+              <Skeleton className="h-[72px] w-full rounded-2xl bg-zinc-800" />
+            </div>
+          ) : plansQuery.isError ? (
+            <div className="rounded-2xl border border-zinc-800 p-5 text-center">
+              <p className="text-sm text-zinc-400">
+                {plansQuery.error?.message ?? 'Could not load plans.'}
+              </p>
+              <button
+                type="button"
+                onClick={() => void plansQuery.refetch()}
+                className="mt-3 text-sm font-semibold text-[color:var(--primary)] hover:text-[color:var(--primary-strong)]"
+              >
+                Try again
+              </button>
+            </div>
+          ) : (
+            <fieldset className="space-y-3">
+              <legend className="sr-only">Billing plan</legend>
+              {plans.map((plan) => {
+                const isSelected = plan.id === selected;
+                const planName = plan.id === 'annual' ? 'Annual plan' : 'Monthly plan';
+
+                return (
+                  <div
+                    key={plan.id}
+                    className={`flex items-center justify-between gap-3 p-4 rounded-2xl border transition-all duration-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[color:var(--primary)] ${
                       isSelected
-                        ? 'border-[color:var(--primary)]'
-                        : 'border-[color:var(--text-dim)]'
+                        ? 'border-[color:var(--primary)]/50'
+                        : 'border-zinc-800'
                     }`}
                   >
-                    {isSelected ? (
-                      <span className="h-2.5 w-2.5 rounded-full bg-[color:var(--primary)]" />
-                    ) : null}
-                  </span>
+                    <label className="flex-1 min-w-0 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="plan"
+                        value={plan.id}
+                        checked={isSelected}
+                        onChange={() => setPreferred(plan.id)}
+                        className="sr-only"
+                      />
 
-                  <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-2">
-                      <span className="text-[15px] font-semibold capitalize">{plan.id === 'annual' ? 'Yearly' : 'Monthly'}</span>
-                      {plan.savingsPercent ? (
-                        <span className="rounded-full bg-[color:var(--primary)] px-2 py-0.5 text-[11px] font-semibold text-[color:var(--on-primary)]">
-                          Save {plan.savingsPercent}%
+                      {/* Left Details */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-zinc-300 capitalize">
+                          {plan.id === 'annual' ? 'Annual Plan' : 'Monthly Plan'}
+                        </span>
+                        <StarRating rating={PLAN_RATINGS[plan.id]} />
+                      </div>
+
+                      <div className="mt-1 flex items-baseline gap-1">
+                        <span className="text-2xl font-bold tracking-tight text-white">
+                          {formatMoney(plan.amountMinorUnits, plan.currency)}
+                        </span>
+                        <span className="text-xs text-zinc-400 font-normal">
+                          /{intervalLabel(plan)}
+                        </span>
+                      </div>
+
+                      {plan.monthlyEquivalentMinorUnits != null && plan.monthlyEquivalentMinorUnits !== plan.amountMinorUnits ? (
+                        <span className="block text-md text-zinc-300 mt-0.5">
+                          {formatMoney(plan.monthlyEquivalentMinorUnits, plan.currency)} /month
                         </span>
                       ) : null}
-                    </span>
-                    {plan.monthlyEquivalentMinorUnits != null && plan.monthlyEquivalentMinorUnits !== plan.amountMinorUnits ? (
-                      <span className="mt-0.5 block text-[13px] text-[color:var(--text-dim)]">
-                        {formatMoney(plan.monthlyEquivalentMinorUnits, plan.currency)} /month
-                      </span>
-                    ) : null}
-                  </span>
+                    </label>
 
-                  <span className="shrink-0 text-right">
-                    <span className="block text-[19px] font-bold tabular-nums">
-                      {formatMoney(plan.amountMinorUnits, plan.currency)}
-                    </span>
-                    <span className="block text-[12px] text-[color:var(--text-dim)]">
-                      /{intervalLabel(plan)}
-                    </span>
-                  </span>
-                </label>
-              );
-            })}
-          </fieldset>
-        )}
+                    {/* Right Toggle Switch */}
+                    <div className="flex flex-col items-center gap-1 shrink-0">
+                      <IOSSwitch
+                        enabled={isSelected}
+                        busy={false}
+                        onClick={() => setPreferred(plan.id)}
+                        label={`Select the ${planName.toLowerCase()}`}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </fieldset>
+          )}
+
+          {/* Feature List (from design image) */}
+          <div className="mt-6 pt-5 border-t border-zinc-800/80 space-y-3">
+            {[
+              '120 Reminders per month (4/day)',
+              '24/7 Extended Support',
+            ].map((feature, idx) => (
+              <div key={idx} className="flex items-center gap-3 text-md text-zinc-300">
+                <div className="flex items-center justify-center w-4 h-4 rounded-full bg-zinc-100 text-zinc-900 shrink-0">
+                  <svg className="w-2.5 h-2.5 stroke-[3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <span>{feature}</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {trialDays > 0 ? (
-          <p className="px-1 pt-4 text-center text-[13px] text-[color:var(--text-dim)]">
+          <p className="pt-4 text-center text-xs text-zinc-400">
             {trialDays} days free, then billing starts. Cancel anytime.
           </p>
         ) : null}
       </div>
 
-      {/* Sticky CTA */}
-      <div className="shrink-0 px-4 pt-2 pb-6 bg-[linear-gradient(to_top,var(--bg)_55%,transparent)]">
+      {/* Action Button */}
+      <div className="shrink-0 px-4 max-w-md mx-auto w-full">
         <button
           type="button"
           onClick={() => void onContinue()}
           disabled={checkout.isPending || plansQuery.isLoading || plansQuery.isError}
-          className="w-full py-4 rounded-2xl bg-[color:var(--primary)] text-[color:var(--on-primary)] font-semibold text-[15px] active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 transition flex items-center justify-center gap-2"
+          className="w-full py-3.5 rounded-2xl bg-[color:var(--primary)] hover:bg-[color:var(--primary-strong)] text-white font-semibold text-sm active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 transition shadow-lg shadow-[color:var(--primary)]/20 flex items-center justify-center gap-2"
         >
           {checkout.isPending ? <Spinner /> : <span>Start my free trial</span>}
         </button>

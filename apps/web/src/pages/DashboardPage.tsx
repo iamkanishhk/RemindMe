@@ -912,8 +912,7 @@ export default function DashboardPage() {
     <section
       className="
         relative
-        min-h-screen
-        overflow-x-hidden
+       
         bg-[color:var(--bg)]
         px-4
         pb-44

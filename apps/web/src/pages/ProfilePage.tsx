@@ -63,7 +63,7 @@ export default function ProfilePage() {
 
   return (
     <section className="ios-settings-page">
-      <div className="ios-settings-container">
+      <div className="ios-settings-container max-h-[85vh]">
           <LiquidGlass 
                        displacementScale={64}
                        saturation={130}
@@ -178,7 +178,7 @@ export default function ProfilePage() {
         {/* =========================================
             DANGER ZONE
         ========================================== */}
-        <section className="ios-settings-section danger-section">
+        {/* <section className="ios-settings-section danger-section">
           <div className="ios-section-label danger-label">
             DANGER ZONE
           </div>
@@ -193,7 +193,7 @@ export default function ProfilePage() {
                 </button>
 
          
-        </section>
+        </section> */}
 
         <div className="ios-footer-note">
           <span>Profile</span>
