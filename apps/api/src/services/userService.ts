@@ -57,6 +57,13 @@ export async function getOwnUser(userId: string) {
   });
 }
 
+export async function completeOnboarding(userId: string) {
+  return prisma.user.update({
+    where: { id: userId },
+    data: { onboardingCompletedAt: new Date() }
+  });
+}
+
 export async function deleteMe(userId: string): Promise<void> {
   const user = await prisma.user.findUnique({
     where: { id: userId },

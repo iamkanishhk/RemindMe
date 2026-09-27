@@ -40,6 +40,8 @@ model User {
   phoneNumbers  PhoneNumber[]
   reminders     Reminder[]
   subscriptions Subscription[]
+  // Set when the user finishes the post-signup Maya intro (onboarding step 2).
+  onboardingCompletedAt DateTime?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 

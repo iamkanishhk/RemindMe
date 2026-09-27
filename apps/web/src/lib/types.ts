@@ -78,6 +78,7 @@ export interface Me {
   email: string;
   phoneNumbers: { id: string; e164: string; verified: boolean }[];
   counts: { phoneNumbers: number; reminders: number };
+  onboardingCompletedAt: string | null;
   createdAt: string;
 }
 

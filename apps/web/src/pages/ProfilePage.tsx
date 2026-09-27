@@ -9,11 +9,7 @@ import { useErrorToast } from '../components/Toast';
 import ConfirmSheet from '../components/ConfirmSheet';
 import { iosTheme } from './iosTheme';
 import LiquidGlass from 'liquid-glass-react';
-
-function displayNameFromEmail(email: string): string {
-  const local = email.split('@')[0] ?? '';
-  return local.charAt(0).toUpperCase() + local.slice(1);
-}
+import { resolveDisplayName } from '../lib/displayName';
 
 export default function ProfilePage() {
   const me = useMe();
@@ -34,8 +30,7 @@ export default function ProfilePage() {
     me.data?.email ?? user?.primaryEmailAddress?.emailAddress ?? '';
 
   const name =
-    user?.fullName?.trim() ||
-    (email ? displayNameFromEmail(email) : 'RemindMe');
+    resolveDisplayName(user?.fullName, email) ?? 'RemindMe';
 
   const avatarUrl = user?.imageUrl;
 

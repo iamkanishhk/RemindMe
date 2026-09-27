@@ -57,6 +57,20 @@ export function useMe() {
   });
 }
 
+export function useCompleteOnboarding() {
+  const authed = useAuthedFetch();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const res = await authed<{ onboardingCompletedAt: string | null }>('/api/users/me/onboarding-complete', { method: 'POST', body: JSON.stringify({}) });
+      return res;
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['me'] });
+    }
+  });
+}
+
 export function useReminders(opts: { status?: ReminderStatus; upcoming?: boolean } = {}) {
   const authed = useAuthedFetch();
   return useQuery({
