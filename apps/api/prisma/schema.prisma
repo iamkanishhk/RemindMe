@@ -46,10 +46,14 @@ model User {
   // reminder/call. Never refunded, even if the reminder is later deleted.
   freeCallUsed    Boolean        @default(false)
   // Daily reminder creation quota for entitled (paid/trial) accounts. Bucket is
-  // the UTC day (YYYY-MM-DD) the count belongs to. Incremented atomically at
-  // creation and never decremented, so deleted reminders still count against it.
+  // the user's local calendar day (YYYY-MM-DD, derived from timezone) the count
+  // belongs to. Incremented atomically at creation and never decremented, so
+  // deleted reminders still count against it.
   reminderDailyBucket String?
   reminderDailyCount  Int          @default(0)
+  // IANA timezone inferred from the user's reminders; drives the local-midnight
+  // daily quota reset.
+  timezone      String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 

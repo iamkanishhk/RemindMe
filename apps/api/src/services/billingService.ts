@@ -1,6 +1,7 @@
 import { env } from '../config';
 import { logger } from '../lib/logger';
 import { prisma } from '../lib/prisma';
+import { DateTime, IANAZone } from 'luxon';
 import { getDodoClient } from '../lib/dodo';
 import { ApiError, notFound, conflict, paymentRequired, serviceUnavailable, unprocessable } from '../lib/errors';
 import type { SubscriptionStatus } from '@prisma/client';
@@ -207,22 +208,42 @@ export async function isEntitled(userId: string): Promise<boolean> {
   return Boolean(sub && subscriptionGrantsAccess(sub));
 }
 
+// User-local calendar day (YYYY-MM-DD) for the daily quota. The boundary is the
+// user's midnight, falling back to UTC when the timezone is empty or invalid.
+function localDayBucket(timezone: string | undefined, now = new Date()): string {
+  if (timezone && IANAZone.isValidZone(timezone)) {
+    return DateTime.fromJSDate(now).setZone(timezone).toISODate() ?? '';
+  }
+  return DateTime.fromJSDate(now).toUTC().toISODate() ?? '';
+}
+
 // Enforce the daily reminder-creation quota for entitled (paid/trial)
 // accounts. A creation slot is consumed atomically here and never refunded, so
 // deleting a reminder does not free a slot for the rest of the day. The counter
-// resets at UTC midnight when the day bucket changes.
-export async function consumeDailyReminderSlot(userId: string): Promise<void> {
-  const bucket = new Date().toISOString().slice(0, 10);
+// resets at the user's local midnight (12:00 AM in their timezone).
+export async function consumeDailyReminderSlot(userId: string, timezone?: string): Promise<void> {
+  const bucket = localDayBucket(timezone);
+  // Reset when the stored bucket is not today. Must match NULL buckets too
+  // (fresh accounts) - a plain `!==` misses NULL rows because of SQL semantics.
   await prisma.user.updateMany({
-    where: { id: userId, reminderDailyBucket: { not: bucket } },
+    where: {
+      id: userId,
+      OR: [{ reminderDailyBucket: { not: bucket } }, { reminderDailyBucket: null }]
+    },
     data: { reminderDailyBucket: bucket, reminderDailyCount: 0 }
   });
+
+  const claimData: Prisma.UserUpdateManyMutationInput = { reminderDailyCount: { increment: 1 } };
+  if (timezone && IANAZone.isValidZone(timezone)) {
+    claimData.timezone = timezone;
+  }
+
   const claimed = await prisma.user.updateMany({
     where: { id: userId, reminderDailyBucket: bucket, reminderDailyCount: { lt: env.DAILY_REMINDER_LIMIT } },
-    data: { reminderDailyCount: { increment: 1 } }
+    data: claimData
   });
   if (claimed.count !== 1) {
-    throw unprocessable(`Daily limit of ${env.DAILY_REMINDER_LIMIT} reminders reached. New slots reset tomorrow.`);
+    throw unprocessable(`Daily limit of ${env.DAILY_REMINDER_LIMIT} reminders reached. New slots reset at midnight.`);
   }
 }
 
@@ -236,14 +257,14 @@ export async function consumeDailyReminderSlot(userId: string): Promise<void> {
 // refund it. Once spent, further creates throw 402 PAYMENT_REQUIRED. Free
 // reminders are restricted to a one-shot call, so a recurring reminder is not
 // eligible and does not burn the free call.
-export async function assertReminderCreateAllowed(userId: string, repeatRule: 'NONE' | 'DAILY' | 'WEEKLY'): Promise<boolean> {
+export async function assertReminderCreateAllowed(userId: string, repeatRule: 'NONE' | 'DAILY' | 'WEEKLY', timezone?: string): Promise<boolean> {
   if (await isEntitled(userId)) {
-    await consumeDailyReminderSlot(userId);
+    await consumeDailyReminderSlot(userId, timezone);
     return false;
   }
   const reconciled = await reconcileSubscriptionFromProvider(userId);
   if (reconciled && subscriptionGrantsAccess(reconciled)) {
-    await consumeDailyReminderSlot(userId);
+    await consumeDailyReminderSlot(userId, timezone);
     return false;
   }
 
@@ -251,7 +272,7 @@ export async function assertReminderCreateAllowed(userId: string, repeatRule: 'N
 
   const consumed = await prisma.user.updateMany({
     where: { id: userId, freeCallUsed: false },
-    data: { freeCallUsed: true }
+    data: { freeCallUsed: true, ...(timezone && IANAZone.isValidZone(timezone) ? { timezone } : {}) }
   });
   if (consumed.count !== 1) throw paymentRequired();
   return true;

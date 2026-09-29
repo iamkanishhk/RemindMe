@@ -34,7 +34,7 @@ function wallClockFor(existing: { scheduledAt: Date; timezone: string }): string
 
 export async function createReminder(userId: string, input: ReminderInput) {
   const phone = await assertCallablePhone(userId, input.phoneNumberId);
-  const isFreeCall = await assertReminderCreateAllowed(userId, input.repeatRule);
+  const isFreeCall = await assertReminderCreateAllowed(userId, input.repeatRule, input.timezone);
 
   const run = computeNextRun({ localDateTime: input.localDateTime, timezone: input.timezone });
   if (!run) throw badRequest('Invalid local date-time or timezone');
