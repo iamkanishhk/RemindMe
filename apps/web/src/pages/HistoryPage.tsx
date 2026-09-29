@@ -1,5 +1,6 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCalls } from '../hooks/queries';
 import { formatDateTimeLocal } from '../lib/format';
 import { StatusChip } from '../components/StatusChip';
@@ -15,6 +16,18 @@ export default function HistoryPage() {
   const calls = useCalls();
   const navigate = useNavigate();
   const [selected, setSelected] = useState<CallAttempt | null>(null);
+  const [searching, setSearching] = useState(false);
+  const [query, setQuery] = useState('');
+  const searchRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (searching) searchRef.current?.focus();
+  }, [searching]);
+
+  function closeSearch() {
+    setSearching(false);
+    setQuery('');
+  }
 
   if (calls.isLoading) {
     return (
@@ -72,70 +85,157 @@ export default function HistoryPage() {
 
   const attempts = calls.data?.pages.flatMap((p) => p.attempts) ?? [];
 
+  const needle = query.trim().toLowerCase();
+  const visibleAttempts = needle
+    ? attempts.filter((a) =>
+        [a.reminderTitle, a.reminderId, a.status, a.detail, a.destinationE164]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
+          .includes(needle)
+      )
+    : attempts;
+
   return (
     <section className="ios-history-page">
       <div className="ios-history-container">
         {/* Page Header */}
         <header className="ios-page-header">
-
-        <div className="flex mt-15">
-              <span className="w-full text-4xl">Call history</span>
-           <div className="flex items-center justify-center w-fit">
-              <LiquidGlass 
-             displacementScale={64}
-             saturation={130}
-             aberrationIntensity={2}
-             elasticity={0.35}
-             cornerRadius={100}
-            blurAmount={0.1}
-            padding="15px"
-            style={{ 
-              width: 20,
-              height: 20,
-              top: 25,
-              right: 50,
-              position: 'fixed',
-              zIndex: 9999,
-             }}
+          <div className="flex mt-15 items-center justify-between gap-3">
+            <span className="text-4xl">Call history</span>
+            <div className="flex items-center justify-center w-fit">
+              <LiquidGlass
+                displacementScale={64}
+                saturation={130}
+                aberrationIntensity={2}
+                elasticity={0.35}
+                cornerRadius={100}
+                blurAmount={0.1}
+                padding="15px"
+                style={{
+                  top: 40,
+                  position: 'fixed',
+                  zIndex: 9999,
+                }}
               >
-              <svg width="40" height="40" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">
-                  <circle
-                    cx="42"
-                    cy="42"
-                    r="19"
-                    fill="none"
-                    stroke="white"
-                    stroke-width="8"
-                  />
-                  <line
-                    x1="56"
-                    y1="56"
-                    x2="73"
-                    y2="73"
-                    stroke="white"
-                    stroke-width="8"
-                    stroke-linecap="round"
-                  />
-                </svg>
-                    </LiquidGlass>
-           </div>
+                <motion.div
+                  layout
+                  transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                  className="flex items-center overflow-hidden"
+                  style={{
+                    borderRadius: 9999,
+                  }}
+                >
+                  <AnimatePresence mode="wait">
+                    {searching ? (
+                      <motion.div
+                        key="search-input-wrapper"
+                        initial={{ opacity: 0, width: 40 }}
+                        animate={{ opacity: 1, width: '85vw' }}
+                        exit={{ opacity: 0, width: 40 }}
+                        transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                        className="flex items-center gap-2 px-2"
+                      >
+                        <input
+                          ref={searchRef}
+                          type="search"
+                          value={query}
+                          onChange={(e) => setQuery(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Escape') closeSearch();
+                          }}
+                          placeholder="Search reminder or status"
+                          aria-label="Search call history"
+                          className="w-full bg-transparent border-none outline-none text-white text-base placeholder-gray-400"
+                        />
+                        <motion.button
+                          type="button"
+                          onClick={closeSearch}
+                          aria-label="Close search"
+                          whileTap={{ scale: 0.9 }}
+                          className="pressable flex items-center justify-center p-1 text-white shrink-0 cursor-pointer"
+                        >
+                          {/* Cancel / X Icon */}
+                          <svg
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                          </svg>
+                        </motion.button>
+                      </motion.div>
+                    ) : (
+                      <motion.button
+                        key="search-button"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
+                        type="button"
+                        onClick={() => setSearching(true)}
+                        aria-label="Search call history"
+                        aria-expanded={searching}
+                        className="pressable ios-search-btn"
+                      >
+                        <svg
+                          width="24"
+                          height="24"
+                          viewBox="0 0 96 96"
+                          xmlns="http://www.w3.org/2000/svg"
+                          aria-hidden="true"
+                        >
+                          <circle
+                            cx="42"
+                            cy="42"
+                            r="19"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="8"
+                          />
+                          <line
+                            x1="56"
+                            y1="56"
+                            x2="73"
+                            y2="73"
+                            stroke="currentColor"
+                            strokeWidth="8"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              </LiquidGlass>
+            </div>
           </div>
         </header>
 
         {/* Empty State */}
         {attempts.length === 0 ? (
-          <div className="w-full flex flex-col items-center justify-center gap-3  p-6 text-center">
-             <img src={Image} width="auto" height="10vh" className="opacity-70" alt="Call icon">
-</img>
+          <div className="w-full flex flex-col items-center justify-center gap-3 p-6 text-center">
+            <img
+              src={Image}
+              width="auto"
+              height="10vh"
+              className="opacity-70"
+              alt="Call icon"
+            />
             <div> no call history yet</div>
-           
           </div>
         ) : (
           <>
             {/* Grouped history list, settings-card style */}
             <section className="ios-history-section ">
               <div className="ios-settings-card stagger">
-                {attempts.map((a, index) => (
+                {visibleAttempts.map((a, index) => (
                   <Fragment key={a.id}>
                     {index > 0 && <div className="ios-divider" />}
 
@@ -166,6 +266,12 @@ export default function HistoryPage() {
                 ))}
               </div>
             </section>
+
+            {visibleAttempts.length === 0 && (
+              <p className="ios-search-empty">
+                No calls match &ldquo;{query.trim()}&rdquo;
+              </p>
+            )}
 
             {/* Pagination */}
             {calls.hasNextPage ? (
@@ -208,20 +314,14 @@ export default function HistoryPage() {
           background:
             radial-gradient(
               ellipse 900px 450px at 50% -150px,
-              rgba(50, 50, 55, 0.32),
+              var(--ios-glow),
               transparent 70%
             ),
             var(--ios-black);
 
           color: var(--ios-text);
 
-          font-family:
-            -apple-system,
-            BlinkMacSystemFont,
-            "SF Pro Display",
-            "SF Pro Text",
-            system-ui,
-            sans-serif;
+          font-family: var(--font);
 
           -webkit-font-smoothing: antialiased;
           text-rendering: optimizeLegibility;
@@ -292,8 +392,6 @@ export default function HistoryPage() {
           letter-spacing: -0.01em;
         }
 
-       
-
         /* --------------------------------
            Section
         -------------------------------- */
@@ -327,9 +425,7 @@ export default function HistoryPage() {
 
           border-radius: 17px;
 
-          box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.025),
-            0 8px 30px rgba(0, 0, 0, 0.16);
+          box-shadow: var(--shadow-card);
         }
 
         .ios-divider {
@@ -426,7 +522,6 @@ export default function HistoryPage() {
           line-height: 14px;
           font-weight: 300;
         }
-
 
         /* --------------------------------
            Pagination
@@ -553,6 +648,36 @@ export default function HistoryPage() {
         }
 
         /* --------------------------------
+           Search
+        -------------------------------- */
+
+        .ios-search-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          background: none;
+          border: 0;
+          padding: 0;
+          line-height: 0;
+
+          color: var(--ios-text);
+
+          cursor: pointer;
+        }
+
+        .ios-search-empty {
+          margin-top: 18px;
+
+          text-align: center;
+
+          color: var(--ios-secondary);
+
+          font-size: 15px;
+          line-height: 1.4;
+        }
+
+        /* --------------------------------
            Tablet
         -------------------------------- */
 
@@ -589,7 +714,6 @@ export default function HistoryPage() {
           .ios-title-row {
             align-items: flex-start;
           }
-
 
           .ios-section-label {
             padding-left: 13px;

@@ -24,7 +24,7 @@ export default function ReminderDetailPage() {
   if (reminder.isLoading) {
     return (
       <section
-        className="min-h-screen w-full bg-[#000000] text-[#FFFFFF] px-4 pt-12 pb-24"
+        className="min-h-screen w-full bg-[color:var(--bg)] text-[color:var(--text)] px-4 pt-12 pb-24"
         aria-busy="true"
       >
         <div className="mx-auto max-w-md space-y-6">
@@ -38,17 +38,17 @@ export default function ReminderDetailPage() {
           {/* Grouped List Skeleton */}
           <div className="space-y-2">
             <Skeleton className="h-3 w-28 ml-4 rounded" />
-            <div className="rounded-2xl bg-[#1C1C1E] p-4 space-y-4">
+            <div className="rounded-2xl bg-[color:var(--surface)] p-4 space-y-4">
               <div className="flex justify-between items-center">
                 <Skeleton className="h-4 w-20 rounded" />
                 <Skeleton className="h-4 w-32 rounded" />
               </div>
-              <div className="h-[0.5px] bg-[#38383A]" />
+              <div className="h-[0.5px] bg-[color:var(--border)]" />
               <div className="flex justify-between items-center">
                 <Skeleton className="h-4 w-24 rounded" />
                 <Skeleton className="h-4 w-28 rounded" />
               </div>
-              <div className="h-[0.5px] bg-[#38383A]" />
+              <div className="h-[0.5px] bg-[color:var(--border)]" />
               <div className="flex justify-between items-center">
                 <Skeleton className="h-4 w-16 rounded" />
                 <Skeleton className="h-4 w-36 rounded" />
@@ -124,7 +124,7 @@ export default function ReminderDetailPage() {
           <button
             disabled={busy}
             onClick={() => void toggle()}
-            className="w-10 text-white font-medium active:opacity-60 transition-opacity"
+            className="w-10 text-[color:var(--text)] font-medium active:opacity-60 transition-opacity"
           >
             {r.isEnabled ? '| |' : '▶'}
           </button>
@@ -195,7 +195,7 @@ export default function ReminderDetailPage() {
         }}
       >
         <Link to="/" className="ios-back flex items-center justify-center w-full h-full">
-          <span className="text-white text-xl font-light">‹</span>
+          <span className="text-[color:var(--text)] text-xl font-light">‹</span>
         </Link>
       </LiquidGlass>
 
@@ -218,7 +218,7 @@ export default function ReminderDetailPage() {
           </div>
 
           <h1 className="ios-title">
-            I'll Call You for <span className="text-white font-semibold">{r.title}</span>
+            I'll Call You for <span className="text-[color:var(--text)] font-semibold">{r.title}</span>
           </h1>
           <p className="ios-subtitle">{formatDateTimeLocal(r.scheduledAt)}</p>
         </header>
@@ -266,9 +266,9 @@ export default function ReminderDetailPage() {
         .ios-page {
           min-height: 100vh;
           width: 100%;
-          background-color: #000000;
-          color: #FFFFFF;
-          font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+          background-color: var(--bg);
+          color: var(--text);
+          font-family: var(--font);
           -webkit-font-smoothing: antialiased;
           padding-top: 80px;
           padding-bottom: 40px;
@@ -295,7 +295,7 @@ export default function ReminderDetailPage() {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          background: #1C1C1E;
+          background: var(--ios-card);
           padding: 4px 12px;
           border-radius: 20px;
           margin-bottom: 16px;
@@ -308,17 +308,17 @@ export default function ReminderDetailPage() {
         }
 
         .ios-status-dot.active {
-          background-color: #30D158;
+          background-color: var(--success);
         }
 
         .ios-status-dot.paused {
-          background-color: #8E8E93;
+          background-color: var(--text-dim);
         }
 
         .ios-status-text {
           font-size: 13px;
           font-weight: 500;
-          color: #8E8E93;
+          color: var(--text-dim);
           text-transform: uppercase;
           letter-spacing: 0.02em;
         }
@@ -327,14 +327,14 @@ export default function ReminderDetailPage() {
           font-size: 24px;
           line-height: 1.25;
           font-weight: 400;
-          color: #8E8E93;
+          color: var(--text-dim);
           letter-spacing: -0.02em;
           margin: 0 0 8px 0;
         }
 
         .ios-subtitle {
           font-size: 15px;
-          color: #0A84FF;
+          color: var(--primary);
           font-weight: 500;
           margin: 0;
         }
@@ -346,7 +346,7 @@ export default function ReminderDetailPage() {
 
         .ios-group-label {
           padding: 0 0 8px 16px;
-          color: #8E8E93;
+          color: var(--text-dim);
           font-size: 13px;
           font-weight: 400;
           letter-spacing: -0.01em;
@@ -354,7 +354,7 @@ export default function ReminderDetailPage() {
         }
 
         .ios-card {
-          background: #1C1C1E;
+          background: var(--ios-card);
           border-radius: 16px;
           overflow: hidden;
         }
@@ -369,7 +369,7 @@ export default function ReminderDetailPage() {
         }
 
         .ios-row-label {
-          color: #FFFFFF;
+          color: var(--text);
           font-size: 16px;
           font-weight: 400;
           letter-spacing: -0.01em;
@@ -377,7 +377,7 @@ export default function ReminderDetailPage() {
         }
 
         .ios-row-value {
-          color: #8E8E93;
+          color: var(--text-dim);
           font-size: 16px;
           font-weight: 400;
           text-align: right;
@@ -391,7 +391,7 @@ export default function ReminderDetailPage() {
 
         .ios-divider {
           height: 0.5px;
-          background-color: #38383A;
+          background-color: var(--border);
           margin-left: 16px;
         }
       `}</style>

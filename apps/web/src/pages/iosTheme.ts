@@ -6,20 +6,14 @@ export const iosTheme = `
     background:
       radial-gradient(
         ellipse 850px 450px at 50% -150px,
-        rgba(55, 55, 60, 0.28),
+        var(--ios-glow),
         transparent 70%
       ),
       var(--ios-black);
 
     color: var(--ios-text);
 
-    font-family:
-      -apple-system,
-      BlinkMacSystemFont,
-      "SF Pro Display",
-      "SF Pro Text",
-      system-ui,
-      sans-serif;
+    font-family: var(--font);
 
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -105,9 +99,7 @@ export const iosTheme = `
 
     border-radius: 17px;
 
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.025),
-      0 8px 30px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-card);
   }
 
   /* =========================================
@@ -132,7 +124,7 @@ export const iosTheme = `
   }
 
   .ios-link-row:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--hover);
   }
 
   .ios-link-row:active {
@@ -317,7 +309,7 @@ export const iosTheme = `
 
     border-radius: 50%;
 
-    border: 1px solid rgba(255, 255, 255, 0.14);
+    border: 1px solid var(--hairline);
 
     background:
       linear-gradient(
@@ -326,7 +318,7 @@ export const iosTheme = `
         color-mix(in srgb, var(--ios-purple) 35%, transparent),
       );
 
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    box-shadow: var(--shadow-raised);
   }
 
   .ios-avatar img {
@@ -658,12 +650,12 @@ export const iosTheme = `
 
     padding: 0 14px;
 
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--input-border);
     outline: none;
 
     border-radius: 11px;
 
-    background: rgba(0, 0, 0, 0.28);
+    background: var(--input-bg);
     color: var(--ios-text);
 
     font-family:
@@ -676,8 +668,7 @@ export const iosTheme = `
 
     font-size: 15px;
 
-    box-shadow:
-      inset 0 1px 2px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--input-shadow);
 
     transition:
       border-color 0.15s ease,
@@ -692,7 +683,7 @@ export const iosTheme = `
   .ios-delete-confirm input:focus {
     border-color: color-mix(in srgb, var(--ios-red) 55%, transparent);
 
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--input-bg);
 
     box-shadow:
       0 0 0 3px color-mix(in srgb, var(--ios-red) 10%, transparent);
@@ -812,6 +803,100 @@ export const iosTheme = `
     font-size: 11px;
 
     letter-spacing: 0.01em;
+  }
+
+  /* =========================================
+     APPEARANCE — native segmented control
+  ========================================== */
+
+  .ios-appearance-row {
+    padding: 13px 17px 15px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 12px;
+  }
+
+  .ios-segmented {
+    position: relative;
+
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+
+    padding: 2px;
+
+    border-radius: 10px;
+
+    background: var(--seg-track);
+  }
+
+  /* The sliding selection pill. --seg-index / --seg-count are set inline. */
+  .ios-segmented-thumb {
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    left: 2px;
+
+    width: calc((100% - 4px) / var(--seg-count, 3));
+
+    border-radius: 8px;
+
+    background: var(--seg-thumb);
+
+    box-shadow:
+      0 3px 8px rgba(0, 0, 0, 0.12),
+      0 1px 1px rgba(0, 0, 0, 0.04);
+
+    transform: translateX(calc(var(--seg-index, 0) * 100%));
+
+    transition: transform 0.26s cubic-bezier(0.32, 0.72, 0, 1);
+
+    pointer-events: none;
+  }
+
+  .ios-segmented-option {
+    position: relative;
+    z-index: 1;
+
+    min-height: 28px;
+    padding: 0 8px;
+
+    border: 0;
+    border-radius: 8px;
+
+    background: transparent;
+
+    color: var(--ios-text);
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    transition: opacity 0.15s ease;
+  }
+
+  .ios-segmented-option[aria-checked='true'] {
+    font-weight: 600;
+  }
+
+  .ios-segmented-option[aria-checked='false'] {
+    opacity: 0.55;
+  }
+
+  .ios-segmented-option:active {
+    opacity: 0.7;
+  }
+
+  .ios-segmented-option:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--ios-blue) 60%, transparent);
+    outline-offset: 1px;
   }
 
   /* =========================================
@@ -967,7 +1052,8 @@ export const iosTheme = `
   @media (prefers-reduced-motion: reduce) {
     .ios-delete-button,
     .ios-delete-confirm input,
-    .ios-link-row {
+    .ios-link-row,
+    .ios-segmented-thumb {
       transition: none;
     }
   }

@@ -52,10 +52,10 @@ export default function SignInPage() {
         />
 
         <div className="text-center px-2 space-y-3 my-2">
-          <h1 className="text-[26px] font-bold text-white tracking-tight leading-tight">
+          <h1 className="text-[26px] font-bold text-[color:var(--text)] tracking-tight leading-tight">
             Welcome to RemindMe
           </h1>
-          <p className="text-[13px] text-slate-400 font-normal leading-relaxed px-2 max-w-[300px] mx-auto">
+          <p className="text-[13px] text-[color:var(--text-dim)] font-normal leading-relaxed px-2 max-w-[300px] mx-auto">
             Sign in to schedule phone-call reminders so nothing slips through.
           </p>
         </div>

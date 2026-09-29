@@ -148,7 +148,7 @@ export default function BottomNav() {
     <div className="fixed bottom-5 w-[90vw] max-w-md left-1/2 -translate-x-1/2 z-40">
       <nav
         aria-label="Primary"
-        className="relative flex items-center justify-between gap-1 p-1.5 rounded-full border border-white/20 bg-[#1c1c1e]/80 backdrop-blur-2xl shadow-2xl overflow-visible"
+        className="relative flex items-center justify-between gap-1 p-1.5 rounded-full border border-[color:var(--border)] bg-[color:var(--glass-tint)] backdrop-blur-2xl shadow-2xl overflow-visible"
       >
         {/* ==========================================
             LIQUID GLASS MOVING BACKDROP
@@ -163,7 +163,7 @@ export default function BottomNav() {
           >
             {/* SOLID RESTING TAB BACKGROUND */}
             <motion.div
-              className="w-full h-full rounded-full bg-white/15 shadow-sm border border-white/10"
+              className="w-full h-full rounded-full bg-[color:var(--active)] shadow-sm border border-[color:var(--border-soft)]"
               animate={{
                 opacity: isLiquidActive ? 0 : 1,
                 scale: isLiquidActive ? 0.92 : 1,
@@ -198,13 +198,12 @@ export default function BottomNav() {
                   saturate(${NAV_GLASS_CONFIG.glass.saturation}%)
                   contrast(${NAV_GLASS_CONFIG.glass.contrast}%)
                 `,
-                background: 'rgba(255, 255, 255, 0.22)',
-                border: `1px solid rgba(255, 255, 255, ${NAV_GLASS_CONFIG.glass.borderOpacity})`,
-                boxShadow: `
-                  inset 0 2px 4px rgba(255,255,255,0.95),
-                  inset 0 -2px 4px rgba(0,0,0,${NAV_GLASS_CONFIG.glass.shadowOpacity}),
-                  0 6px 16px rgba(0,0,0,0.25)
-                `,
+                    background: 'var(--glass-highlight)',
+                    border: `1px solid rgba(255, 255, 255, ${NAV_GLASS_CONFIG.glass.borderOpacity})`,
+                      boxShadow: `
+                        var(--glass-inner),
+                        var(--shadow-nav)
+                      `,
               }}
             >
               {/* RGB dispersion overlay */}
@@ -249,8 +248,8 @@ export default function BottomNav() {
                 <div
                   className={`flex flex-col items-center justify-center transition-all duration-300 ${
                     isActive
-                      ? 'text-white font-semibold scale-105'
-                      : 'text-white/60 hover:text-white font-normal'
+                      ? 'text-[color:var(--text)] font-semibold scale-105'
+                      : 'text-[color:var(--text-dim)] hover:text-[color:var(--text)] font-normal'
                   }`}
                 >
                   <Icon />

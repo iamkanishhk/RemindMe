@@ -214,7 +214,7 @@ export default function PhoneVerifyOnboarding({
                   <br />
                   call you?
                 </h1>
-                <p className="text-[14px] text-neutral-400 font-normal leading-relaxed">
+                <p className="text-[14px] text-[color:var(--text-dim)] font-normal leading-relaxed">
                   We&apos;ll use this number to deliver
                   <br />
                   your reminder calls.
@@ -224,14 +224,14 @@ export default function PhoneVerifyOnboarding({
               <div className="flex items-center gap-2.5 pt-1">
                 {/* Country Code Picker */}
                 <div className="relative w-[110px] shrink-0">
-                  <div className="w-full h-[52px] bg-[color:var(--surface)] border border-white/10 rounded-2xl flex items-center justify-between px-3 shadow-inner active:bg-[color:var(--surface-2)] transition-colors pointer-events-none">
+                  <div className="w-full h-[52px] bg-[color:var(--surface)] border border-[color:var(--border)] rounded-2xl flex items-center justify-between px-3 shadow-inner active:bg-[color:var(--surface-2)] transition-colors pointer-events-none">
                     <span className="flex items-center gap-1.5">
                       <span aria-hidden="true" className="text-base">
                         {country.flag}
                       </span>
                       <span className="text-sm font-semibold text-[color:var(--text)] tracking-wide">{country.code}</span>
                     </span>
-                    <svg viewBox="0 0 320 512" fill="currentColor" className="h-2.5 w-2.5 text-neutral-400" aria-hidden="true">
+                    <svg viewBox="0 0 320 512" fill="currentColor" className="h-2.5 w-2.5 text-[color:var(--text-dim)]" aria-hidden="true">
                       <path d="M301.7 158.3l-137 137a23.9 23.9 0 0 1-33.9 0l-137-137a23.9 23.9 0 0 1 0-33.9l22.6-22.6a23.9 23.9 0 0 1 33.9 0L160 222.1 245.4 101.7a23.9 23.9 0 0 1 33.9 0l22.6 22.6a23.9 23.9 0 0 1-.2 34z" />
                     </svg>
                   </div>
@@ -258,7 +258,7 @@ export default function PhoneVerifyOnboarding({
                     value={raw}
                     maxLength={14}
                     onChange={(e) => setRaw(e.target.value.replace(/[^\d\s()-]/g, ''))}
-                    className="w-full h-[52px] bg-[color:var(--surface)] border border-white/10 rounded-2xl px-4 text-[15px] font-medium text-[color:var(--text)] placeholder:text-[color:var(--text-faint)] focus:outline-none focus:border-[color:var(--primary)] focus:ring-1 focus:ring-[color:var(--primary)] transition"
+                    className="w-full h-[52px] bg-[color:var(--surface)] border border-[color:var(--border)] rounded-2xl px-4 text-[15px] font-medium text-[color:var(--text)] placeholder:text-[color:var(--text-faint)] focus:outline-none focus:border-[color:var(--primary)] focus:ring-1 focus:ring-[color:var(--primary)] transition"
                   />
                 </div>
               </div>
@@ -277,7 +277,7 @@ export default function PhoneVerifyOnboarding({
             </div>
 
             <div className="pb-2 text-center space-y-5 mt-10">
-              <p className="text-[12px] text-neutral-500 font-normal">Standard call and data rates may apply.</p>
+              <p className="text-[12px] text-[color:var(--text-faint)] font-normal">Standard call and data rates may apply.</p>
             </div>
           </div>
 
@@ -307,7 +307,7 @@ export default function PhoneVerifyOnboarding({
                   <br />
                   we sent.
                 </h1>
-                <p className="text-[14px] text-neutral-400 font-normal leading-relaxed">
+                <p className="text-[14px] text-[color:var(--text-dim)] font-normal leading-relaxed">
                   We sent a code to{' '}
                   <span className="font-semibold text-[color:var(--text)]">{verifying ? verifying.e164 : (otpRef.current?.e164 ?? '')}</span>
                 </p>
@@ -330,14 +330,14 @@ export default function PhoneVerifyOnboarding({
                     onKeyDown={(e) => onOtpKey(i, e)}
                     onPaste={onOtpPaste}
                     aria-label={`Digit ${i + 1}`}
-                    className="w-full h-[52px] bg-[color:var(--surface)] border border-white/10 rounded-2xl text-center font-semibold text-xl text-[color:var(--text)] focus:ring-1 focus:ring-[color:var(--primary)] focus:border-[color:var(--primary)] focus:bg-[color:var(--surface-2)] outline-none transition-all"
+                    className="w-full h-[52px] bg-[color:var(--surface)] border border-[color:var(--border)] rounded-2xl text-center font-semibold text-xl text-[color:var(--text)] focus:ring-1 focus:ring-[color:var(--primary)] focus:border-[color:var(--primary)] focus:bg-[color:var(--surface-2)] outline-none transition-all"
                   />
                 ))}
               </div>
 
               <div className="text-center space-y-3 pt-1">
                 {remaining > 0 ? (
-                  <p className="text-xs text-neutral-500 font-medium tracking-wide">
+                  <p className="text-xs text-[color:var(--text-faint)] font-medium tracking-wide">
                     Resend code (<span>{formatTimer(remaining)}</span>)
                   </p>
                 ) : (

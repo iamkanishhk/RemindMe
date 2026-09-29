@@ -258,7 +258,7 @@ export default function SubscriptionsPage() {
           height: 44px;
           padding: 0 16px;
           background-color: var(--ios-bg);
-          border-bottom: 0.5px solid var(--ios-divider);
+          border-bottom: 0.5px solid var(--border);
         }
 
         .ios-nav-left, .ios-nav-right {
@@ -270,7 +270,7 @@ export default function SubscriptionsPage() {
         }
 
         .ios-back-button {
-          color: var(--ios-link);
+          color: var(--primary);
           text-decoration: none;
           font-size: 17px;
           display: inline-flex;
@@ -301,7 +301,7 @@ export default function SubscriptionsPage() {
 
         /* Grouped Card */
         .ios-group {
-          background-color: var(--ios-card-bg);
+          background-color: var(--ios-card);
           border-radius: 12px;
           overflow: hidden;
           margin-bottom: 12px;
@@ -322,7 +322,7 @@ export default function SubscriptionsPage() {
         }
 
         .ios-row-value {
-          color: var(--ios-secondary-text);
+          color: var(--text-dim);
           text-align: right;
         }
 
@@ -338,7 +338,7 @@ export default function SubscriptionsPage() {
 
         .ios-row-divider {
           height: 0.5px;
-          background-color: var(--ios-divider);
+          background-color: var(--border);
           margin-left: 16px;
         }
 
@@ -388,7 +388,7 @@ export default function SubscriptionsPage() {
         }
 
         .ios-button-danger:active {
-          background-color: rgba(0, 0, 0, 0.05);
+          background-color: var(--pressed);
         }
 
         .ios-button-danger:disabled {
@@ -412,14 +412,14 @@ export default function SubscriptionsPage() {
         }
 
         .ios-empty-text {
-          color: var(--ios-secondary-text);
+          color: var(--text-dim);
           font-size: 15px;
         }
 
         /* Footer Captions & Notes */
         .ios-footer-caption {
           font-size: 13px;
-          color: var(--ios-secondary-text);
+          color: var(--text-dim);
           padding: 0 16px;
           margin-top: 6px;
           margin-bottom: 16px;
@@ -431,7 +431,7 @@ export default function SubscriptionsPage() {
           justify-content: center;
           gap: 6px;
           font-size: 12px;
-          color: var(--ios-secondary-text);
+          color: var(--text-dim);
           margin-top: 32px;
           text-transform: uppercase;
           letter-spacing: -0.2px;

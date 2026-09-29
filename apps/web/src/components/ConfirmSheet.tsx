@@ -73,7 +73,7 @@ export default function ConfirmSheet({
           aria-label={title}
         >
           <motion.div
-            className="relative w-[430px] max-w-full rounded-[28px] border border-[color:var(--border-soft)] bg-black/15 backdrop-blur-[1px] px-5 pb-5 pt-[25px] text-center shadow-[0_30px_70px_rgba(0,0,0,0.55),inset_0_1px_0_rgba(255,255,255,0.04)]"
+            className="relative w-[430px] max-w-full rounded-[28px] border border-[color:var(--border-soft)] bg-[color:var(--glass-tint)] backdrop-blur-[1px] px-5 pb-5 pt-[25px] text-center shadow-[0_30px_70px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.06)]"
             initial={reduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.55, y: 24 }}
             animate={reduceMotion ? { opacity: 1 } : 'enter'}
             exit={reduceMotion ? { opacity: 0 } : 'exit'}

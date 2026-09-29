@@ -766,7 +766,7 @@ export default function ReminderNewPage() {
                     className="flex h-[84px] w-[76px] shrink-0 flex-col items-center justify-center rounded-[20px] border transition-all duration-200 active:scale-95 hover:border-[color:color-mix(in_srgb,var(--primary)_50%,transparent)] "
                   >
                   
-                    <span className="mt-0.5 text-[20px] font-bold text-[color:var(--secodary)] tabular-nums">
+                    <span className="mt-0.5 text-[20px] font-bold text-[color:var(--secondary)] tabular-nums">
                       {ampm}
                     </span>
                   </button>
@@ -913,7 +913,7 @@ export default function ReminderNewPage() {
             <section>
 
 
-              <div className="rounded-[20px] border border-white/10 bg-[color:color-mix(in_srgb,var(--surface)_60%,transparent)] p-1.5 backdrop-blur-xl">
+              <div className="rounded-[20px] border border-[color:var(--border)] bg-[color:color-mix(in_srgb,var(--surface)_60%,transparent)] p-1.5 backdrop-blur-xl">
                 <div className="grid grid-cols-3 gap-1">
                   {REPEAT_OPTIONS.map((opt) => {
                     const isSelected = repeatRule === opt.value;

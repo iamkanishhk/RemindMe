@@ -704,6 +704,7 @@ function ScheduleItem({ reminder }: { reminder: Reminder }) {
       <Link
         to={`/reminders/${reminder.id}`}
         className="min-w-0 flex-1"
+         style={{ textDecoration: 'none' }}
       >
         <div className="flex items-baseline gap-1.5">
          <span
@@ -779,6 +780,10 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
     >
 
       <div className="relative p-5">
+     <Link 
+  to={`/reminders/${reminder.id}`} 
+    style={{ textDecoration: 'none' }}
+>
            <h2
           className="
             mt-4
@@ -818,20 +823,7 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
             </span>
           </div>
 
-          <Link
-            to={`/reminders/${reminder.id}`}
-            className="
-              flex
-              h-12
-              w-12
-              shrink-0
-              items-center
-              justify-center
-              rounded-full
-              text-[color:var(--text)]
-              active:scale-90
-            "
-          >
+         
             <div className="mt-4">
           <span
             className={`
@@ -850,14 +842,14 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
             VIEW
           </span>
         </div>
-          </Link>
+          
         </div>
 
       
           <span className="text-[13px] font-medium text-[color:var(--primary)]">
             {relative}
           </span>
-
+        </Link>
       </div>
     </div>
   );
@@ -893,7 +885,18 @@ export default function DashboardPage() {
   useErrorToast(error);
 
   const email = me.data?.email ?? '';
-  const next = today[0];
+
+  // Hero highlights the most recently created of today's reminders
+  // (previously the earliest-scheduled one).
+  const next = useMemo(() => {
+    if (today.length === 0) return undefined;
+
+    return today.reduce((newest, r) =>
+      new Date(r.createdAt).getTime() > new Date(newest.createdAt).getTime()
+        ? r
+        : newest
+    );
+  }, [today]);
 
   const todayLabel = new Date().toLocaleDateString(
     'en-US',
@@ -946,6 +949,7 @@ export default function DashboardPage() {
                 text-[color:var(--primary)]
                 text-[35px]
               "
+               style={{ textDecoration: 'none' }}
             >
               +
             </Link>

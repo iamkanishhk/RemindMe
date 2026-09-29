@@ -37,7 +37,7 @@ function StarRating({ rating }: { rating: number }) {
       aria-label={`Rated ${clamped} out of 5`}
       className="relative inline-flex items-center gap-0.5"
     >
-      <span className="flex items-center gap-0.5 text-zinc-600">
+      <span className="flex items-center gap-0.5 text-[color:var(--text-faint)]">
         {[0, 1, 2, 3, 4].map((i) => (
           <svg key={i} viewBox="0 0 24 24" className="h-3.5 w-3.5 shrink-0" aria-hidden="true">
             <path d={STAR_PATH} fill="none" stroke="currentColor" strokeWidth={1.5} />
@@ -109,14 +109,14 @@ export default function PlansPage() {
   const trialDays = plans.find((p) => p.id === selected)?.trialDays ?? 0;
 
   return (
-    <div className="h-[85vh] bg-zinc-950 text-zinc-100 flex flex-col justify-between selection:bg-[color:var(--primary)] selection:text-white">
+    <div className="h-[85vh] bg-[color:var(--bg)] text-[color:var(--text)] flex flex-col justify-between selection:bg-[color:var(--primary)] selection:text-[color:var(--on-primary)]">
 
       <div className="flex-1 flex flex-col items-center justify-center px-4 max-w-md mx-auto w-full">
          <button
           type="button"
           onClick={goBack}
           aria-label="Go back"
-          className="h-10 fixed top-4 left-5 w-10 flex items-center justify-center rounded-full bg-zinc-900  text-zinc-400 hover:text-white active:scale-95 transition"
+          className="h-10 fixed top-4 left-5 w-10 flex items-center justify-center rounded-full bg-[color:var(--surface)]  text-[color:var(--text-dim)] hover:text-[color:var(--text)] active:scale-95 transition"
         >
           <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -125,7 +125,7 @@ export default function PlansPage() {
         {/* Top Avatar Illustration */}
         <div className="relative mb-6">
           <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-[color:var(--primary)] to-[color:var(--primary-strong)] opacity-30 blur-md" />
-          <div className="relative w-28 h-28 rounded-full border-2 border-[color:var(--primary)]/40 p-1 bg-zinc-900 shadow-xl overflow-hidden">
+          <div className="relative w-28 h-28 rounded-full border-2 border-[color:var(--primary)]/40 p-1 bg-[color:var(--surface)] shadow-xl overflow-hidden">
             {avatarUrl ? (
               <img
                 src={avatarUrl}
@@ -133,7 +133,7 @@ export default function PlansPage() {
                 className="w-full h-full object-cover rounded-full"
               />
             ) : (
-              <span className="flex w-full h-full items-center justify-center rounded-full bg-zinc-800 text-3xl font-semibold text-[color:var(--primary)]">
+              <span className="flex w-full h-full items-center justify-center rounded-full bg-[color:var(--surface-2)] text-3xl font-semibold text-[color:var(--primary)]">
                 {name.charAt(0).toUpperCase()}
               </span>
             )}
@@ -143,15 +143,15 @@ export default function PlansPage() {
        
 
         {/* Main Card Container */}
-        <div className="w-full bg-zinc-900/90  rounded-3xl p-6 ">
+        <div className="w-full bg-[color:var(--surface)]/90  rounded-3xl p-6 ">
           {plansQuery.isLoading ? (
             <div className="space-y-4" aria-busy="true">
-              <Skeleton className="h-[72px] w-full rounded-2xl bg-zinc-800" />
-              <Skeleton className="h-[72px] w-full rounded-2xl bg-zinc-800" />
+              <Skeleton className="h-[72px] w-full rounded-2xl bg-[color:var(--surface-2)]" />
+              <Skeleton className="h-[72px] w-full rounded-2xl bg-[color:var(--surface-2)]" />
             </div>
           ) : plansQuery.isError ? (
-            <div className="rounded-2xl border border-zinc-800 p-5 text-center">
-              <p className="text-sm text-zinc-400">
+            <div className="rounded-2xl border border-[color:var(--border)] p-5 text-center">
+              <p className="text-sm text-[color:var(--text-dim)]">
                 {plansQuery.error?.message ?? 'Could not load plans.'}
               </p>
               <button
@@ -175,7 +175,7 @@ export default function PlansPage() {
                     className={`flex items-center justify-between gap-3 p-4 rounded-2xl border transition-all duration-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[color:var(--primary)] ${
                       isSelected
                         ? 'border-[color:var(--primary)]/50'
-                        : 'border-zinc-800'
+                        : 'border-[color:var(--border)]'
                     }`}
                   >
                     <label className="flex-1 min-w-0 cursor-pointer">
@@ -190,23 +190,23 @@ export default function PlansPage() {
 
                       {/* Left Details */}
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-zinc-300 capitalize">
+                        <span className="text-sm font-medium text-[color:var(--text-muted)] capitalize">
                           {plan.id === 'annual' ? 'Annual Plan' : 'Monthly Plan'}
                         </span>
                         <StarRating rating={PLAN_RATINGS[plan.id]} />
                       </div>
 
                       <div className="mt-1 flex items-baseline gap-1">
-                        <span className="text-2xl font-bold tracking-tight text-white">
+                        <span className="text-2xl font-bold tracking-tight text-[color:var(--text)]">
                           {formatMoney(plan.amountMinorUnits, plan.currency)}
                         </span>
-                        <span className="text-xs text-zinc-400 font-normal">
+                        <span className="text-xs text-[color:var(--text-dim)] font-normal">
                           /{intervalLabel(plan)}
                         </span>
                       </div>
 
                       {plan.monthlyEquivalentMinorUnits != null && plan.monthlyEquivalentMinorUnits !== plan.amountMinorUnits ? (
-                        <span className="block text-md text-zinc-300 mt-0.5">
+                        <span className="block text-md text-[color:var(--text-muted)] mt-0.5">
                           {formatMoney(plan.monthlyEquivalentMinorUnits, plan.currency)} /month
                         </span>
                       ) : null}
@@ -228,13 +228,13 @@ export default function PlansPage() {
           )}
 
           {/* Feature List (from design image) */}
-          <div className="mt-6 pt-5 border-t border-zinc-800/80 space-y-3">
+          <div className="mt-6 pt-5 border-t border-[color:var(--border-soft)] space-y-3">
             {[
               '120 Reminders per month (4/day)',
               '24/7 Extended Support',
             ].map((feature, idx) => (
-              <div key={idx} className="flex items-center gap-3 text-md text-zinc-300">
-                <div className="flex items-center justify-center w-4 h-4 rounded-full bg-zinc-100 text-zinc-900 shrink-0">
+              <div key={idx} className="flex items-center gap-3 text-md text-[color:var(--text-muted)]">
+                <div className="flex items-center justify-center w-4 h-4 rounded-full bg-[color:var(--text)] text-[color:var(--bg)] shrink-0">
                   <svg className="w-2.5 h-2.5 stroke-[3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
@@ -246,7 +246,7 @@ export default function PlansPage() {
         </div>
 
         {trialDays > 0 ? (
-          <p className="pt-4 text-center text-xs text-zinc-400">
+          <p className="pt-4 text-center text-xs text-[color:var(--text-dim)]">
             {trialDays} days free, then billing starts. Cancel anytime.
           </p>
         ) : null}
@@ -258,7 +258,7 @@ export default function PlansPage() {
           type="button"
           onClick={() => void onContinue()}
           disabled={checkout.isPending || plansQuery.isLoading || plansQuery.isError}
-          className="w-full py-3.5 rounded-2xl bg-[color:var(--primary)] hover:bg-[color:var(--primary-strong)] text-white font-semibold text-sm active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 transition shadow-lg shadow-[color:var(--primary)]/20 flex items-center justify-center gap-2"
+          className="w-full py-3.5 rounded-2xl bg-[color:var(--primary)] hover:bg-[color:var(--primary-strong)] text-[color:var(--on-primary)] font-semibold text-sm active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 transition shadow-lg shadow-[color:var(--primary)]/20 flex items-center justify-center gap-2"
         >
           {checkout.isPending ? <Spinner /> : <span>Start my free trial</span>}
         </button>

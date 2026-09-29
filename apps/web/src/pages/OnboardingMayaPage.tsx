@@ -113,7 +113,7 @@ export default function OnboardingMayaPage() {
   }
 
   return (
-    <div className="h-screen w-screen overflow-hidden flex flex-col justify-between items-center px-6 pt-[calc(1.25rem+env(safe-area-inset-top))] pb-[calc(1.25rem+env(safe-area-inset-bottom))] select-none touch-manipulation bg-black text-white">
+    <div className="h-screen w-screen overflow-hidden flex flex-col justify-between items-center px-6 pt-[calc(1.25rem+env(safe-area-inset-top))] pb-[calc(1.25rem+env(safe-area-inset-bottom))] select-none touch-manipulation bg-[color:var(--bg)] text-[color:var(--text)]">
       {/* Main Container - Balanced vertical center layout */}
       <main className="flex-1 w-full max-w-sm flex flex-col items-center justify-center min-h-0 gap-5 text-center">
         
@@ -130,26 +130,26 @@ export default function OnboardingMayaPage() {
         {/* Text Area - Defined visual hierarchy & reserved layout height to eliminate shifts */}
         <div className="flex flex-col items-center space-y-2.5 px-2 w-full">
           {/* Headline - Primary Accent */}
-          <h1 className="text-3xl font-extrabold tracking-tight leading-tight text-white">
+          <h1 className="text-3xl font-extrabold tracking-tight leading-tight text-[color:var(--text)]">
             {name ? `Hi, ${name}!` : 'Hi there!'}
           </h1>
 
           {/* Typing Subtitle Container - Height reserved so layout never jumps */}
           <div className="min-h-[3.75rem] flex items-center justify-center w-full">
             {hasPlayedSound ? (
-              <p className="text-lg font-medium leading-snug text-slate-200 max-w-xs animate-fade-in">
+              <p className="text-lg font-medium leading-snug text-[color:var(--text-muted)] max-w-xs animate-fade-in">
                 {typedText}
                 {isTyping && <span className="animate-pulse ml-0.5 text-indigo-400 font-bold">|</span>}
               </p>
             ) : (
-              <p className="text-sm font-medium text-slate-400 tracking-wide uppercase opacity-80">
+              <p className="text-sm font-medium text-[color:var(--text-dim)] tracking-wide uppercase opacity-80">
                 Tap below to hear your intro
               </p>
             )}
           </div>
 
           {/* Secondary Subtext */}
-          <p className="text-sm text-slate-400 font-normal leading-normal max-w-[270px]">
+          <p className="text-sm text-[color:var(--text-dim)] font-normal leading-normal max-w-[270px]">
             Just set my schedule and I&rsquo;ll handle the rest.
           </p>
         </div>

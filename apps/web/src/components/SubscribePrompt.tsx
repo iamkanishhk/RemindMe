@@ -20,20 +20,20 @@ export function SubscribePrompt({ expanded }: SubscribePromptProps) {
   if (billing.isLoading || plans.isLoading) {
     return (
       <div
-        className="px-5 pb-5 pt-4 text-white font-sans"
+        className="px-5 pb-5 pt-4 text-[color:var(--text)] font-sans"
         aria-busy="true"
       >
-        <Skeleton className="mx-auto h-[5px] w-9 rounded-full bg-zinc-800" />
-        <Skeleton className="mt-4 w-full h-44 rounded-2xl bg-zinc-900" />
+        <Skeleton className="mx-auto h-[5px] w-9 rounded-full bg-[color:var(--surface-2)]" />
+        <Skeleton className="mt-4 w-full h-44 rounded-2xl bg-[color:var(--surface)]" />
         <div className="mt-5 flex flex-col space-y-3">
-          <Skeleton className="h-6 w-3/4 rounded-md bg-zinc-900" />
-          <Skeleton className="h-4 w-5/6 rounded-md bg-zinc-900" />
+          <Skeleton className="h-6 w-3/4 rounded-md bg-[color:var(--surface)]" />
+          <Skeleton className="h-4 w-5/6 rounded-md bg-[color:var(--surface)]" />
         </div>
         <div className="mt-6 space-y-4">
-          <Skeleton className="h-12 w-full rounded-xl bg-zinc-900" />
-          <Skeleton className="h-12 w-full rounded-xl bg-zinc-900" />
+          <Skeleton className="h-12 w-full rounded-xl bg-[color:var(--surface)]" />
+          <Skeleton className="h-12 w-full rounded-xl bg-[color:var(--surface)]" />
         </div>
-        <Skeleton className="mt-6 h-14 w-full rounded-2xl bg-zinc-900" />
+        <Skeleton className="mt-6 h-14 w-full rounded-2xl bg-[color:var(--surface)]" />
       </div>
     );
   }
@@ -65,27 +65,27 @@ export function SubscribePrompt({ expanded }: SubscribePromptProps) {
     <button
       type="button"
       onClick={() => navigate('/plans')}
-      className="w-full py-4 px-4 bg-gradient-to-r from-[#D95F59] to-[#ff4a40] active:scale-[0.98] text-white font-semibold rounded-2xl text-base transition-all duration-150 flex items-center justify-center space-x-2"
+      className="w-full py-4 px-4 bg-[image:var(--gradient-primary)] active:scale-[0.98] text-[color:var(--on-primary)] font-semibold rounded-2xl text-base transition-all duration-150 flex items-center justify-center space-x-2"
     >
       <span>Start my free trial now</span>
     </button>
   );
 
   return (
-    <div className="text-white font-sans ">
+    <div className="text-[color:var(--text)] font-sans ">
       {/* Head — always visible so the collapsed sheet still sells the offer */}
       <div className="px-5">
-        <h2 className="text-xl font-bold tracking-tight text-white">
+        <h2 className="text-xl font-bold tracking-tight text-[color:var(--text)]">
           Start your free trial 
         </h2>
 
-        <div className="mt-1 text-sm text-zinc-300">
+        <div className="mt-1 text-sm text-[color:var(--text-muted)]">
           Pro Access for{' '}
-          <span className="font-bold text-white">
+          <span className="font-bold text-[color:var(--text)]">
             {perMonth ? `${perMonth} per month` : 'every month'}
           </span>
           {chargeAmount && chargeInterval ? (
-            <span className="text-zinc-400">
+            <span className="text-[color:var(--text-dim)]">
               {' '}
               (billed {chargeInterval}ly)
             </span>
@@ -93,7 +93,7 @@ export function SubscribePrompt({ expanded }: SubscribePromptProps) {
         </div>
 
         {trialExhausted && (
-          <p className="inline-block text-xs font-medium text-amber-400 bg-amber-950/60 border border-amber-800/50 px-3 py-1 rounded-full mt-3">
+          <p className="inline-block text-xs font-medium text-[color:var(--warning)] bg-[color:var(--warning-soft)] border border-[color:var(--warning-soft)] px-3 py-1 rounded-full mt-3">
             You&apos;ve used all {trial?.callLimit} trial calls.
           </p>
         )}
@@ -115,18 +115,18 @@ export function SubscribePrompt({ expanded }: SubscribePromptProps) {
         aria-hidden={!expanded}
       >
 
-        <div className="relative mt-4 w-full h-35 overflow-hidden bg-gradient-to-b from-[#D95F59]/20 via-zinc-900/40 to-black flex items-center justify-center">
+        <div className="relative mt-4 w-full h-35 overflow-hidden bg-[image:linear-gradient(to_bottom,color-mix(in_srgb,var(--primary)_22%,transparent),color-mix(in_srgb,var(--surface)_55%,transparent),var(--surface))] flex items-center justify-center">
           <img
             src={happyIllustration}
             alt=""
             className="w-80 h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-[image:linear-gradient(to_top,var(--scrim),transparent,transparent)] pointer-events-none" />
         </div>
 
-        <div className="relative pl-4 space-y-6 mt-6 mx-5 before:absolute before:left-[27px] before:top-3 before:bottom-3 before:w-[2px] before:bg-zinc-800">
+        <div className="relative pl-4 space-y-6 mt-6 mx-5 before:absolute before:left-[27px] before:top-3 before:bottom-3 before:w-[2px] before:bg-[color:var(--surface-2)]">
           <div className="relative flex items-start space-x-4">
-            <div className="relative z-10 flex-shrink-0 w-10 h-10 rounded-full border border-[#D95F59] flex items-center justify-center text-[#D95F59] ">
+            <div className="relative z-10 flex-shrink-0 w-10 h-10 rounded-full border border-[color:var(--primary)] flex items-center justify-center text-[color:var(--primary)] ">
               <svg
   className="w-5 h-5"
   fill="none"
@@ -144,10 +144,10 @@ export function SubscribePrompt({ expanded }: SubscribePromptProps) {
 
             </div>
             <div>
-              <h4 className="text-md font-semibold text-white">
+              <h4 className="text-md font-semibold text-[color:var(--text)]">
                 Today
               </h4>
-              <p className="text-sm text-zinc-400 mt-0.5 leading-normal">
+              <p className="text-sm text-[color:var(--text-dim)] mt-0.5 leading-normal">
                 (Free) Unlock full access to Call Reminders and 
                 keep them active.
               </p>
@@ -155,7 +155,7 @@ export function SubscribePrompt({ expanded }: SubscribePromptProps) {
           </div>
 
           <div className="relative flex items-start space-x-4">
-            <div className="relative z-10 flex-shrink-0 w-10 h-10 rounded-full bg-zinc-900 border border-zinc-700/60 flex items-center justify-center text-zinc-300">
+            <div className="relative z-10 flex-shrink-0 w-10 h-10 rounded-full bg-[color:var(--surface)] border border-[color:var(--border)] flex items-center justify-center text-[color:var(--text-muted)]">
               <svg
                 className="w-5 h-5"
                 fill="none"
@@ -173,7 +173,7 @@ export function SubscribePrompt({ expanded }: SubscribePromptProps) {
             </div>
             <div>
             
-              <p className="text-md text-zinc-400 mt-0.5 leading-normal">
+              <p className="text-md text-[color:var(--text-dim)] mt-0.5 leading-normal">
                 We&apos;ll send you a reminder that your <br/>
                  free trail ending soon
               </p>
@@ -181,7 +181,7 @@ export function SubscribePrompt({ expanded }: SubscribePromptProps) {
           </div>
 
           <div className="relative flex items-start space-x-4">
-            <div className="relative z-10 flex-shrink-0 w-10 h-10 rounded-full bg-zinc-900 border border-zinc-700/60 flex items-center justify-center text-zinc-300">
+            <div className="relative z-10 flex-shrink-0 w-10 h-10 rounded-full bg-[color:var(--surface)] border border-[color:var(--border)] flex items-center justify-center text-[color:var(--text-muted)]">
               <svg
                 className="w-5 h-5"
                 fill="none"
@@ -199,11 +199,11 @@ export function SubscribePrompt({ expanded }: SubscribePromptProps) {
             </div>
             <div>
               {trialDays > 0 ? (
-                <h4 className="text-md font-semibold text-white">
+                <h4 className="text-md font-semibold text-[color:var(--text)]">
                   Day {trialDays}
                 </h4>
               ) : null}
-              <p className="text-sm text-zinc-400 mt-0.5 leading-normal">
+              <p className="text-sm text-[color:var(--text-dim)] mt-0.5 leading-normal">
                 {chargeAmount && chargeInterval
                   ? `Your first charge per ${chargeInterval} begins on `
                   : 'Your first charge begins on '}
@@ -221,7 +221,7 @@ export function SubscribePrompt({ expanded }: SubscribePromptProps) {
 
       <div className="px-5 pt-5 pb-1">{cta}</div>
 
-      <p className="px-5 pt-3 pb-1 text-center text-sm text-zinc-500 font-medium">
+      <p className="px-5 pt-3 pb-1 text-center text-sm text-[color:var(--text-faint)] font-medium">
         Start in 2 Taps. Cancel anytime.
       </p>
     </div>
