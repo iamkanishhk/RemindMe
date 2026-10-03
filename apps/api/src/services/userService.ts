@@ -3,34 +3,48 @@ import { logger } from '../lib/logger';
 import { clerkClient } from '@clerk/express';
 
 const fetchedFromClerk = new Set<string>();
+// Guard so a user with no first name on record isn't re-queried in Clerk on
+// every single authenticated request.
+const nameBackfillTried = new Set<string>();
 
-async function fetchClerkEmail(clerkUserId: string): Promise<string | null> {
+async function fetchClerkProfile(clerkUserId: string): Promise<{ email: string | null; firstName: string | null }> {
   try {
     const user = await clerkClient.users.getUser(clerkUserId);
     const primary =
       user.emailAddresses.find((e) => e.id === user.primaryEmailAddressId) ?? user.emailAddresses[0];
-    return primary?.emailAddress ?? null;
+    const firstName = user.firstName || user.fullName?.split(' ')[0] || null;
+    return { email: primary?.emailAddress ?? null, firstName };
   } catch (err) {
     logger.warn({ err: err instanceof Error ? err.message : String(err), clerkUserId }, 'clerk user fetch failed');
-    return null;
+    return { email: null, firstName: null };
   }
 }
 
 export async function ensureUserByClerkId(clerkUserId: string) {
   const existing = await prisma.user.findUnique({ where: { clerkUserId } });
-  if (existing) return existing;
+  if (existing) {
+    // Lazy backfill of the first name once, from Clerk registration.
+    if (!existing.firstName && !nameBackfillTried.has(clerkUserId)) {
+      nameBackfillTried.add(clerkUserId);
+      const profile = await fetchClerkProfile(clerkUserId);
+      if (profile.firstName) {
+        return prisma.user.update({ where: { id: existing.id }, data: { firstName: profile.firstName } });
+      }
+    }
+    return existing;
+  }
 
-  let email: string | null = null;
+  let profile: { email: string | null; firstName: string | null } = { email: null, firstName: null };
   if (!fetchedFromClerk.has(clerkUserId)) {
     fetchedFromClerk.add(clerkUserId);
-    email = await fetchClerkEmail(clerkUserId);
+    profile = await fetchClerkProfile(clerkUserId);
   }
-  const resolvedEmail = email ?? `${clerkUserId}@clerk.local`;
+  const resolvedEmail = profile.email ?? `${clerkUserId}@clerk.local`;
 
   try {
     return await prisma.user.upsert({
       where: { clerkUserId },
-      create: { clerkUserId, email: resolvedEmail },
+      create: { clerkUserId, email: resolvedEmail, firstName: profile.firstName },
       update: { email: resolvedEmail }
     });
   } catch {
@@ -38,7 +52,7 @@ export async function ensureUserByClerkId(clerkUserId: string) {
     try {
       return await prisma.user.upsert({
         where: { clerkUserId },
-        create: { clerkUserId, email: `${clerkUserId}@clerk.local` },
+        create: { clerkUserId, email: `${clerkUserId}@clerk.local`, firstName: profile.firstName },
         update: {}
       });
     } catch (err2) {

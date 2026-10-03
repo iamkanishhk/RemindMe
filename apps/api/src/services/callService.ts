@@ -11,6 +11,7 @@ import type { TelephonyEvent } from '../telephony/types';
 import { nextOccurrence } from '../lib/schedule';
 import { enqueueReminder } from './schedulerService';
 import { isEntitled, recordTrialCall } from './billingService';
+import { composeSpokenText } from './spokenText';
 
 const TERMINAL: ReminderStatus[] = ['COMPLETED', 'NO_ANSWER', 'BUSY', 'FAILED', 'CANCELED'];
 
@@ -152,9 +153,14 @@ export async function handleTelnyxEvent(evt: TelephonyEvent): Promise<void> {
     case 'call.answered': {
       await attemptRepo.setAttemptStatus(attempt.id, 'ANSWERED');
       await prisma.reminder.update({ where: { id: attempt.reminderId }, data: { status: 'ANSWERED' } });
-      const reminder = await prisma.reminder.findUnique({ where: { id: attempt.reminderId } });
+      const reminder = await prisma.reminder.findUnique({
+        where: { id: attempt.reminderId },
+        include: { user: { select: { firstName: true } } }
+      });
       if (reminder) {
-        fireAndForget(() => telnyxProvider.speak(callControlId, reminder.voiceMessage ?? reminder.message));
+        const spoken = composeSpokenText({ firstName: reminder.user?.firstName, voiceMessage: reminder.voiceMessage, message: reminder.message });
+        logger.debug({ reminderId: reminder.id }, `speaking: ${spoken}`);
+        fireAndForget(() => telnyxProvider.speak(callControlId, spoken));
       }
       break;
     }

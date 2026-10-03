@@ -37,6 +37,9 @@ model User {
   id            String         @id @default(cuid())
   clerkUserId   String         @unique
   email         String         @unique
+  // First name from Clerk registration; used to personalize the spoken
+  // greeting ("Hello Kanishk, ..."). Lazily backfilled from Clerk.
+  firstName     String?
   phoneNumbers  PhoneNumber[]
   reminders     Reminder[]
   subscriptions Subscription[]

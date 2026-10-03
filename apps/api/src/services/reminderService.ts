@@ -7,6 +7,7 @@ import { computeNextRun } from '../lib/schedule';
 import { enqueueReminder, cancelJob } from './schedulerService';
 import { assertEntitled, assertReminderCreateAllowed } from './billingService';
 import { enhanceReminderMessage } from './messageEnhancer';
+import { logger } from '../lib/logger';
 
 export interface ReminderInput {
   title: string;
@@ -58,6 +59,16 @@ export async function createReminder(userId: string, input: ReminderInput) {
     phoneNumberId: phone.id,
     isFreeCall
   });
+
+  logger.info(
+    {
+      reminderId: reminder.id,
+      original: input.message,
+      enhanced: reminder.voiceMessage,
+      fallback: reminder.voiceMessage === null
+    },
+    'reminder created (AI-enhanced voice message)'
+  );
 
   await enqueueReminder({ id: reminder.id, nextRunAt: reminder.nextRunAt, isEnabled: reminder.isEnabled, status: reminder.status });
   return reminder;

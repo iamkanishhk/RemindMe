@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type {
   FormEvent,
-  PointerEvent as ReactPointerEvent,
-  WheelEvent as ReactWheelEvent
+  PointerEvent as ReactPointerEvent
 } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
@@ -341,12 +340,34 @@ function ScrubBox({
 }) {
   const [dragging, setDragging] = useState(false);
 
+  const boxRef = useRef<HTMLDivElement | null>(null);
+
   const drag = useRef<{
     startY: number;
     base: number;
   } | null>(null);
 
   const apply = (v: number) => onChange(normalize(v));
+
+  // React attaches wheel/touch listeners passively on the root, so a synthetic
+  // onWheel's preventDefault() is ignored (and logs a console warning). Attach a
+  // native listener with { passive: false } so the scrub box can swallow page
+  // scrolling while dragging with the mouse wheel.
+  const currentRef = useRef(current);
+  currentRef.current = current;
+  const applyRef = useRef(apply);
+  applyRef.current = apply;
+
+  useEffect(() => {
+    const el = boxRef.current;
+    if (!el) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      applyRef.current(currentRef.current + (e.deltaY < 0 ? 1 : -1));
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
 
   function onPointerDown(e: ReactPointerEvent<HTMLDivElement>) {
     if (!e.isPrimary) return;
@@ -379,17 +400,13 @@ function ScrubBox({
     setDragging(false);
   }
 
-  function onWheel(e: ReactWheelEvent<HTMLDivElement>) {
-    e.preventDefault();
-    apply(current + (e.deltaY < 0 ? 1 : -1));
-  }
-
   function stopPropagation(e: ReactPointerEvent<HTMLButtonElement>) {
     e.stopPropagation();
   }
 
   return (
     <div
+      ref={boxRef}
       role="group"
       tabIndex={0}
       aria-label={`${label} ${format(current)}`}
@@ -408,7 +425,6 @@ function ScrubBox({
       onPointerMove={onPointerMove}
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
-      onWheel={onWheel}
       className={`
         relative
         flex

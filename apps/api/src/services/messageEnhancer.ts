@@ -2,7 +2,10 @@ import { env, geminiApiKeys } from '../config';
 import { logger } from '../lib/logger';
 
 const API_HOST = 'https://generativelanguage.googleapis.com/v1beta';
-const TIMEOUT_MS = 4000;
+// Generous but bounded: generation can take > the old 4s on a preview model or
+// a slow link. If Gemini is genuinely down the create path still falls back to
+// the original message after this window.
+const TIMEOUT_MS = 20000;
 const MAX_TOKENS = 60;
 
 // A process-local cursor that round-robins across the configured keys so load
@@ -53,7 +56,10 @@ async function callGemini(apiKey: string, message: string): Promise<string | nul
       })
     });
     if (!res.ok) {
-      const err = new Error(`gemini HTTP ${res.status}`);
+      // Capture Gemini's error payload (e.g. invalid/missing key, quota). The
+      // body is truncated and never contains the API key.
+      const detail = (await res.text().catch(() => '')) || undefined;
+      const err = new Error(`gemini HTTP ${res.status}${detail ? `: ${detail.slice(0, 300)}` : ''}`);
       (err as Error & { status: number }).status = res.status;
       throw err;
     }
@@ -93,7 +99,8 @@ export async function enhanceReminderMessage(message: string): Promise<string | 
       return null;
     } catch (err) {
       const status = err instanceof Error ? (err as Error & { status?: number }).status : undefined;
-      logger.warn({ geminiStatus: status, attempt: attempt + 1 }, 'gemini request failed; trying next key');
+      const detail = err instanceof Error ? err.message : String(err);
+      logger.warn({ geminiStatus: status, err: detail, attempt: attempt + 1 }, 'gemini request failed; trying next key');
     }
   }
   rotationCursor = cursor;
