@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDeleteReminder, useReminder, useUpdateReminder } from '../hooks/queries';
 import { formatDateTimeLocal } from '../lib/format';
@@ -7,6 +7,7 @@ import ErrorPage from '../components/ErrorPage';
 import { useErrorToast } from '../components/Toast';
 import ConfirmSheet from '../components/ConfirmSheet';
 import LiquidGlass from 'liquid-glass-react';
+import SoftAurora from '../components/SoftAurora';
 
 export default function ReminderDetailPage() {
   const { id = '' } = useParams();
@@ -18,6 +19,16 @@ export default function ReminderDetailPage() {
   const [busy, setBusy] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [error, setError] = useState('');
+
+  // Local optimistic state for instant toggle response
+  const [localEnabled, setLocalEnabled] = useState<boolean | null>(null);
+
+  // Sync local state when reminder data loads or changes
+  useEffect(() => {
+    if (reminder.data) {
+      setLocalEnabled(reminder.data.isEnabled);
+    }
+  }, [reminder.data]);
 
   useErrorToast(error);
 
@@ -72,17 +83,20 @@ export default function ReminderDetailPage() {
   }
 
   const r = reminder.data;
+  const isEnabled = localEnabled ?? r.isEnabled;
 
   async function toggle() {
-    setBusy(true);
+    const nextState = !isEnabled;
+    // Instant UI feedback via local state
+    setLocalEnabled(nextState);
     setError('');
 
     try {
-      await update.mutateAsync({ isEnabled: !r.isEnabled });
+      await update.mutateAsync({ isEnabled: nextState });
     } catch (e) {
+      // Revert back on error
+      setLocalEnabled(r.isEnabled);
       setError(e instanceof Error ? e.message : 'Could not update reminder');
-    } finally {
-      setBusy(false);
     }
   }
 
@@ -102,7 +116,15 @@ export default function ReminderDetailPage() {
 
   return (
     <section className="ios-page">
-      {/* Liquid Glass Floating Buttons (Unchanged) */}
+      <SoftAurora
+        colorStops={["#AE897F","#B26B56","#B35443"]}
+        blend={0.5}
+        amplitude={1}
+        speed={1}
+        className="fixed inset-0 w-full h-full opacity-20"
+      />
+      
+      {/* Liquid Glass Floating Buttons */}
       <LiquidGlass
         displacementScale={64}
         saturation={130}
@@ -122,17 +144,18 @@ export default function ReminderDetailPage() {
       >
         <div className="flex items-center gap-5 justify-center">
           <button
-            disabled={busy}
             onClick={() => void toggle()}
-            className="w-10 text-[color:var(--text)] font-medium active:opacity-60 transition-opacity"
+            className="w-10 text-[color:var(--text)] font-medium active:opacity-60 transition-opacity cursor-pointer"
+            aria-label={isEnabled ? 'Pause reminder' : 'Play reminder'}
           >
-            {r.isEnabled ? '| |' : '▶'}
+            {isEnabled ? '| |' : '▶'}
           </button>
 
           <button
             type="button"
-            className="w-10 active:opacity-60 transition-opacity"
+            className="w-10 active:opacity-60 transition-opacity cursor-pointer"
             onClick={() => setConfirmingDelete(true)}
+            aria-label="Delete reminder"
           >
             <svg
               width="35"
@@ -201,20 +224,21 @@ export default function ReminderDetailPage() {
 
       {/* Main Mobile Screen Layout */}
       <div className="ios-container">
-         <div className="flex justify-center items-center mt-5 mb-5">
-           <img
-                  src="./../assets/done.png"
-                  width="200"
-                  height="20vh"
-                  className="opacity-70"
-                  alt="Call icon"
-                />
-         </div>
+        <div className="flex justify-center items-center mt-5 mb-5">
+          <img
+            src="./../assets/done.png"
+            width="200"
+            height="20vh"
+            className="opacity-70"
+            alt="Call icon"
+          />
+        </div>
+        
         {/* Header Hero Section */}
         <header className="ios-hero-header">
           <div className="ios-status-badge">
-            <span className={`ios-status-dot ${r.isEnabled ? 'active' : 'paused'}`} />
-            <span className="ios-status-text">{r.isEnabled ? 'Active' : 'Paused'}</span>
+            <span className={`ios-status-dot ${isEnabled ? 'active' : 'paused'}`} />
+            <span className="ios-status-text">{isEnabled ? 'Active' : 'Paused'}</span>
           </div>
 
           <h1 className="ios-title">

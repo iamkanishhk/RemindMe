@@ -13,6 +13,7 @@ import {
   useTransform,
 } from 'framer-motion';
 import scheduleImage from '../../public/assets/schedule.png';
+import SoftAurora from '../components/SoftAurora'; 
 
 function sortKey(r: Reminder): number {
   return r.nextRunAt ? new Date(r.nextRunAt).getTime() : Number.MAX_SAFE_INTEGER;
@@ -125,137 +126,57 @@ function PauseIcon() {
 /* -------------------------------------------------------------------------- */
 /* iOS-style Switch                                                           */
 /* -------------------------------------------------------------------------- */
- const IOS_SWITCH_CONFIG = {
-  // ─────────────────────────────────────────────
-  // GEOMETRY
-  // ─────────────────────────────────────────────
+const IOS_SWITCH_CONFIG = {
   geometry: {
     trackWidth: 65,
     trackHeight: 30,
     trackPadding: 3,
-
     knobWidth: 36,
     knobHeight: 25,
-
-    // 9999 = pill / circle
     knobRadius: 9999,
   },
-
-  // ─────────────────────────────────────────────
-  // SPRING PHYSICS
-  // ─────────────────────────────────────────────
   physics: {
-    stiffness: 420,
-    damping: 28,
-    mass: 0.8,
-
-    // How long we consider the switch to be
-    // in its "liquid motion" state.
-    animationDuration: 450,
-
-    // Minimum velocity before liquid mode activates.
+    stiffness: 550, // Increased for a snappier response
+    damping: 25,    // Tuned for zero lag
+    mass: 0.5,      // Lighter mass for instantaneous feel
+    animationDuration: 300,
     velocityThreshold: 2,
-
-    // Velocity used as the reference for
-    // calculating stretch.
     velocityReference: 450,
   },
-
-  // ─────────────────────────────────────────────
-  // LIQUID / GLASS
-  // ─────────────────────────────────────────────
   glass: {
-    // Size multiplier while moving
     scale: 1.27,
-
-    // Extra width/height of glass layer
     thickness: 2,
-
-    // Overall transparency
     transmission: 0.92,
-
-    // Backdrop blur
     blur: 4,
-
-    // Glass saturation
     saturation: 150,
-
-    // Contrast
     contrast: 505,
-
-    // Border opacity
     borderOpacity: 0.75,
-
-    // Shadow strength
     shadowOpacity: 2.30,
-
-    // How much the glass reacts to velocity
     velocityDisplacement: 8,
-
-    // Base displacement
     displacement: 12,
   },
-
-  // ─────────────────────────────────────────────
-  // LIQUID STRETCH
-  // ─────────────────────────────────────────────
   stretch: {
-    // Base horizontal stretch multiplier
     factorX: 1.45,
-
-    // Base vertical compression
     factorY: 0.16,
-
-    // Minimum vertical scale
     minY: 0.72,
-
-    // Maximum normalized velocity
     maxVelocity: 2.5,
-
-    // Optional anisotropic multiplier
     anisotropy: 1.0,
   },
-
-  // ─────────────────────────────────────────────
-  // CHROMATIC ABERRATION
-  // ─────────────────────────────────────────────
   chromatic: {
-    // Minimum RGB separation
     base: 1,
-
-    // Additional separation based on velocity
     velocityAmount: 4,
-
-    // CSS overlay opacity
     overlayOpacity: 0.75,
-
-    // Red channel
     red: 'rgba(255, 0, 90, 0.28)',
-
-    // Cyan / blue channel
     blue: 'rgba(0, 240, 255, 0.28)',
   },
-
-  // ─────────────────────────────────────────────
-  // SOLID KNOB
-  // ─────────────────────────────────────────────
   knob: {
     restingScale: 1,
-
     movingScale: 0.88,
-
-    fadeDuration: 0.14,
-
+    fadeDuration: 0.1,
     background: 'var(--on-primary)',
-
   },
-
-  // ─────────────────────────────────────────────
-  // SPECULAR / LIGHTING
-  // ─────────────────────────────────────────────
   lighting: {
     specularOpacity: 0.0,
-
     specularGradient: `
       linear-gradient(
         135deg,
@@ -264,9 +185,7 @@ function PauseIcon() {
         transparent 68%
       )
     `,
-
     causticOpacity: 0.45,
-
     causticGradient: `
       radial-gradient(
         circle at 50% 85%,
@@ -275,19 +194,12 @@ function PauseIcon() {
       )
     `,
   },
-
-  // ─────────────────────────────────────────────
-  // COLORS
-  // ─────────────────────────────────────────────
   colors: {
     on: 'var(--success)',
     off: 'var(--surface-3)',
-
     onGlow: 'color-mix(in srgb, var(--success) 45%, transparent)',
     offGlow: 'rgba(255, 255, 255, 0.18)',
-
     onAmbientOpacity: 0.35,
-
     onAmbientGradient: `
       radial-gradient(
         circle at 82% 50%,
@@ -296,41 +208,24 @@ function PauseIcon() {
       )
     `,
   },
-
-  // ─────────────────────────────────────────────
-  // ANIMATION
-  // ─────────────────────────────────────────────
   animation: {
-    liquidFadeDuration: 0.1,
-
+    liquidFadeDuration: 0.08,
     liquidEase: [0.16, 1, 0.3, 1],
-
-    ambientDuration: 0.25,
-
-    // whileTap scale
+    ambientDuration: 0.15,
     tapScale: 0.92,
   },
-
-  // ─────────────────────────────────────────────
-  // LIQUID GLASS COMPONENT
-  // ─────────────────────────────────────────────
   liquidGlass: {
     displacementScale: 12,
     saturation: 150,
     aberrationIntensity: 3,
     blurAmount: 0.08,
   },
-
-  // ─────────────────────────────────────────────
-  // TRACK SHADOWS
-  // ─────────────────────────────────────────────
   shadows: {
     on: `
       inset 0 2px 4px rgba(0,0,0,0.20),
       inset 0 -1px 1px rgba(255,255,255,0.20),
       0 2px 6px rgba(0,0,0,0.25)
     `,
-
     off: `
       inset 0 2px 5px rgba(0,0,0,0.45),
       inset 0 -1px 1px rgba(255,255,255,0.08),
@@ -362,7 +257,6 @@ export function IOSSwitch({
     lighting,
     colors,
     animation,
-    liquidGlass,
     shadows,
   } = config;
 
@@ -427,10 +321,6 @@ export function IOSSwitch({
       )
     : 1;
 
-  const aberrationIntensity =
-    chromatic.base +
-    normalizedVelocity * chromatic.velocityAmount;
-
   return (
     <button
       type="button"
@@ -444,7 +334,7 @@ export function IOSSwitch({
         shrink-0
         rounded-full
         transition-colors
-        duration-300
+        duration-150
         ease-out
         focus:outline-none
         focus-visible:ring-2
@@ -504,9 +394,7 @@ export function IOSSwitch({
           height: geometry.knobHeight,
         }}
       >
-        {/* ==========================================
-            SOLID RESTING KNOB
-            ========================================== */}
+        {/* SOLID RESTING KNOB */}
         <motion.div
           className="absolute inset-0 flex items-center justify-center bg-[color:var(--on-primary)]"
           animate={{
@@ -521,14 +409,10 @@ export function IOSSwitch({
           }}
           style={{
             borderRadius: geometry.knobRadius,
-
           }}
-        >
-        </motion.div>
+        />
 
-        {/* ==========================================
-            LIQUID GLASS
-            ========================================== */}
+        {/* LIQUID GLASS */}
         <motion.div
           className="absolute pointer-events-none z-20"
           animate={{
@@ -603,7 +487,6 @@ export function IOSSwitch({
             `,
           }}
         >
-
           {/* RGB dispersion */}
           <motion.div
             className="absolute inset-0 overflow-hidden rounded-full pointer-events-none"
@@ -658,7 +541,6 @@ export function IOSSwitch({
   );
 }
 
-
 /* -------------------------------------------------------------------------- */
 /* Schedule Item                                                              */
 /* -------------------------------------------------------------------------- */
@@ -666,17 +548,30 @@ export function IOSSwitch({
 function ScheduleItem({ reminder }: { reminder: Reminder }) {
   const update = useUpdateReminder(reminder.id);
   const [busy, setBusy] = useState(false);
+  
+  // Optimistic local state to make the switch feel instantaneous
+  const [localEnabled, setLocalEnabled] = useState(reminder.isEnabled);
+
+  // Keep local state in sync if parent props change
+  useEffect(() => {
+    setLocalEnabled(reminder.isEnabled);
+  }, [reminder.isEnabled]);
 
   const [hour, meridiem] = splitTime(reminderTime(reminder) ?? '');
-  const enabled = reminder.isEnabled;
+  const enabled = localEnabled;
 
   async function toggle() {
+    const nextState = !enabled;
+    setLocalEnabled(nextState); // Instant UI feedback
     setBusy(true);
 
     try {
       await update.mutateAsync({
-        isEnabled: !enabled,
+        isEnabled: nextState,
       });
+    } catch (err) {
+      // Revert back on error
+      setLocalEnabled(!nextState);
     } finally {
       setBusy(false);
     }
@@ -704,30 +599,30 @@ function ScheduleItem({ reminder }: { reminder: Reminder }) {
       <Link
         to={`/reminders/${reminder.id}`}
         className="min-w-0 flex-1"
-         style={{ textDecoration: 'none' }}
+        style={{ textDecoration: 'none' }}
       >
         <div className="flex items-baseline gap-1.5">
-         <span
-              className="
-                text-[48px]
-                leading-none
-                tracking-[-0.045em]
-                text-[color:var(--text-dim)]
-                tabular-nums
-              "
-            >
-              {hour}
-            </span>
+          <span
+            className="
+              text-[48px]
+              leading-none
+              tracking-[-0.045em]
+              text-[color:var(--text-dim)]
+              tabular-nums
+            "
+          >
+            {hour}
+          </span>
 
-            <span
-              className="
-                text-[19px]
-                tracking-[-0.01em]
-                text-[color:var(--text-dim)]
-              "
-            >
-              {meridiem}
-            </span>
+          <span
+            className="
+              text-[19px]
+              tracking-[-0.01em]
+              text-[color:var(--text-dim)]
+            "
+          >
+            {meridiem}
+          </span>
         </div>
 
         <p
@@ -737,13 +632,11 @@ function ScheduleItem({ reminder }: { reminder: Reminder }) {
             text-[14px]
             leading-[18px]
             font-medium
-          text-[color:var(--text-dim)]
+            text-[color:var(--text-dim)]
           `}
         >
           {reminder.title}
         </p>
-
-       
       </Link>
 
       <IOSSwitch
@@ -766,86 +659,79 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
     ? formatRelative(reminder.nextLocal)
     : '';
 
-  const enabled = reminder.isEnabled;
-
   return (
     <div
       className="
-      rise-in
-      border-b
-      border-t
-      border-[color:var(--surface-2)]
-
+        rise-in
+        border-b
+        border-t
+        border-[color:var(--surface-2)]
       "
     >
-
       <div className="relative p-5">
-     <Link 
-  to={`/reminders/${reminder.id}`} 
-    style={{ textDecoration: 'none' }}
->
-           <h2
-          className="
-            mt-4
-            truncate
-            text-[17px]
-            leading-[22px]
-            font-semibold
-            tracking-[-0.01em]
-            text-[color:var(--text)]
-          "
+        <Link 
+          to={`/reminders/${reminder.id}`} 
+          style={{ textDecoration: 'none' }}
         >
-          {reminder.title}
-        </h2>
+          <h2
+            className="
+              mt-4
+              truncate
+              text-[17px]
+              leading-[22px]
+              font-semibold
+              tracking-[-0.01em]
+              text-[color:var(--text)]
+            "
+          >
+            {reminder.title}
+          </h2>
 
-        <div className="mt-4 flex items-center justify-between gap-4">
-          <div className="flex min-w-0 items-baseline gap-2">
-            <span
-              className="
-                text-[48px]
-                leading-none
-                tracking-[-0.045em]
-                text-[color:var(--text)]
-                tabular-nums
-              "
-            >
-              {hour}
-            </span>
+          <div className="mt-4 flex items-center justify-between gap-4">
+            <div className="flex min-w-0 items-baseline gap-2">
+              <span
+                className="
+                  text-[48px]
+                  leading-none
+                  tracking-[-0.045em]
+                  text-[color:var(--text)]
+                  tabular-nums
+                "
+              >
+                {hour}
+              </span>
 
-            <span
-              className="
-                text-[19px]
-                tracking-[-0.01em]
-                text-[color:var(--text)]
-              "
-            >
-              {meridiem}
-            </span>
+              <span
+                className="
+                  text-[19px]
+                  tracking-[-0.01em]
+                  text-[color:var(--text)]
+                "
+              >
+                {meridiem}
+              </span>
+            </div>
+
+            <div className="mt-4">
+              <span
+                className={`
+                  inline-flex
+                  items-center
+                  gap-1.5
+                  rounded-full
+                  px-2.5
+                  py-1.5
+                  text-[11px]
+                  font-semibold
+                  bg-[#3f576f50]
+                  text-[color:var(--primary)]
+                `}
+              >
+                VIEW
+              </span>
+            </div>
           </div>
 
-         
-            <div className="mt-4">
-          <span
-            className={`
-              inline-flex
-              items-center
-              gap-1.5
-              rounded-full
-              px-2.5
-              py-1.5
-              text-[11px]
-              font-semibold
-             bg-[#3f576f50]
-              text-[color:var(--primary)]
-            `}
-          >
-            VIEW
-          </span>
-        </div>
-          
-        </div>
-
-      
           <span className="text-[13px] font-medium text-[color:var(--primary)]">
             {relative}
           </span>
@@ -886,8 +772,6 @@ export default function DashboardPage() {
 
   const email = me.data?.email ?? '';
 
-  // Hero highlights the most recently created of today's reminders
-  // (previously the earliest-scheduled one).
   const next = useMemo(() => {
     if (today.length === 0) return undefined;
 
@@ -898,67 +782,64 @@ export default function DashboardPage() {
     );
   }, [today]);
 
-  const todayLabel = new Date().toLocaleDateString(
-    'en-US',
-    {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-    }
-  );
-
-  const displayName = email
-    ? displayNameFromEmail(email)
-    : 'RemindMe';
-
   return (
     <section
       className="
         relative
-       
         bg-[color:var(--bg)]
         px-4
         pb-44
         pt-3
         text-[color:var(--text)]
         antialiased
+        overflow-hidden
       "
     >
+   
+          <SoftAurora
+                   colorStops={["#AE897F","#B26B56","#B35443"]}
+                   blend={0.5}
+                   amplitude={1}
+                   speed={1}
+                   className="fixed inset-0 w-full h-full opacity-20"
+                 />
+         
+
       {/* ------------------------------------------------------------------ */}
       {/* Header                                                             */}
       {/* ------------------------------------------------------------------ */}
 
-   <div className="mb-4 pt-5 flex items-center justify-between">
-     <div
-              className="
-                flex
-                text-[25px]
-                font-semibold
-                text-[color:var(--text)]
-            
-              "
-            >
-              Call Reminder
-            </div>
-             <Link
-              to="/reminders/new"
-              aria-label="New reminder"
-              className="
-                pressable-round
-                inline-flex
-                text-[color:var(--primary)]
-                text-[35px]
-              "
-               style={{ textDecoration: 'none' }}
-            >
-              +
-            </Link>
-            </div>
+      <div className="relative z-20 mb-4 pt-5 flex items-center justify-between">
+        <div
+          className="
+            flex
+            text-[25px]
+            font-semibold
+            text-[color:var(--text)]
+          "
+        >
+          Call Reminder
+        </div>
+        <Link
+          to="/reminders/new"
+          aria-label="New reminder"
+          className="
+            pressable-round
+            inline-flex
+            text-[color:var(--primary)]
+            text-[35px]
+          "
+          style={{ textDecoration: 'none' }}
+        >
+          +
+        </Link>
+      </div>
+
       {/* ------------------------------------------------------------------ */}
       {/* Main Content                                                       */}
       {/* ------------------------------------------------------------------ */}
 
-      <div className="mx-auto max-w-xl">
+      <div className="relative z-20 mx-auto max-w-xl">
         {reminders.isLoading ? (
           <div className="mt-5 flex flex-col gap-6 skeleton-area" aria-busy="true">
             {/* Hero */}
@@ -998,29 +879,19 @@ export default function DashboardPage() {
             </div>
           </div>
         ) : today.length === 0 ? (
-          /* -------------------------------------------------------------- */
-          /* Empty State                                                    */
-          /* -------------------------------------------------------------- */
-        <div className="w-full flex flex-col items-center justify-center gap-3  p-6 text-center">
-             <img src={scheduleImage} width="auto" height="10vh" className="opacity-70" alt="Call icon">
-</img>
-            <div> No  Schedules Yet</div>
-           
+          /* Empty State */
+          <div className="w-full flex flex-col items-center justify-center gap-3 p-6 text-center">
+            <img src={scheduleImage} width="auto" height="10vh" className="opacity-70" alt="Call icon" />
+            <div> No Schedules Yet</div>
           </div>
         ) : (
           <div className="mt-5 flex flex-col gap-6">
-            {/* ------------------------------------------------------------ */}
-            {/* Hero                                                          */}
-            {/* ------------------------------------------------------------ */}
-
+            {/* Hero */}
             {next ? (
               <HeroCard reminder={next} />
             ) : null}
 
-            {/* ------------------------------------------------------------ */}
-            {/* Today's Schedule                                              */}
-            {/* ------------------------------------------------------------ */}
-
+            {/* Today's Schedule */}
             <div>
               <div className="mb-2.5 flex items-end justify-between px-1">
                 <div>
@@ -1033,15 +904,13 @@ export default function DashboardPage() {
                       text-[color:var(--text)]
                     "
                   >
-                   Other
+                    Other
                   </h3>
                 </div>
               </div>
 
               {/* iOS grouped list */}
-                <div
-                  className="stagger"
-               >
+              <div className="stagger">
                 {today.map((r) => (
                   <ScheduleItem
                     key={r.id}

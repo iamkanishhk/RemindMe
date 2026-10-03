@@ -8,6 +8,7 @@ import { useCompleteOnboarding, useMe } from '../hooks/queries';
 import { resolveDisplayName } from '../lib/displayName';
 // PLACEHOLDER: swap this asset once the final Maya artwork is ready.
 import mayaIllustration from '../../public/assets/maya.gif';
+import SoftAurora from '../components/SoftAurora';
 
 const FULL_INTRO_TEXT = "I’m Maya, and I remind you of anything you forget on calls.";
 const TYPING_SPEED_MS = 45; // Speed of each character being typed
@@ -114,6 +115,17 @@ export default function OnboardingMayaPage() {
 
   return (
     <div className="h-screen w-screen overflow-hidden flex flex-col justify-between items-center px-6 pt-[calc(1.25rem+env(safe-area-inset-top))] pb-[calc(1.25rem+env(safe-area-inset-bottom))] select-none touch-manipulation bg-[color:var(--bg)] text-[color:var(--text)]">
+      
+      
+               <div className="fixed top-[-40vh] inset-x-0 w-full h-full opacity-50 ">
+                   <SoftAurora
+                    colorStops={["#AE897F","#B26B56","#B35443"]}
+                    blend={0.5}
+                    amplitude={1}
+                    speed={1}
+                   
+                  />
+               </div>
       {/* Main Container - Balanced vertical center layout */}
       <main className="flex-1 w-full max-w-sm flex flex-col items-center justify-center min-h-0 gap-5 text-center">
         
@@ -143,7 +155,7 @@ export default function OnboardingMayaPage() {
               </p>
             ) : (
               <p className="text-sm font-medium text-[color:var(--text-dim)] tracking-wide uppercase opacity-80">
-                Tap below to hear your intro
+                Tap below to hear my introduction
               </p>
             )}
           </div>
@@ -178,7 +190,7 @@ export default function OnboardingMayaPage() {
                   <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H3.75A1.75 1.75 0 0 0 2 9.25v5.5c0 .966.784 1.75 1.75 1.75h2.69l4.5 4.5c.944.945 2.56.276 2.56-1.06V4.06ZM18.53 7.47a.75.75 0 0 0-1.06 1.06 4.5 4.5 0 0 1 0 6.364.75.75 0 0 0 1.06 1.06 6 6 0 0 0 0-8.484Z" />
                 </svg>
               )}
-              {hasPlayedSound ? 'Continue to Dashboard' : 'Listen Intro & Continue'}
+              {hasPlayedSound ? 'Continue to Dashboard' : 'Listen'}
             </span>
           )}
         </button>

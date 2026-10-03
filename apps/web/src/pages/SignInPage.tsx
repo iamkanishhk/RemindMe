@@ -5,6 +5,7 @@ import { Spinner } from '../components/Spinner';
 import { Skeleton } from '../components/Skeleton';
 import { useErrorToast } from '../components/Toast';
 import illustration from '../../public/assets/welcome.png';
+import SoftAurora from '../components/SoftAurora';
 
 export default function SignInPage() {
   const { isLoaded, isSignedIn } = useAuth();
@@ -44,6 +45,8 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 select-none">
+
+          
       <div className="flex-1 min-h-0 w-full max-w-[310px] flex flex-col items-center justify-center gap-2 animate-fade-in">
         <img
           src={illustration}
@@ -84,6 +87,7 @@ export default function SignInPage() {
           </div>
         ) : null}
       </div>
+      
     </div>
   );
 }

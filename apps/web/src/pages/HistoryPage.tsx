@@ -11,6 +11,7 @@ import CallDetailSheet from '../components/CallDetailSheet';
 import LiquidGlass from 'liquid-glass-react';
 import type { CallAttempt } from '../lib/types';
 import Image from '../../public/assets/call.png';
+import SoftAurora from '../components/SoftAurora';
 
 export default function HistoryPage() {
   const calls = useCalls();
@@ -35,6 +36,7 @@ export default function HistoryPage() {
         className="min-h-screen w-full bg-[color:var(--bg)] text-[color:var(--text)]"
         aria-busy="true"
       >
+         
         <div className="mx-auto w-full max-w-[920px] px-4 pb-24 pt-9">
           {/* Header */}
           <div className="skeleton-area pb-6">
@@ -97,7 +99,21 @@ export default function HistoryPage() {
     : attempts;
 
   return (
+    
     <section className="ios-history-page">
+    
+      
+          
+            <SoftAurora
+              colorStops={["#AE897F","#B26B56","#B35443"]}
+              blend={0.5}
+              amplitude={1}
+              speed={1}
+              className="fixed bottom-0 rotate-180 inset-0 w-full h-full opacity-20"
+            />
+    
+     
+       
       <div className="ios-history-container">
         {/* Page Header */}
         <header className="ios-page-header">
