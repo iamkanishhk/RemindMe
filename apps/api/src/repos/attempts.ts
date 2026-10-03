@@ -54,7 +54,7 @@ export async function listAttemptsByUser(params: { userId: string; limit: number
     orderBy: { startedAt: 'desc' },
     include: {
       reminder: {
-        select: { id: true, title: true, phoneNumber: { select: { e164: true } } }
+        select: { id: true, message: true, phoneNumber: { select: { e164: true } } }
       }
     }
   });

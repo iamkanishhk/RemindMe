@@ -10,7 +10,6 @@ import { enhanceReminderMessage } from './messageEnhancer';
 import { logger } from '../lib/logger';
 
 export interface ReminderInput {
-  title: string;
   message: string;
   timezone: string;
   localDateTime: string;
@@ -49,7 +48,6 @@ export async function createReminder(userId: string, input: ReminderInput) {
   const scheduledAt = isoToDate(run.scheduledAtIso);
   const reminder = await reminderRepo.createReminder({
     userId,
-    title: input.title,
     message: input.message,
     voiceMessage,
     timezone: input.timezone,
@@ -81,7 +79,6 @@ export async function listReminders(userId: string, opts: { status?: ReminderSta
 
 export function serializeReminder(r: {
   id: string;
-  title: string;
   message: string;
   timezone: string;
   scheduledAt: Date;
@@ -97,7 +94,6 @@ export function serializeReminder(r: {
   const nextLocal = r.nextRunAt ? DateTime.fromJSDate(r.nextRunAt, { zone: r.timezone }).toISO() ?? null : null;
   return {
     id: r.id,
-    title: r.title,
     message: r.message,
     timezone: r.timezone,
     scheduledAt: r.scheduledAt.toISOString(),
@@ -161,7 +157,6 @@ export async function updateReminder(userId: string, reminderId: string, patch: 
   await cancelJob(existing.id, existing.nextRunAt);
 
   const updated = await reminderRepo.updateReminderFields(existing.id, {
-    ...(patch.title !== undefined ? { title: patch.title } : {}),
     ...(patch.message !== undefined ? { message: patch.message } : {}),
     ...(messageChanged ? { voiceMessage } : {}),
     ...(patch.repeatRule !== undefined ? { repeatRule: patch.repeatRule } : {}),

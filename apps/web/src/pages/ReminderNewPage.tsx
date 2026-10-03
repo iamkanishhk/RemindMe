@@ -9,36 +9,19 @@ import {
   usePhoneNumbers,
   type ReminderInputBody
 } from '../hooks/queries';
-import type { RepeatRule } from '../lib/types';
 import SubscribeSheet from '../components/SubscribeSheet';
 import PhoneVerifyOnboarding from '../components/PhoneVerifyOnboarding';
 import { useErrorToast } from '../components/Toast';
 import { Spinner } from '../components/Spinner';
 import { ApiError } from '../lib/api';
+import { celebrate } from '../lib/confetti';
 import { GlassButton } from '../components/GlassButton';
+import callerImage from '../../public/assets/maya.gif';
 
 const DEFAULT_TZ =
   Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
 
 const DAYS = 14;
-
-const REPEAT_OPTIONS: Array<{
-  value: RepeatRule;
-  label: string;
-}> = [
-  {
-    value: 'NONE',
-    label: 'Once'
-  },
-  {
-    value: 'DAILY',
-    label: 'Daily'
-  },
-  {
-    value: 'WEEKLY',
-    label: 'Weekly'
-  }
-];
 
 const pad = (v: number) => String(v).padStart(2, '0');
 
@@ -57,6 +40,17 @@ function toHour24(
 ): number {
   const h = hour % 12;
   return ampm === 'PM' ? h + 12 : h;
+}
+
+function scheduledInstant(
+  date: Date,
+  hour: number,
+  minute: number,
+  ampm: 'AM' | 'PM'
+): Date {
+  const instant = new Date(date);
+  instant.setHours(toHour24(hour, ampm), minute, 0, 0);
+  return instant;
 }
 
 function initialTime() {
@@ -552,9 +546,7 @@ export default function ReminderNewPage() {
   const [hour, setHour] = useState(initial.hour);
   const [minute, setMinute] = useState(initial.minute);
   const [ampm, setAmpm] = useState<'AM' | 'PM'>(initial.ampm);
-  const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
-  const [repeatRule, setRepeatRule] = useState<RepeatRule>('NONE');
   const timezone = DEFAULT_TZ;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -589,30 +581,29 @@ export default function ReminderNewPage() {
     )}-${pad(selectedDate.getDate())}T${hh}:${mi}`;
 
     return {
-      title: title.trim(),
+
       message: message.trim(),
       timezone,
       localDateTime,
-      repeatRule,
+      repeatRule: 'NONE',
       phoneNumberId
     };
   }
 
   function validate(): string {
-    if (title.trim().length === 0) {
-      return 'Title is required';
-    }
-
-    if (title.trim().length > 80) {
-      return 'Title must be 80 characters or fewer';
-    }
-
     if (message.trim().length === 0) {
       return 'Message is required';
     }
 
     if (message.trim().length > 500) {
       return 'Message must be 500 characters or fewer';
+    }
+
+    if (
+      scheduledInstant(selected.date, hour, minute, ampm).getTime() <=
+      Date.now()
+    ) {
+      return 'Pick a date and time in the future';
     }
 
     return '';
@@ -626,6 +617,7 @@ export default function ReminderNewPage() {
 
     try {
       const reminder = await create.mutateAsync(buildBody(phoneNumberId));
+      celebrate();
       navigate(`/reminders/${reminder.id}`, { replace: true });
     } catch (err) {
       if (err instanceof ApiError && err.code === 'SUBSCRIPTION_REQUIRED') {
@@ -861,29 +853,19 @@ export default function ReminderNewPage() {
 
               <div className="overflow-hidden rounded-[20px] border border-[color:var(--border-soft)] bg-[color:var(--surface)]">
                 <div className="p-4">
-                  <div className="mb-2 flex items-baseline justify-between gap-3">
-                    <label
-                      htmlFor="reminder-title"
-                      className="text-[13px] font-semibold text-[color:var(--text-dim)]"
-                    >
-                      Title
-                    </label>
-
-                    <span className="text-[12px] tabular-nums text-[color:var(--text-faint)]">
-                      {title.length}/80
-                    </span>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full ">
+                    <img src={callerImage} alt="Caller" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-[13px] font-medium text-[color:var(--text-dim)]">
+                        Caller
+                      </div>
+                      <div className="truncate text-[17px] font-semibold text-[color:var(--text)]">
+                        Maya
+                      </div>
+                    </div>
                   </div>
-
-                  <input
-                    id="reminder-title"
-                    type="text"
-                    value={title}
-                    maxLength={80}
-                    enterKeyHint="next"
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g. Take the cake out"
-                    className="w-full rounded-[14px] border border-[color:var(--border-soft)] bg-[color:var(--surface-2)] px-4 py-3 text-[16px] font-normal leading-[1.45] text-[color:var(--text)] placeholder:text-[color:var(--text-faint)] outline-none "
-                  />
                 </div>
 
                 <div className="mx-4 border-t border-[color:var(--border-soft)]" />
@@ -918,49 +900,6 @@ export default function ReminderNewPage() {
                     placeholder="What we'll read over the call"
                     className="max-h-[40vh] min-h-[76px] w-full resize-none overflow-hidden rounded-[14px] border border-[color:var(--border-soft)] bg-[color:var(--surface-2)] px-4 py-3 text-[16px] font-normal leading-[1.5] text-[color:var(--text)] placeholder:text-[color:var(--text-faint)] outline-none transition focus:border-[color:var(--primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--primary)_30%,transparent)]"
                   />
-                </div>
-              </div>
-            </section>
-
-            {/* ---------------------------------------------------------- */}
-            {/* Repeat                                                     */}
-            {/* ---------------------------------------------------------- */}
-
-            <section>
-
-
-              <div className="rounded-[20px] border border-[color:var(--border)] bg-[color:color-mix(in_srgb,var(--surface)_60%,transparent)] p-1.5 backdrop-blur-xl">
-                <div className="grid grid-cols-3 gap-1">
-                  {REPEAT_OPTIONS.map((opt) => {
-                    const isSelected = repeatRule === opt.value;
-
-                    return (
-                      <button
-                        key={opt.value}
-                        type="button"
-                        aria-pressed={isSelected}
-                        onClick={() => setRepeatRule(opt.value)}
-                        className={`
-                          min-h-[42px]
-                          rounded-[14px]
-                          px-3
-                          py-2
-                          text-[13px]
-                          font-semibold
-                          transition-all
-                          duration-200
-                          active:scale-95
-                          ${
-                            isSelected
-        ? 'bg-[color:var(--surface-3)] text-[color:var(--text)] shadow-md'
-        : 'text-[color:var(--text-dim)] hover:text-[color:var(--text)]'
-                          }
-                        `}
-                      >
-                        {opt.label}
-                      </button>
-                    );
-                  })}
                 </div>
               </div>
             </section>

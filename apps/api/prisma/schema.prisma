@@ -114,7 +114,6 @@ model Reminder {
   id            String         @id @default(cuid())
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId        String
-  title         String
   message       String
   timezone      String
   scheduledAt   DateTime

@@ -3,7 +3,6 @@ import { useAuthedFetch } from './useAuthedFetch';
 import type { BillingPlan, BillingStatus, CallAttempt, Me, PhoneNumber, PlanId, Reminder, ReminderDetail, ReminderStatus, RepeatRule } from '../lib/types';
 
 export interface ReminderInputBody {
-  title: string;
   message: string;
   timezone: string;
   localDateTime: string;

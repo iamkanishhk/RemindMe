@@ -42,7 +42,7 @@ export default function CallDetailSheet({
         },
       };
 
-  const name = attempt?.reminderTitle ?? attempt?.reminderId ?? 'Untitled reminder';
+  const name = attempt?.reminderMessage ?? attempt?.reminderId ?? 'Reminder call';
   const reminderId = attempt?.reminderId;
   const canViewReminder = Boolean(reminderId) && Boolean(onViewReminder);
 

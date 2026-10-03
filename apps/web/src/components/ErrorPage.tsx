@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'framer-motion';
-
+import sadImage from '../../public/assets/sad.png';
 interface ErrorPageProps {
   message: string;
   title?: string;
@@ -26,13 +26,10 @@ export default function ErrorPage({
       animate={{ opacity: 1, y: 0 }}
       transition={reduceMotion ? { duration: 0 } : { duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div
-        aria-hidden="true"
-        className="flex h-16 w-16 items-center justify-center rounded-[18px] bg-[color:var(--danger-soft)] text-[30px] font-bold leading-none text-[color:var(--danger)]"
-      >
-        !
-      </div>
-
+      <div className="w-full flex flex-col items-center justify-center gap-3 p-6 text-center">
+                <img src={sadImage} width="auto" height="10vh" className="opacity-70" alt="Call icon" />
+           
+              </div>
       <h1 className="mt-5 text-[22px] font-bold tracking-[-0.02em] text-[color:var(--text)]">
         {title ?? 'Something went wrong'}
       </h1>
@@ -45,7 +42,7 @@ export default function ErrorPage({
         <button
           type="button"
           onClick={onRetry}
-          className="pressable mt-8 inline-flex min-h-[44px] items-center justify-center rounded-[12px] bg-[image:var(--gradient-primary)] px-7 text-[15px] font-semibold text-[color:var(--on-primary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]"
+          className="pressable mt-8 inline-flex min-h-[44px] items-center justify-center rounded-[12px] px-7 text-[15px] font-semibold text-[color:var(--primary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] border border-[color:var(--primary)] transition-colors hover:bg-[color:var(--primary)] hover:text-[color:--primary]  "
         >
           {retryLabel}
         </button>

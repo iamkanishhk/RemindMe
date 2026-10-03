@@ -3,7 +3,6 @@ import { prisma } from '../lib/prisma';
 
 export type ReminderCreateInput = {
   userId: string;
-  title: string;
   message: string;
   voiceMessage: string | null;
   timezone: string;

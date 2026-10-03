@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDeleteReminder, useReminder, useUpdateReminder } from '../hooks/queries';
-import { formatDateTimeLocal } from '../lib/format';
+import { deriveShortTitle, formatDateTimeLocal } from '../lib/format';
 import { Skeleton } from '../components/Skeleton';
 import ErrorPage from '../components/ErrorPage';
 import { useErrorToast } from '../components/Toast';
@@ -221,7 +221,7 @@ export default function ReminderDetailPage() {
           </div>
 
           <h1 className="ios-title">
-            I'll Call You for <span className="text-[color:var(--text)] font-semibold">{r.title}</span>
+            I'll Call You for <span className="text-[color:var(--text)] font-semibold">{deriveShortTitle(r.message)}</span>
           </h1>
           <p className="ios-subtitle">{formatDateTimeLocal(r.scheduledAt)}</p>
         </header>
@@ -236,12 +236,6 @@ export default function ReminderDetailPage() {
               <span className="ios-row-value">{r.message || '—'}</span>
             </div>
 
-            <div className="ios-divider" />
-
-            <div className="ios-row">
-              <span className="ios-row-label">Calls</span>
-              <span className="ios-row-value mono">{r.phoneNumber?.e164 ?? '—'}</span>
-            </div>
 
             <div className="ios-divider" />
 

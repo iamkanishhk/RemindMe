@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { ReminderStatus, RepeatRule } from '@prisma/client';
 import { normalizeE164 } from './e164';
-import { toZone } from './schedule';
+import { toZone, localToUtc } from './schedule';
 
 export const e164Schema = z
   .string()
@@ -24,8 +24,7 @@ export const localDateTimeSchema = z
   .string()
   .refine((v) => new Date(v).toString() !== 'Invalid Date', { message: 'Invalid ISO date-time' });
 
-export const reminderActionSchema = z.object({
-  title: z.string().trim().min(1).max(80),
+export const reminderFieldsSchema = z.object({
   message: z.string().trim().min(1).max(500),
   timezone: timezoneSchema,
   localDateTime: localDateTimeSchema,
@@ -33,9 +32,35 @@ export const reminderActionSchema = z.object({
   phoneNumberId: z.string().min(1)
 });
 
-export const reminderPatchSchema = reminderActionSchema.partial().extend({
-  isEnabled: z.boolean().optional()
-});
+const PAST_GRACE_MS = 60_000;
+
+function assertScheduledInFuture(
+  value: { localDateTime?: string; timezone?: string },
+  ctx: z.RefinementCtx
+) {
+  if (value.localDateTime === undefined || value.timezone === undefined) return;
+
+  const run = localToUtc(value.localDateTime, value.timezone);
+  if (!run) return;
+
+  if (Date.parse(run.scheduledAtIso) <= Date.now() - PAST_GRACE_MS) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['localDateTime'],
+      message: 'Scheduled time must be in the future'
+    });
+  }
+}
+
+export const reminderActionSchema =
+  reminderFieldsSchema.superRefine(assertScheduledInFuture);
+
+export const reminderPatchSchema = reminderFieldsSchema
+  .partial()
+  .extend({
+    isEnabled: z.boolean().optional()
+  })
+  .superRefine(assertScheduledInFuture);
 
 export const listRemindersQuerySchema = z.object({
   status: z.nativeEnum(ReminderStatus).optional(),

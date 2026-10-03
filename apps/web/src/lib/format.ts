@@ -134,3 +134,33 @@ export function elapsed(ms: number): string {
 }
 
 export const WEEK = WEEKDAYS;
+
+const STOPWORDS = new Set([
+  'i', 'i\'m', 'ive', 'im', 'i\'ve', 'me', 'my', 'mine', 'we', 'our', 'you', 'your',
+  'the', 'a', 'an', 'and', 'or', 'but', 'so', 'to', 'for', 'of', 'in', 'on', 'at',
+  'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does',
+  'did', 'will', 'would', 'can', 'could', 'should', 'shall', 'may', 'might', 'must',
+  'please', 'remind', 'me', 'remember', 'dont', 'don\'t', 'do', 'not', 'that', 'this',
+  'these', 'those', 'it', 'it\'s', 'call', 'calling', 'about'
+]);
+
+/**
+ * Derive a short 1-2 word label from a reminder message (used as the
+ * "I'll call you for …" summary). Trims leading filler/stopwords so the
+ * remaining words are the meaningful ones, cap at two.
+ */
+export function deriveShortTitle(message: string): string {
+  const words = message
+    .replace(/[^a-zA-Z0-9'\-\s]/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (words.length === 0) return 'Call';
+
+  const meaningful = words.filter((w) => !STOPWORDS.has(w.toLowerCase()));
+  const picks = (meaningful.length >= 2 ? meaningful : words).slice(0, 2);
+  const title = picks
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+  return title || 'Call';
+}

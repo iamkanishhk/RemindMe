@@ -59,7 +59,6 @@ export interface PhoneNumber {
 
 export interface Reminder {
   id: string;
-  title: string;
   message: string;
   timezone: string;
   scheduledAt: string;
@@ -82,7 +81,7 @@ export interface CallAttempt {
   detail: string | null;
   providerCallId?: string | null;
   reminderId?: string;
-  reminderTitle?: string;
+  reminderMessage?: string;
   destinationE164?: string | null;
 }
 

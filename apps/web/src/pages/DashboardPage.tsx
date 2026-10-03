@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useMe, useReminders, useUpdateReminder } from '../hooks/queries';
-import { formatRelative, formatTime, isToday } from '../lib/format';
+import { formatRelative, formatTime } from '../lib/format';
 import type { Reminder } from '../lib/types';
 import { Skeleton } from '../components/Skeleton';
 import { useErrorToast } from '../components/Toast';
@@ -21,6 +21,18 @@ function splitTime(value: string): [string, string] {
 function reminderTime(reminder: Reminder): string | null {
   const iso = reminder.nextLocal ?? reminder.nextRunAt;
   return iso ? formatTime(reminder.timezone, iso) : null;
+}
+
+function useNow(intervalMs = 30_000): number {
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), intervalMs);
+
+    return () => window.clearInterval(timer);
+  }, [intervalMs]);
+
+  return now;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -388,7 +400,7 @@ function ScheduleItem({ reminder }: { reminder: Reminder }) {
             text-[color:var(--text-dim)]
           "
         >
-          {reminder.title}
+          {reminder.message}
         </p>
       </Link>
 
@@ -396,7 +408,7 @@ function ScheduleItem({ reminder }: { reminder: Reminder }) {
         enabled={enabled}
         busy={busy}
         onClick={() => void toggle()}
-        label={enabled ? `Pause ${reminder.title}` : `Resume ${reminder.title}`}
+        label={enabled ? `Pause reminder` : `Resume reminder`}
       />
     </div>
   );
@@ -436,7 +448,7 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
               text-[color:var(--text)]
             "
           >
-            {reminder.title}
+            {reminder.message}
           </h2>
 
           <div className="mt-4 flex items-center justify-between gap-4">
@@ -499,18 +511,19 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
 
 export default function DashboardPage() {
   const me = useMe();
-  const reminders = useReminders();
+  const reminders = useReminders({ upcoming: true });
+  const now = useNow();
 
-  const today = useMemo(() => {
+  const upcoming = useMemo(() => {
     const all = reminders.data ?? [];
 
     return all
       .filter((r) => {
         const iso = r.nextLocal ?? r.nextRunAt;
-        return iso ? isToday(r.timezone, iso) : false;
+        return iso ? new Date(iso).getTime() > now : false;
       })
       .sort((a, b) => sortKey(a) - sortKey(b));
-  }, [reminders.data]);
+  }, [reminders.data, now]);
 
   const error =
     me.error?.message ||
@@ -520,14 +533,14 @@ export default function DashboardPage() {
   useErrorToast(error);
 
   const next = useMemo(() => {
-    if (today.length === 0) return undefined;
+    if (upcoming.length === 0) return undefined;
 
-    return today.reduce((newest, r) =>
+    return upcoming.reduce((newest, r) =>
       new Date(r.createdAt).getTime() > new Date(newest.createdAt).getTime()
         ? r
         : newest
     );
-  }, [today]);
+  }, [upcoming]);
 
   return (
     <section
@@ -560,7 +573,7 @@ export default function DashboardPage() {
             text-[color:var(--text)]
           "
         >
-          Call Reminder
+          SureCall.me
         </div>
         <Link
           to="/reminders/new"
@@ -594,7 +607,7 @@ export default function DashboardPage() {
               <Skeleton className="mt-4 h-4 w-24" />
             </div>
 
-            {/* Today's schedule Skeleton */}
+            {/* Upcoming schedule Skeleton */}
             <div>
               <div className="mb-2.5 px-1">
                 <Skeleton className="h-5 w-16" />
@@ -617,7 +630,7 @@ export default function DashboardPage() {
               ))}
             </div>
           </div>
-        ) : today.length === 0 ? (
+        ) : upcoming.length === 0 ? (
           /* Empty State */
           <div className="w-full flex flex-col items-center justify-center gap-3 p-6 text-center">
             <img src={scheduleImage} width="auto" height="10vh" className="opacity-70" alt="Call icon" />
@@ -628,7 +641,7 @@ export default function DashboardPage() {
             {/* Hero Card */}
             {next ? <HeroCard reminder={next} /> : null}
 
-            {/* Today's Schedule */}
+            {/* Upcoming Schedule */}
             <div>
               <div className="mb-2.5 flex items-end justify-between px-1">
                 <div>
@@ -648,7 +661,7 @@ export default function DashboardPage() {
 
               {/* iOS grouped list */}
               <div>
-                {today.map((r) => (
+                {upcoming.map((r) => (
                   <ScheduleItem
                     key={r.id}
                     reminder={r}

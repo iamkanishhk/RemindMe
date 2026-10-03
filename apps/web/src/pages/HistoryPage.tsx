@@ -33,7 +33,7 @@ export default function HistoryPage() {
     const needle = query.trim().toLowerCase();
     if (!needle) return attempts;
     return attempts.filter((a) =>
-      [a.reminderTitle, a.reminderId, a.status, a.detail, a.destinationE164]
+      [a.reminderMessage, a.reminderId, a.status, a.detail, a.destinationE164]
         .filter(Boolean)
         .join(' ')
         .toLowerCase()
@@ -259,7 +259,7 @@ export default function HistoryPage() {
                     >
                       <div className="ios-call-row-leading">
                         <div className="ios-call-row-title">
-                          {a.reminderTitle ?? a.reminderId ?? 'Untitled reminder'}
+                          {a.reminderMessage ?? a.reminderId ?? 'Reminder call'}
                         </div>
                         <div className="ios-call-row-sub">
                           {formatDateTimeLocal(a.startedAt)}

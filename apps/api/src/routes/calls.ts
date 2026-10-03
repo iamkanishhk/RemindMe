@@ -22,7 +22,7 @@ callsRouter.get(
       attempts: attempts.map((a) => ({
         id: a.id,
         reminderId: a.reminderId,
-        reminderTitle: a.reminder.title,
+        reminderMessage: a.reminder.message,
         destinationE164: a.reminder.phoneNumber?.e164 ?? null,
         status: a.status,
         startedAt: a.startedAt.toISOString(),
