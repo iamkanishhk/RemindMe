@@ -34,7 +34,13 @@ const envSchema = z.object({
 
   GEO_ALLOW_PREFIXES: z.string().default(''),
   SENTRY_DSN: z.string().default(''),
-  CORS_ORIGINS: z.string().default('')
+  CORS_ORIGINS: z.string().default(''),
+
+  // Comma-separated Google Gemini API keys. The enhancer rotates across them
+  // round-robin and fails over to the next key on errors or timeouts, so a
+  // single exhausted key never blocks reminder creation.
+  GEMINI_API_KEYS: z.string().default(''),
+  GEMINI_MODEL: z.string().default('gemini-3.1-flash-lite-preview')
 });
 
 type Env = z.infer<typeof envSchema>;
@@ -71,6 +77,12 @@ export function geoAllowedPrefixes(): string[] {
 
 export function corsOriginList(): string[] {
   return env.CORS_ORIGINS.split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+export function geminiApiKeys(): string[] {
+  return env.GEMINI_API_KEYS.split(',')
     .map((s) => s.trim())
     .filter(Boolean);
 }

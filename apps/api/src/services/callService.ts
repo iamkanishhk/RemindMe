@@ -100,7 +100,7 @@ async function performCall(reminderId: string, nextRunIso: string): Promise<{ ou
     const placed = await telnyxProvider.placeCall({
       to: reminder.phoneNumber.e164,
       from: env.TELNYX_FROM_NUMBER,
-      message: reminder.message,
+      message: reminder.voiceMessage ?? reminder.message,
       reminderId,
       webhookUrl
     });
@@ -154,7 +154,7 @@ export async function handleTelnyxEvent(evt: TelephonyEvent): Promise<void> {
       await prisma.reminder.update({ where: { id: attempt.reminderId }, data: { status: 'ANSWERED' } });
       const reminder = await prisma.reminder.findUnique({ where: { id: attempt.reminderId } });
       if (reminder) {
-        fireAndForget(() => telnyxProvider.speak(callControlId, reminder.message));
+        fireAndForget(() => telnyxProvider.speak(callControlId, reminder.voiceMessage ?? reminder.message));
       }
       break;
     }

@@ -5,6 +5,7 @@ export type ReminderCreateInput = {
   userId: string;
   title: string;
   message: string;
+  voiceMessage: string | null;
   timezone: string;
   scheduledAt: Date;
   nextRunAt: Date;

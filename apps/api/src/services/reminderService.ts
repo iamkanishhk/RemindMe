@@ -6,6 +6,7 @@ import * as phoneRepo from '../repos/phoneNumbers';
 import { computeNextRun } from '../lib/schedule';
 import { enqueueReminder, cancelJob } from './schedulerService';
 import { assertEntitled, assertReminderCreateAllowed } from './billingService';
+import { enhanceReminderMessage } from './messageEnhancer';
 
 export interface ReminderInput {
   title: string;
@@ -34,7 +35,12 @@ function wallClockFor(existing: { scheduledAt: Date; timezone: string }): string
 
 export async function createReminder(userId: string, input: ReminderInput) {
   const phone = await assertCallablePhone(userId, input.phoneNumberId);
-  const isFreeCall = await assertReminderCreateAllowed(userId, input.repeatRule, input.timezone);
+  // Run the entitlement gate and the AI enhancement in parallel; the enhancer
+  // never throws (it returns null and the original message is spoken).
+  const [isFreeCall, voiceMessage] = await Promise.all([
+    assertReminderCreateAllowed(userId, input.repeatRule, input.timezone),
+    enhanceReminderMessage(input.message)
+  ]);
 
   const run = computeNextRun({ localDateTime: input.localDateTime, timezone: input.timezone });
   if (!run) throw badRequest('Invalid local date-time or timezone');
@@ -44,6 +50,7 @@ export async function createReminder(userId: string, input: ReminderInput) {
     userId,
     title: input.title,
     message: input.message,
+    voiceMessage,
     timezone: input.timezone,
     scheduledAt,
     nextRunAt: scheduledAt,
@@ -134,12 +141,18 @@ export async function updateReminder(userId: string, reminderId: string, patch: 
     scheduledAt = isoToDate(run.scheduledAtIso);
   }
 
+  // Re-enhance the spoken text when the message itself changes; otherwise keep
+  // the existing enhanced version.
+  const messageChanged = patch.message !== undefined && patch.message !== existing.message;
+  const voiceMessage = messageChanged ? await enhanceReminderMessage(patch.message ?? '') : undefined;
+
   // Cancel the pending job under the current scheduling before mutating.
   await cancelJob(existing.id, existing.nextRunAt);
 
   const updated = await reminderRepo.updateReminderFields(existing.id, {
     ...(patch.title !== undefined ? { title: patch.title } : {}),
     ...(patch.message !== undefined ? { message: patch.message } : {}),
+    ...(messageChanged ? { voiceMessage } : {}),
     ...(patch.repeatRule !== undefined ? { repeatRule: patch.repeatRule } : {}),
     ...(patch.phoneNumberId !== undefined ? { phoneNumber: { connect: { id: patch.phoneNumberId } } } : {}),
     ...(patch.isEnabled !== undefined ? { isEnabled: patch.isEnabled } : {}),
