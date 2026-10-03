@@ -6,7 +6,7 @@ import { Skeleton } from '../components/Skeleton';
 import ErrorPage from '../components/ErrorPage';
 import { useErrorToast } from '../components/Toast';
 import ConfirmSheet from '../components/ConfirmSheet';
-import LiquidGlass from 'liquid-glass-react';
+import { GlassButton } from '../components/GlassButton';
 import SoftAurora from '../components/SoftAurora';
 
 export default function ReminderDetailPage() {
@@ -117,15 +117,15 @@ export default function ReminderDetailPage() {
   return (
     <section className="ios-page">
       <SoftAurora
-        colorStops={["#AE897F","#B26B56","#B35443"]}
+        colorStops={["#AE897F", "#B26B56", "#B35443"]}
         blend={0.5}
         amplitude={1}
         speed={1}
-        className="fixed inset-0 w-full h-full opacity-20"
+        className="fixed inset-0 w-full h-full opacity-20 pointer-events-none will-change-transform transform-gpu"
       />
-      
+
       {/* Liquid Glass Floating Buttons */}
-      <LiquidGlass
+      <GlassButton
         displacementScale={64}
         saturation={130}
         aberrationIntensity={2}
@@ -162,45 +162,22 @@ export default function ReminderDetailPage() {
               height="35"
               viewBox="0 0 24 24"
               fill="none"
+              stroke="var(--danger, #FF453A)"
+              strokeWidth="1.8"
+              strokeLinecap="round"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <path
-                d="M5 7H19"
-                style={{ stroke: 'var(--danger, #FF453A)' }}
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              />
-              <path
-                d="M9 4H15"
-                style={{ stroke: 'var(--danger, #FF453A)' }}
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              />
-              <path
-                d="M7 7.5L7.7 19C7.77 20.1 8.68 21 9.78 21H14.22C15.32 21 16.23 20.1 16.3 19L17 7.5"
-                style={{ stroke: 'var(--danger, #FF453A)' }}
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M10 11V17"
-                style={{ stroke: 'var(--danger, #FF453A)' }}
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-              <path
-                d="M14 11V17"
-                style={{ stroke: 'var(--danger, #FF453A)' }}
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
+              <path d="M5 7H19" />
+              <path d="M9 4H15" />
+              <path d="M7 7.5L7.7 19C7.77 20.1 8.68 21 9.78 21H14.22C15.32 21 16.23 20.1 16.3 19L17 7.5" strokeLinejoin="round" />
+              <path d="M10 11V17" strokeWidth="1.6" />
+              <path d="M14 11V17" strokeWidth="1.6" />
             </svg>
           </button>
         </div>
-      </LiquidGlass>
+      </GlassButton>
 
-      <LiquidGlass
+      <GlassButton
         displacementScale={64}
         saturation={130}
         aberrationIntensity={2}
@@ -220,7 +197,7 @@ export default function ReminderDetailPage() {
         <Link to="/" className="ios-back flex items-center justify-center w-full h-full">
           <span className="text-[color:var(--text)] text-xl font-light">‹</span>
         </Link>
-      </LiquidGlass>
+      </GlassButton>
 
       {/* Main Mobile Screen Layout */}
       <div className="ios-container">
@@ -231,9 +208,11 @@ export default function ReminderDetailPage() {
             height="20vh"
             className="opacity-70"
             alt="Call icon"
+            loading="eager"
+            decoding="async"
           />
         </div>
-        
+
         {/* Header Hero Section */}
         <header className="ios-hero-header">
           <div className="ios-status-badge">
@@ -296,6 +275,7 @@ export default function ReminderDetailPage() {
           -webkit-font-smoothing: antialiased;
           padding-top: 80px;
           padding-bottom: 40px;
+          contain: content;
         }
 
         .ios-container {
@@ -305,7 +285,6 @@ export default function ReminderDetailPage() {
           padding: 0 16px;
         }
 
-        /* Hero Header Styling */
         .ios-hero-header {
           display: flex;
           flex-direction: column;
@@ -363,7 +342,6 @@ export default function ReminderDetailPage() {
           margin: 0;
         }
 
-        /* Grouped Card Styling */
         .ios-group {
           margin-top: 24px;
         }

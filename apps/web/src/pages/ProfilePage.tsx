@@ -8,8 +8,9 @@ import { SkeletonRow } from '../components/Skeleton';
 import { useErrorToast } from '../components/Toast';
 import ConfirmSheet from '../components/ConfirmSheet';
 import { iosTheme } from './iosTheme';
-import LiquidGlass from 'liquid-glass-react';
+import { GlassButton } from '../components/GlassButton';
 import { resolveDisplayName } from '../lib/displayName';
+import SoftAurora from '../components/SoftAurora';
 
 export default function ProfilePage() {
   const me = useMe();
@@ -63,8 +64,16 @@ export default function ProfilePage() {
 
   return (
     <section className="ios-settings-page">
+          <SoftAurora
+              colorStops={["#AE897F","#B26B56","#B35443"]}
+              blend={0.5}
+              amplitude={1}
+              speed={1}
+              className="fixed inset-0 w-full h-full opacity-20 pointer-events-none"
+            />
+            
       <div className="ios-settings-container max-h-[85vh]">
-          <LiquidGlass 
+          <GlassButton 
                        displacementScale={64}
                        saturation={130}
                        aberrationIntensity={2}
@@ -83,7 +92,7 @@ export default function ProfilePage() {
                         <Link to="/settings" className="ios-back">
                       <span className="ios-back-icon text-[color:var(--text)] p-2">‹</span>
                     </Link>
-                              </LiquidGlass>
+                              </GlassButton>
         {/* Header */}
         <header className="ios-settings-header mt-15">
           <h1>Profile</h1>
@@ -98,7 +107,7 @@ export default function ProfilePage() {
             <div className="ios-profile-card">
               <div className="ios-avatar">
                 {avatarUrl ? (
-                  <img src={avatarUrl} alt={name} />
+                  <img src={avatarUrl} alt={name} className="z-10" />
                 ) : (
                   <span className="ios-avatar-fallback">
                     {name.charAt(0).toUpperCase()}

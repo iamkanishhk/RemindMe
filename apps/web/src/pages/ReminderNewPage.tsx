@@ -16,7 +16,7 @@ import PhoneVerifyOnboarding from '../components/PhoneVerifyOnboarding';
 import { useErrorToast } from '../components/Toast';
 import { Spinner } from '../components/Spinner';
 import { ApiError } from '../lib/api';
-import LiquidGlass from 'liquid-glass-react';
+import { GlassButton } from '../components/GlassButton';
 
 const DEFAULT_TZ =
   Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
@@ -701,7 +701,7 @@ export default function ReminderNewPage() {
                                      
                                              
                                                
-                                                <LiquidGlass 
+                                                <GlassButton 
                          displacementScale={64}
                          saturation={130}
                          aberrationIntensity={2}
@@ -720,7 +720,7 @@ export default function ReminderNewPage() {
                           <Link to="/" className="ios-back">
                         <span className="ios-back-icon text-[color:var(--text)] p-2">‹</span>
                       </Link>
-                                </LiquidGlass>
+                                </GlassButton>
           </div>
           
           <div className="h-10 w-10" aria-hidden="true" />

@@ -1,19 +1,13 @@
 import { useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useMe, useReminders, useUpdateReminder } from '../hooks/queries';
-import { formatRelative, formatTime, isToday, repeatLabel } from '../lib/format';
+import { formatRelative, formatTime, isToday } from '../lib/format';
 import type { Reminder } from '../lib/types';
 import { Skeleton } from '../components/Skeleton';
 import { useErrorToast } from '../components/Toast';
 import { motion } from 'framer-motion';
-import LiquidGlass from 'liquid-glass-react';
-import {
-  useMotionValue,
-  useSpring,
-  useTransform,
-} from 'framer-motion';
 import scheduleImage from '../../public/assets/schedule.png';
-import SoftAurora from '../components/SoftAurora'; 
+import SoftAurora from '../components/SoftAurora';
 
 function sortKey(r: Reminder): number {
   return r.nextRunAt ? new Date(r.nextRunAt).getTime() : Number.MAX_SAFE_INTEGER;
@@ -24,103 +18,9 @@ function splitTime(value: string): [string, string] {
   return i === -1 ? [value, ''] : [value.slice(0, i), value.slice(i + 1)];
 }
 
-function greetingLabel(now = new Date()): string {
-  const h = now.getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 17) return 'Good afternoon';
-  return 'Good evening';
-}
-
-function displayNameFromEmail(email: string): string {
-  const local = email.split('@')[0] ?? '';
-  return local.charAt(0).toUpperCase() + local.slice(1);
-}
-
 function reminderTime(reminder: Reminder): string | null {
   const iso = reminder.nextLocal ?? reminder.nextRunAt;
   return iso ? formatTime(reminder.timezone, iso) : null;
-}
-
-/* -------------------------------------------------------------------------- */
-/* Icons                                                                      */
-/* -------------------------------------------------------------------------- */
-
-function PhoneIcon() {
-  return (
-    <svg
-      viewBox="0 0 512 512"
-      fill="currentColor"
-      className="h-[18px] w-[18px]"
-      aria-hidden="true"
-    >
-      <path d="M164.9 24.6c-7.7-18.6-28-28.5-47.4-23.2l-88 24C12.1 30.2 0 46 0 64C0 311.4 200.6 512 448 512c18 0 33.8-12.1 38.6-29.5l24-88c5.3-19.4-4.6-39.7-23.2-47.4l-96-40c-16.3-6.8-35.2-2.1-46.3 11.6L304.7 368C234.3 334.7 177.3 277.7 144 207.3L193.3 167c13.7-11.2 18.4-30 11.6-46.3l-40-96z" />
-    </svg>
-  );
-}
-
-function ChevronIcon() {
-  return (
-    <svg
-      viewBox="0 0 320 512"
-      fill="currentColor"
-      className="h-3 w-3"
-      aria-hidden="true"
-    >
-      <path d="M285.5 273l-177 177c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9L188.2 256 51.9 118.5c-9.4-9.4-9.4-24.6 0-33.9L74.5 61.9c9.4-9.4 24.6-9.4 33.9 0l177 177c9.4 9.5 9.4 24.7.1 34.1z" />
-    </svg>
-  );
-}
-
-function CheckCircleIcon() {
-  return (
-    <svg
-      viewBox="0 0 512 512"
-      fill="currentColor"
-      className="h-3.5 w-3.5"
-      aria-hidden="true"
-    >
-      <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z" />
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg
-      viewBox="0 0 512 512"
-      fill="currentColor"
-      className="h-[18px] w-[18px]"
-      aria-hidden="true"
-    >
-      <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
-    </svg>
-  );
-}
-
-function BellIcon() {
-  return (
-    <svg
-      viewBox="0 0 448 512"
-      fill="currentColor"
-      className="h-6 w-6"
-      aria-hidden="true"
-    >
-      <path d="M224 0c-17.7 0-32 14.3-32 32V51.2C119 66 64 130.6 64 208v25.4c0 45.4-15.5 89.5-43.8 124.9L5.3 377c-5.8 7.2-6.9 17.1-2.9 25.4S14.8 416 24 416H424c9.2 0 17.6-5.3 21.6-13.6s2.9-18.2-2.9-25.4l-14.9-18.6C399.5 322.9 384 278.8 384 233.4V208c0-77.4-55-142-128-156.8V32c0-17.7-14.3-32-32-32zm0 96c61.9 0 112 50.1 112 112v25.4c0 47.9 13.9 94.6 39.7 134.6H72.3C98.1 328 112 281.3 112 233.4V208c0-61.9 50.1-112 112-112zM288 448a64 64 0 1 1-128 0H288z" />
-    </svg>
-  );
-}
-
-function PauseIcon() {
-  return (
-    <svg
-      viewBox="0 0 448 512"
-      fill="currentColor"
-      className="h-3 w-3"
-      aria-hidden="true"
-    >
-      <path d="M144 32C117.5 32 96 53.5 96 80V432c0 26.5 21.5 48 48 48s48-21.5 48-48V80c0-26.5-21.5-48-48-48zm160 0c-26.5 0-48 21.5-48 48V432c0 26.5 21.5 48 48 48s48-21.5 48-48V80c0-26.5-21.5-48-48-48z" />
-    </svg>
-  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -136,12 +36,7 @@ const IOS_SWITCH_CONFIG = {
     knobRadius: 9999,
   },
   physics: {
-    stiffness: 550, // Increased for a snappier response
-    damping: 25,    // Tuned for zero lag
-    mass: 0.5,      // Lighter mass for instantaneous feel
     animationDuration: 300,
-    velocityThreshold: 2,
-    velocityReference: 450,
   },
   glass: {
     scale: 1.27,
@@ -152,19 +47,8 @@ const IOS_SWITCH_CONFIG = {
     contrast: 505,
     borderOpacity: 0.75,
     shadowOpacity: 2.30,
-    velocityDisplacement: 8,
-    displacement: 12,
-  },
-  stretch: {
-    factorX: 1.45,
-    factorY: 0.16,
-    minY: 0.72,
-    maxVelocity: 2.5,
-    anisotropy: 1.0,
   },
   chromatic: {
-    base: 1,
-    velocityAmount: 4,
     overlayOpacity: 0.75,
     red: 'rgba(255, 0, 90, 0.28)',
     blue: 'rgba(0, 240, 255, 0.28)',
@@ -173,7 +57,6 @@ const IOS_SWITCH_CONFIG = {
     restingScale: 1,
     movingScale: 0.88,
     fadeDuration: 0.1,
-    background: 'var(--on-primary)',
   },
   lighting: {
     specularOpacity: 0.0,
@@ -212,13 +95,6 @@ const IOS_SWITCH_CONFIG = {
     liquidFadeDuration: 0.08,
     liquidEase: [0.16, 1, 0.3, 1],
     ambientDuration: 0.15,
-    tapScale: 0.92,
-  },
-  liquidGlass: {
-    displacementScale: 12,
-    saturation: 150,
-    aberrationIntensity: 3,
-    blurAmount: 0.08,
   },
   shadows: {
     on: `
@@ -245,81 +121,31 @@ export function IOSSwitch({
   onClick: () => void;
   label: string;
 }) {
-  const config = IOS_SWITCH_CONFIG;
-
   const {
     geometry,
     physics,
     glass,
-    stretch,
     chromatic,
     knob,
     lighting,
     colors,
     animation,
     shadows,
-  } = config;
+  } = IOS_SWITCH_CONFIG;
 
-  const travel =
-    geometry.trackWidth -
-    geometry.knobWidth -
-    geometry.trackPadding * 2;
-
+  const travel = geometry.trackWidth - geometry.knobWidth - geometry.trackPadding * 2;
   const targetX = enabled ? travel : 0;
 
-  const x = useMotionValue(targetX);
-
-  const springX = useSpring(x, {
-    stiffness: physics.stiffness,
-    damping: physics.damping,
-    mass: physics.mass,
-  });
-
-  const [velocity, setVelocity] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
-    x.set(targetX);
     setIsAnimating(true);
-
     const timer = window.setTimeout(() => {
       setIsAnimating(false);
     }, physics.animationDuration);
 
     return () => window.clearTimeout(timer);
-  }, [enabled, targetX, x, physics.animationDuration]);
-
-  useEffect(() => {
-    return springX.on('change', () => {
-      setVelocity(springX.getVelocity());
-    });
-  }, [springX]);
-
-  const isLiquidActive =
-    isAnimating ||
-    Math.abs(velocity) > physics.velocityThreshold;
-
-  const normalizedVelocity = Math.min(
-    Math.abs(velocity) / physics.velocityReference,
-    stretch.maxVelocity
-  );
-
-  const stretchX = isLiquidActive
-    ? 1 +
-      normalizedVelocity *
-        stretch.factorX *
-        stretch.anisotropy
-    : 1;
-
-  const stretchY = isLiquidActive
-    ? Math.max(
-        stretch.minY,
-        1 -
-          normalizedVelocity *
-            stretch.factorY *
-            stretch.anisotropy
-      )
-    : 1;
+  }, [enabled, physics.animationDuration]);
 
   return (
     <button
@@ -342,26 +168,17 @@ export function IOSSwitch({
         disabled:opacity-50
         touch-manipulation
         select-none
-        overflow-visible
       "
       style={{
         width: geometry.trackWidth,
         height: geometry.trackHeight,
         padding: geometry.trackPadding,
-        borderRadius:
-          Math.min(
-            geometry.trackHeight / 2,
-            geometry.knobRadius
-          ),
-
-        backgroundColor: enabled
-          ? colors.on
-          : colors.off,
-
-        boxShadow: enabled
-          ? shadows.on
-          : shadows.off,
-
+        borderRadius: Math.min(
+          geometry.trackHeight / 2,
+          geometry.knobRadius
+        ),
+        backgroundColor: enabled ? colors.on : colors.off,
+        boxShadow: enabled ? shadows.on : shadows.off,
         WebkitTapHighlightColor: 'transparent',
       }}
     >
@@ -369,27 +186,23 @@ export function IOSSwitch({
       <motion.div
         className="pointer-events-none absolute inset-0 rounded-full"
         animate={{
-          opacity: enabled
-            ? colors.onAmbientOpacity
-            : 0,
+          opacity: enabled ? colors.onAmbientOpacity : 0,
         }}
         transition={{
           duration: animation.ambientDuration,
         }}
         style={{
-          background:
-            colors.onAmbientGradient,
+          background: colors.onAmbientGradient,
         }}
       />
 
       {/* Sliding knob */}
-      <motion.div
-        className="absolute pointer-events-none"
+      <div
+        className="absolute pointer-events-none transition-transform duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]"
         style={{
           left: geometry.trackPadding,
           top: '50%',
-          x: springX,
-          y: '-50%',
+          transform: `translate3d(${targetX}px, -50%, 0)`,
           width: geometry.knobWidth,
           height: geometry.knobHeight,
         }}
@@ -398,10 +211,8 @@ export function IOSSwitch({
         <motion.div
           className="absolute inset-0 flex items-center justify-center bg-[color:var(--on-primary)]"
           animate={{
-            opacity: isLiquidActive ? 0 : 1,
-            scale: isLiquidActive
-              ? knob.movingScale
-              : knob.restingScale,
+            opacity: isAnimating ? 0 : 1,
+            scale: isAnimating ? knob.movingScale : knob.restingScale,
           }}
           transition={{
             duration: knob.fadeDuration,
@@ -416,74 +227,28 @@ export function IOSSwitch({
         <motion.div
           className="absolute pointer-events-none z-20"
           animate={{
-            opacity: isLiquidActive
-              ? glass.transmission
-              : 0,
-
-            scale: isLiquidActive
-              ? glass.scale
-              : 0.82,
-
-            scaleX: stretchX,
-            scaleY: stretchY,
+            opacity: isAnimating ? glass.transmission : 0,
+            scale: isAnimating ? glass.scale : 0.82,
           }}
           transition={{
-            duration:
-              animation.liquidFadeDuration,
-
+            duration: animation.liquidFadeDuration,
             ease: animation.liquidEase,
           }}
           style={{
-            width:
-              geometry.knobWidth +
-              glass.thickness * 2,
-
-            height:
-              geometry.knobHeight +
-              glass.thickness * 2,
-
+            width: geometry.knobWidth + glass.thickness * 2,
+            height: geometry.knobHeight + glass.thickness * 2,
             left: -glass.thickness,
             top: -glass.thickness,
-
-            borderRadius:
-              geometry.knobRadius,
-
-            backdropFilter: `
-              blur(${glass.blur}px)
-              saturate(${glass.saturation}%)
-              contrast(${glass.contrast}%)
-            `,
-
-            WebkitBackdropFilter: `
-              blur(${glass.blur}px)
-              saturate(${glass.saturation}%)
-              contrast(${glass.contrast}%)
-            `,
-
-            background:
-              'rgba(255,255,255,0.16)',
-
-            border: `
-              1px solid
-              rgba(255,255,255,${glass.borderOpacity})
-            `,
-
+            borderRadius: geometry.knobRadius,
+            backdropFilter: `blur(${glass.blur}px) saturate(${glass.saturation}%) contrast(${glass.contrast}%)`,
+            WebkitBackdropFilter: `blur(${glass.blur}px) saturate(${glass.saturation}%) contrast(${glass.contrast}%)`,
+            background: 'rgba(255,255,255,0.16)',
+            border: `1px solid rgba(255,255,255,${glass.borderOpacity})`,
             boxShadow: `
-              inset 0 2px 4px
-                rgba(255,255,255,0.95),
-
-              inset 0 -2px 4px
-                rgba(0,0,0,${glass.shadowOpacity}),
-
-              0 5px 14px
-                rgba(0,0,0,0.30),
-
-              0 0 12px
-                ${
-                  enabled
-                    ? colors.onGlow
-                    : colors.offGlow
-                }
+              inset 0 2px 4px rgba(255,255,255,0.95),
+              inset 0 -2px 4px rgba(0,0,0,${glass.shadowOpacity}),
+              0 5px 14px rgba(0,0,0,0.30),
+              0 0 12px ${enabled ? colors.onGlow : colors.offGlow}
             `,
           }}
         >
@@ -491,9 +256,7 @@ export function IOSSwitch({
           <motion.div
             className="absolute inset-0 overflow-hidden rounded-full pointer-events-none"
             animate={{
-              opacity: isLiquidActive
-                ? chromatic.overlayOpacity
-                : 0,
+              opacity: isAnimating ? chromatic.overlayOpacity : 0,
             }}
           >
             <div
@@ -516,11 +279,8 @@ export function IOSSwitch({
           <div
             className="absolute inset-0 rounded-full pointer-events-none"
             style={{
-              opacity:
-                lighting.specularOpacity,
-
-              background:
-                lighting.specularGradient,
+              opacity: lighting.specularOpacity,
+              background: lighting.specularGradient,
             }}
           />
 
@@ -528,15 +288,12 @@ export function IOSSwitch({
           <div
             className="absolute inset-0 rounded-full pointer-events-none"
             style={{
-              opacity:
-                lighting.causticOpacity,
-
-              background:
-                lighting.causticGradient,
+              opacity: lighting.causticOpacity,
+              background: lighting.causticGradient,
             }}
           />
         </motion.div>
-      </motion.div>
+      </div>
     </button>
   );
 }
@@ -548,11 +305,8 @@ export function IOSSwitch({
 function ScheduleItem({ reminder }: { reminder: Reminder }) {
   const update = useUpdateReminder(reminder.id);
   const [busy, setBusy] = useState(false);
-  
-  // Optimistic local state to make the switch feel instantaneous
   const [localEnabled, setLocalEnabled] = useState(reminder.isEnabled);
 
-  // Keep local state in sync if parent props change
   useEffect(() => {
     setLocalEnabled(reminder.isEnabled);
   }, [reminder.isEnabled]);
@@ -562,15 +316,14 @@ function ScheduleItem({ reminder }: { reminder: Reminder }) {
 
   async function toggle() {
     const nextState = !enabled;
-    setLocalEnabled(nextState); // Instant UI feedback
+    setLocalEnabled(nextState);
     setBusy(true);
 
     try {
       await update.mutateAsync({
         isEnabled: nextState,
       });
-    } catch (err) {
-      // Revert back on error
+    } catch {
       setLocalEnabled(!nextState);
     } finally {
       setBusy(false);
@@ -579,7 +332,7 @@ function ScheduleItem({ reminder }: { reminder: Reminder }) {
 
   return (
     <div
-      className={`
+      className="
         group
         flex
         items-center
@@ -594,7 +347,7 @@ function ScheduleItem({ reminder }: { reminder: Reminder }) {
         transition-colors
         duration-150
         active:bg-[color:var(--surface-2)]
-      `}
+      "
     >
       <Link
         to={`/reminders/${reminder.id}`}
@@ -626,14 +379,14 @@ function ScheduleItem({ reminder }: { reminder: Reminder }) {
         </div>
 
         <p
-          className={`
+          className="
             mt-1
             truncate
             text-[14px]
             leading-[18px]
             font-medium
             text-[color:var(--text-dim)]
-          `}
+          "
         >
           {reminder.title}
         </p>
@@ -662,7 +415,6 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
   return (
     <div
       className="
-        rise-in
         border-b
         border-t
         border-[color:var(--surface-2)]
@@ -714,7 +466,7 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
 
             <div className="mt-4">
               <span
-                className={`
+                className="
                   inline-flex
                   items-center
                   gap-1.5
@@ -725,7 +477,7 @@ function HeroCard({ reminder }: { reminder: Reminder }) {
                   font-semibold
                   bg-[#3f576f50]
                   text-[color:var(--primary)]
-                `}
+                "
               >
                 VIEW
               </span>
@@ -755,10 +507,7 @@ export default function DashboardPage() {
     return all
       .filter((r) => {
         const iso = r.nextLocal ?? r.nextRunAt;
-
-        return iso
-          ? isToday(r.timezone, iso)
-          : false;
+        return iso ? isToday(r.timezone, iso) : false;
       })
       .sort((a, b) => sortKey(a) - sortKey(b));
   }, [reminders.data]);
@@ -769,8 +518,6 @@ export default function DashboardPage() {
     '';
 
   useErrorToast(error);
-
-  const email = me.data?.email ?? '';
 
   const next = useMemo(() => {
     if (today.length === 0) return undefined;
@@ -795,20 +542,15 @@ export default function DashboardPage() {
         overflow-hidden
       "
     >
-   
-          <SoftAurora
-                   colorStops={["#AE897F","#B26B56","#B35443"]}
-                   blend={0.5}
-                   amplitude={1}
-                   speed={1}
-                   className="fixed inset-0 w-full h-full opacity-20"
-                 />
-         
+      <SoftAurora
+        colorStops={["#AE897F","#B26B56","#B35443"]}
+        blend={0.5}
+        amplitude={1}
+        speed={1}
+        className="fixed inset-0 w-full h-full opacity-20 pointer-events-none"
+      />
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Header                                                             */}
-      {/* ------------------------------------------------------------------ */}
-
+      {/* Header */}
       <div className="relative z-20 mb-4 pt-5 flex items-center justify-between">
         <div
           className="
@@ -835,14 +577,11 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Main Content                                                       */}
-      {/* ------------------------------------------------------------------ */}
-
+      {/* Main Content */}
       <div className="relative z-20 mx-auto max-w-xl">
         {reminders.isLoading ? (
-          <div className="mt-5 flex flex-col gap-6 skeleton-area" aria-busy="true">
-            {/* Hero */}
+          <div className="mt-5 flex flex-col gap-6" aria-busy="true">
+            {/* Hero Skeleton */}
             <div className="border-b border-t border-[color:var(--surface-2)] p-5">
               <Skeleton className="mt-4 h-[22px] w-2/5" />
               <div className="mt-4 flex items-center justify-between gap-4">
@@ -855,7 +594,7 @@ export default function DashboardPage() {
               <Skeleton className="mt-4 h-4 w-24" />
             </div>
 
-            {/* Today's schedule */}
+            {/* Today's schedule Skeleton */}
             <div>
               <div className="mb-2.5 px-1">
                 <Skeleton className="h-5 w-16" />
@@ -886,10 +625,8 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="mt-5 flex flex-col gap-6">
-            {/* Hero */}
-            {next ? (
-              <HeroCard reminder={next} />
-            ) : null}
+            {/* Hero Card */}
+            {next ? <HeroCard reminder={next} /> : null}
 
             {/* Today's Schedule */}
             <div>
@@ -910,7 +647,7 @@ export default function DashboardPage() {
               </div>
 
               {/* iOS grouped list */}
-              <div className="stagger">
+              <div>
                 {today.map((r) => (
                   <ScheduleItem
                     key={r.id}

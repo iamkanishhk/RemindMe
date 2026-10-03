@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCalls } from '../hooks/queries';
@@ -8,11 +8,10 @@ import { Spinner } from '../components/Spinner';
 import { Skeleton } from '../components/Skeleton';
 import ErrorPage from '../components/ErrorPage';
 import CallDetailSheet from '../components/CallDetailSheet';
-import LiquidGlass from 'liquid-glass-react';
+import { GlassButton } from '../components/GlassButton';
 import type { CallAttempt } from '../lib/types';
 import Image from '../../public/assets/call.png';
 import SoftAurora from '../components/SoftAurora';
-
 export default function HistoryPage() {
   const calls = useCalls();
   const navigate = useNavigate();
@@ -21,24 +20,41 @@ export default function HistoryPage() {
   const [query, setQuery] = useState('');
   const searchRef = useRef<HTMLInputElement | null>(null);
 
+  // 1. ALL HOOKS MUST BE AT THE TOP (Before any return statement)
   useEffect(() => {
     if (searching) searchRef.current?.focus();
   }, [searching]);
+
+  const attempts = useMemo(() => {
+    return calls.data?.pages.flatMap((p) => p.attempts) ?? [];
+  }, [calls.data]);
+
+  const visibleAttempts = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    if (!needle) return attempts;
+    return attempts.filter((a) =>
+      [a.reminderTitle, a.reminderId, a.status, a.detail, a.destinationE164]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+        .includes(needle)
+    );
+  }, [attempts, query]);
 
   function closeSearch() {
     setSearching(false);
     setQuery('');
   }
 
+  // 2. EARLY RETURNS CAN SAFELY HAPPEN AFTER ALL HOOKS ARE DECLARED
   if (calls.isLoading) {
     return (
       <section
         className="min-h-screen w-full bg-[color:var(--bg)] text-[color:var(--text)]"
         aria-busy="true"
       >
-         
         <div className="mx-auto w-full max-w-[920px] px-4 pb-24 pt-9">
-          {/* Header */}
+          {/* Header Skeleton */}
           <div className="skeleton-area pb-6">
             <Skeleton className="h-3 w-24" />
             <Skeleton className="mt-3 h-[52px] w-2/3 rounded-xl" />
@@ -85,42 +101,23 @@ export default function HistoryPage() {
     );
   }
 
-  const attempts = calls.data?.pages.flatMap((p) => p.attempts) ?? [];
-
-  const needle = query.trim().toLowerCase();
-  const visibleAttempts = needle
-    ? attempts.filter((a) =>
-        [a.reminderTitle, a.reminderId, a.status, a.detail, a.destinationE164]
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase()
-          .includes(needle)
-      )
-    : attempts;
-
   return (
-    
     <section className="ios-history-page">
-    
-      
-          
-            <SoftAurora
-              colorStops={["#AE897F","#B26B56","#B35443"]}
-              blend={0.5}
-              amplitude={1}
-              speed={1}
-              className="fixed bottom-0 rotate-180 inset-0 w-full h-full opacity-20"
-            />
-    
-     
-       
+      <SoftAurora
+        colorStops={["#AE897F","#B26B56","#B35443"]}
+        blend={0.5}
+        amplitude={1}
+        speed={1}
+        className="fixed bottom-0 rotate-180 inset-0 w-full h-full opacity-20 pointer-events-none"
+      />
+
       <div className="ios-history-container">
         {/* Page Header */}
         <header className="ios-page-header">
           <div className="flex mt-15 items-center justify-between gap-3">
             <span className="text-4xl">Call history</span>
             <div className="flex items-center justify-center w-fit">
-              <LiquidGlass
+              <GlassButton
                 displacementScale={64}
                 saturation={130}
                 aberrationIntensity={2}
@@ -229,7 +226,7 @@ export default function HistoryPage() {
                     )}
                   </AnimatePresence>
                 </motion.div>
-              </LiquidGlass>
+              </GlassButton>
             </div>
           </div>
         </header>
@@ -249,7 +246,7 @@ export default function HistoryPage() {
         ) : (
           <>
             {/* Grouped history list, settings-card style */}
-            <section className="ios-history-section ">
+            <section className="ios-history-section">
               <div className="ios-settings-card stagger">
                 {visibleAttempts.map((a, index) => (
                   <Fragment key={a.id}>
@@ -326,7 +323,6 @@ export default function HistoryPage() {
         .ios-history-page {
           min-height: 100vh;
           width: 100%;
-
           background:
             radial-gradient(
               ellipse 900px 450px at 50% -150px,
@@ -334,14 +330,10 @@ export default function HistoryPage() {
               transparent 70%
             ),
             var(--ios-black);
-
           color: var(--ios-text);
-
           font-family: var(--font);
-
           -webkit-font-smoothing: antialiased;
           text-rendering: optimizeLegibility;
-
           box-sizing: border-box;
         }
 
@@ -357,128 +349,46 @@ export default function HistoryPage() {
           padding: 34px 0 150px;
         }
 
-        /* --------------------------------
-           Header
-        -------------------------------- */
-
+        /* Header */
         .ios-page-header {
           margin-bottom: 34px;
         }
 
-        .ios-eyebrow {
-          margin-bottom: 8px;
-
-          color: var(--ios-secondary);
-
-          font-size: 12px;
-          line-height: 1;
-          font-weight: 600;
-
-          letter-spacing: 0.07em;
-          text-transform: uppercase;
-        }
-
-        .ios-title-row {
-          display: flex;
-          align-items: flex-end;
-          justify-content: space-between;
-          gap: 20px;
-        }
-
-        .ios-page-header h1 {
-          margin: 0;
-
-          color: var(--ios-text);
-
-          font-size: clamp(34px, 5vw, 44px);
-          line-height: 1.08;
-          font-weight: 700;
-
-          letter-spacing: -0.04em;
-        }
-
-        .ios-page-header p {
-          margin: 9px 0 0;
-
-          color: var(--ios-secondary);
-
-          font-size: 16px;
-          line-height: 1.45;
-
-          letter-spacing: -0.01em;
-        }
-
-        /* --------------------------------
-           Section
-        -------------------------------- */
-
+        /* Section */
         .ios-history-section {
           margin-top: 4px;
         }
 
-        .ios-section-label {
-          padding: 0 16px 10px;
-
-          color: var(--ios-secondary);
-
-          font-size: 12px;
-          line-height: 1;
-
-          font-weight: 600;
-          letter-spacing: 0.06em;
-
-          text-transform: uppercase;
-        }
-
-        /* --------------------------------
-           Grouped card (settings style)
-        -------------------------------- */
-
+        /* Grouped card (settings style) */
         .ios-settings-card {
           overflow: hidden;
-
           background: var(--ios-card);
-
           border-radius: 17px;
-
           box-shadow: var(--shadow-card);
         }
 
         .ios-divider {
           height: 1px;
-
           margin-left: 17px;
-
           background: var(--ios-separator);
         }
 
-        /* --------------------------------
-           Call row
-        -------------------------------- */
-
+        /* Call row */
         .ios-call-row {
           width: 100%;
-
           min-height: 60px;
-
           padding: 11px 17px;
-
           display: flex;
           align-items: center;
           justify-content: space-between;
-
           gap: 12px;
-
           background: none;
           border: 0;
-
           text-align: left;
-
           color: var(--ios-text);
-
           cursor: pointer;
-
-          transition: background 0.15s ease;
+          transition: background 0.15s ease, transform 0.1s ease;
+          will-change: background, transform;
         }
 
         .ios-call-row:hover {
@@ -491,7 +401,6 @@ export default function HistoryPage() {
 
         .ios-call-row-leading {
           min-width: 0;
-
           display: flex;
           flex-direction: column;
           gap: 2px;
@@ -499,24 +408,20 @@ export default function HistoryPage() {
 
         .ios-call-row-title {
           color: var(--ios-text);
-
           font-size: 16px;
           line-height: 1.3;
           font-weight: 500;
-
           overflow-wrap: anywhere;
         }
 
         .ios-call-row-sub {
           color: var(--ios-secondary);
-
           font-size: 12px;
           line-height: 1.3;
         }
 
         .ios-call-row-trailing {
           flex: 0 0 auto;
-
           display: flex;
           align-items: center;
           gap: 8px;
@@ -524,60 +429,43 @@ export default function HistoryPage() {
 
         .ios-call-row-detail {
           color: var(--ios-secondary);
-
           font-size: 14px;
           font-weight: 500;
         }
 
         .ios-chevron {
           flex: 0 0 auto;
-
           color: var(--ios-tertiary);
-
           font-size: 23px;
           line-height: 14px;
           font-weight: 300;
         }
 
-        /* --------------------------------
-           Pagination
-        -------------------------------- */
-
+        /* Pagination */
         .ios-pager {
           display: flex;
           justify-content: center;
-
           margin-top: 22px;
         }
 
         .ios-load-more {
           min-width: 150px;
           min-height: 44px;
-
           padding: 0 18px;
-
           display: inline-flex;
           align-items: center;
           justify-content: center;
           gap: 8px;
-
           border: 0;
           border-radius: 12px;
-
           background: var(--surface-2);
           color: var(--ios-blue);
-
           font-family: inherit;
-
           font-size: 15px;
           font-weight: 600;
-
           cursor: pointer;
-
-          transition:
-            background 0.15s ease,
-            transform 0.12s ease,
-            opacity 0.15s ease;
+          transition: background 0.15s ease, transform 0.12s ease, opacity 0.15s ease;
+          will-change: background, transform;
         }
 
         .ios-load-more:hover {
@@ -598,105 +486,28 @@ export default function HistoryPage() {
           line-height: 1;
         }
 
-        /* --------------------------------
-           Empty state
-        -------------------------------- */
-
-        .ios-empty-card {
-          min-height: 260px;
-
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-
-          padding: 35px 20px;
-
-          background: var(--ios-card);
-
-          border-radius: 17px;
-        }
-
-        .ios-empty-icon {
-          width: 58px;
-          height: 58px;
-
-          margin-bottom: 14px;
-
-          display: flex;
-          align-items: center;
-          justify-content: center;
-
-          border-radius: 16px;
-
-          background: color-mix(in srgb, var(--ios-blue) 14%, transparent);
-          color: var(--ios-blue);
-
-          font-size: 25px;
-        }
-
-        /* --------------------------------
-           Error
-        -------------------------------- */
-
-        .ios-error-card {
-          overflow: hidden;
-
-          padding: 16px;
-
-          background: color-mix(in srgb, var(--ios-red) 8%, transparent);
-
-          border: 1px solid color-mix(in srgb, var(--ios-red) 16%, transparent);
-
-          border-radius: 16px;
-        }
-
-        /* --------------------------------
-           Loading
-        -------------------------------- */
-
-        .ios-loading {
-          min-height: 65vh;
-
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        /* --------------------------------
-           Search
-        -------------------------------- */
-
+        /* Search */
         .ios-search-btn {
           display: flex;
           align-items: center;
           justify-content: center;
-
           background: none;
           border: 0;
           padding: 0;
           line-height: 0;
-
           color: var(--ios-text);
-
           cursor: pointer;
         }
 
         .ios-search-empty {
           margin-top: 18px;
-
           text-align: center;
-
           color: var(--ios-secondary);
-
           font-size: 15px;
           line-height: 1.4;
         }
 
-        /* --------------------------------
-           Tablet
-        -------------------------------- */
-
+        /* Tablet */
         @media (max-width: 720px) {
           .ios-history-container {
             width: min(100% - 24px, 920px);
@@ -704,10 +515,7 @@ export default function HistoryPage() {
           }
         }
 
-        /* --------------------------------
-           Phone
-        -------------------------------- */
-
+        /* Phone */
         @media (max-width: 480px) {
           .ios-history-container {
             width: min(100% - 20px, 920px);
@@ -717,22 +525,6 @@ export default function HistoryPage() {
 
           .ios-page-header {
             margin-bottom: 27px;
-          }
-
-          .ios-page-header h1 {
-            font-size: 34px;
-          }
-
-          .ios-page-header p {
-            font-size: 15px;
-          }
-
-          .ios-title-row {
-            align-items: flex-start;
-          }
-
-          .ios-section-label {
-            padding-left: 13px;
           }
 
           .ios-settings-card {
